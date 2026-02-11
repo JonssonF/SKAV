@@ -1,0 +1,6 @@
+@SKAV.Api_HostAddress = http://localhost:5249
+
+GET {{SKAV.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
