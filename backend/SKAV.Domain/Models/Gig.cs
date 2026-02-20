@@ -8,7 +8,7 @@ namespace SKAV.Domain.Models
 {
     public class Gig
     {
-        public int GigId { get; set; }
+        public int Id { get; set; }
 
         //Mandatory fields
 
