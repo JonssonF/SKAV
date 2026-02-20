@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SKAV.Application\SKAV.Application.csproj" />
     <ProjectReference Include="..\SKAV.Domain\SKAV.Domain.csproj" />
   </ItemGroup>
 

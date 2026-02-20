@@ -24,14 +24,14 @@ namespace SKAV.Infrastructure.Database
             // Create Gigs table if it doesn't exist
             const string sql = """
                 CREATE TABLE IF NOT EXISTS Gigs (
-                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    GigId INTEGER PRIMARY KEY AUTOINCREMENT,
                     Title TEXT NOT NULL,
                     Location TEXT NOT NULL,
-                    Date TEXT NOT NULL,               -- ISO8601 i TEXT
+                    Date TEXT NOT NULL,
                     Description TEXT NULL,
                     Price REAL NULL,
                     Notes TEXT NULL,
-                    IsPrivate INTEGER NOT NULL,       -- 0/1
+                    IsPrivate INTEGER NOT NULL,
                     TicketUrl TEXT NULL
                 );
                 """;
