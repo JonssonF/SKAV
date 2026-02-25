@@ -10,7 +10,9 @@ namespace SKAV.Infrastructure.Repositories
     {
         private readonly IDbConnectionFactory _connectionFactory;
 
-        public GigRepository(IDbConnectionFactory connectionFactory) => _connectionFactory = connectionFactory;
+        public GigRepository(IDbConnectionFactory connectionFactory) 
+            => _connectionFactory = connectionFactory;
+
         public async Task<IReadOnlyList<Gig>> GetAllGigsAsync(CancellationToken cancellationToken)
         {
             const string sql = """
@@ -37,25 +39,121 @@ namespace SKAV.Infrastructure.Repositories
 
             return rows.Select(Map).ToList();
         }
-
-        public Task<int> CreateGigAsync(Gig gig, CancellationToken cancellationToken)
+        public async Task<Gig?> GetGigByIdAsync(int id, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            const string sql = """
+                SELECT
+                    Id,
+                    Title,
+                    Location,
+                    Date,
+                    Description,
+                    Price,
+                    Notes,
+                    IsPrivate,
+                    TicketUrl
+                FROM Gigs
+                WHERE Id = @Id
+                LIMIT 1;
+                """;
+
+            using var connection = _connectionFactory.CreateConnection();
+            connection.Open();
+
+            var row = await connection.QuerySingleOrDefaultAsync<GigRow>(new CommandDefinition(
+                commandText: sql,
+                parameters: new { Id = id },
+                cancellationToken: cancellationToken));
+
+            return row is null ? null : Map(row);
         }
 
-        public Task<Gig?> GetGigByIdAsync(int id, CancellationToken cancellationToken)
+        public async Task<int> CreateGigAsync(Gig gig, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            const string sql = """
+        INSERT INTO Gigs (Title, Location, Date, Description, Price, Notes, IsPrivate, TicketUrl)
+        VALUES (@Title, @Location, @Date, @Description, @Price, @Notes, @IsPrivate, @TicketUrl);
+
+        SELECT last_insert_rowid();
+        """;
+
+            using var connection = _connectionFactory.CreateConnection();
+            connection.Open();
+
+            var id = await connection.ExecuteScalarAsync<long>(new CommandDefinition(
+                commandText: sql,
+                parameters: new
+                {
+                    gig.Title,
+                    gig.Location,
+                    Date = gig.Date.ToUniversalTime().ToString("O"),
+                    gig.Description,
+                    gig.Price,
+                    gig.Notes,
+                    IsPrivate = gig.IsPrivate ? 1 : 0,
+                    gig.TicketUrl
+                },
+                cancellationToken: cancellationToken));
+
+            return (int)id;
         }
 
-        public Task UpdateGigAsync(Gig gig, CancellationToken cancellationToken)
+        public async Task UpdateGigAsync(Gig gig, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            const string sql = """
+        UPDATE Gigs
+        SET
+            Title = @Title,
+            Location = @Location,
+            Date = @Date,
+            Description = @Description,
+            Price = @Price,
+            Notes = @Notes,
+            IsPrivate = @IsPrivate,
+            TicketUrl = @TicketUrl
+        WHERE Id = @Id;
+        """;
+
+            using var connection = _connectionFactory.CreateConnection();
+            connection.Open();
+
+            var affected = await connection.ExecuteAsync(new CommandDefinition(
+                commandText: sql,
+                parameters: new
+                {
+                    gig.Id,
+                    gig.Title,
+                    gig.Location,
+                    Date = gig.Date.ToUniversalTime().ToString("O"),
+                    gig.Description,
+                    gig.Price,
+                    gig.Notes,
+                    IsPrivate = gig.IsPrivate ? 1 : 0,
+                    gig.TicketUrl
+                },
+                cancellationToken: cancellationToken));
+
+            if (affected == 0)
+                throw new KeyNotFoundException($"Gig with id {gig.Id} not found.");
         }
 
-        public Task DeleteGigAsync(int id, CancellationToken cancellationToken)
+        public async Task DeleteGigAsync(int id, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            const string sql = """
+        DELETE FROM Gigs
+        WHERE Id = @Id;
+        """;
+
+            using var connection = _connectionFactory.CreateConnection();
+            connection.Open();
+
+            var affected = await connection.ExecuteAsync(new CommandDefinition(
+                commandText: sql,
+                parameters: new { Id = id },
+                cancellationToken: cancellationToken));
+
+            if (affected == 0)
+                throw new KeyNotFoundException($"Gig with id {id} not found.");
         }
 
         private static Gig Map(GigRow row)
