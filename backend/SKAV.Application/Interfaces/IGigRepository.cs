@@ -14,5 +14,6 @@ namespace SKAV.Application.Interfaces
             Task<int> CreateGigAsync(Gig gig, CancellationToken cancellationToken);
             Task UpdateGigAsync(Gig gig, CancellationToken cancellationToken);
             Task DeleteGigAsync(int id, CancellationToken cancellationToken);
+            Task<int> GetGigCountAsync(CancellationToken cancellationToken);
     }
 }

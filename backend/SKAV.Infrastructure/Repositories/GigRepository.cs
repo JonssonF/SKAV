@@ -2,6 +2,8 @@
 using SKAV.Application.Interfaces;
 using SKAV.Domain.Models;
 using SKAV.Infrastructure.Database;
+using System.Data;
+using System.Data.Common;
 using System.Globalization;
 
 namespace SKAV.Infrastructure.Repositories
@@ -10,8 +12,33 @@ namespace SKAV.Infrastructure.Repositories
     {
         private readonly IDbConnectionFactory _connectionFactory;
 
-        public GigRepository(IDbConnectionFactory connectionFactory) 
+        public GigRepository(IDbConnectionFactory connectionFactory)
             => _connectionFactory = connectionFactory;
+
+        private async Task<IDbConnection> OpenAsync(CancellationToken ct)
+        {
+            var conn = _connectionFactory.CreateConnection();
+
+            if (conn is DbConnection dbConn)
+                await dbConn.OpenAsync(ct);
+            else
+                conn.Open();
+
+            return conn;
+        }
+
+        private static object ToParameters(Gig gig) => new
+        {
+            gig.Id,
+            gig.Title,
+            gig.Location,
+            Date = gig.Date.ToUniversalTime().ToString("O"),
+            gig.Description,
+            gig.Price,
+            gig.Notes,
+            IsPrivate = gig.IsPrivate ? 1 : 0,
+            gig.TicketUrl
+        };
 
         public async Task<IReadOnlyList<Gig>> GetAllGigsAsync(CancellationToken cancellationToken)
         {
@@ -30,15 +57,14 @@ namespace SKAV.Infrastructure.Repositories
                 ORDER BY Date DESC;
                 """;
 
-            using var connection = _connectionFactory.CreateConnection();
-            connection.Open();
-
+            using var connection = await OpenAsync(cancellationToken);
             var rows = await connection.QueryAsync<GigRow>(new CommandDefinition(
                 commandText: sql,
                 cancellationToken: cancellationToken));
 
             return rows.Select(Map).ToList();
         }
+
         public async Task<Gig?> GetGigByIdAsync(int id, CancellationToken cancellationToken)
         {
             const string sql = """
@@ -57,9 +83,7 @@ namespace SKAV.Infrastructure.Repositories
                 LIMIT 1;
                 """;
 
-            using var connection = _connectionFactory.CreateConnection();
-            connection.Open();
-
+            using var connection = await OpenAsync(cancellationToken);
             var row = await connection.QuerySingleOrDefaultAsync<GigRow>(new CommandDefinition(
                 commandText: sql,
                 parameters: new { Id = id },
@@ -71,28 +95,16 @@ namespace SKAV.Infrastructure.Repositories
         public async Task<int> CreateGigAsync(Gig gig, CancellationToken cancellationToken)
         {
             const string sql = """
-        INSERT INTO Gigs (Title, Location, Date, Description, Price, Notes, IsPrivate, TicketUrl)
-        VALUES (@Title, @Location, @Date, @Description, @Price, @Notes, @IsPrivate, @TicketUrl);
+                INSERT INTO Gigs (Title, Location, Date, Description, Price, Notes, IsPrivate, TicketUrl)
+                VALUES (@Title, @Location, @Date, @Description, @Price, @Notes, @IsPrivate, @TicketUrl);
 
-        SELECT last_insert_rowid();
-        """;
+                SELECT last_insert_rowid();
+                """;
 
-            using var connection = _connectionFactory.CreateConnection();
-            connection.Open();
-
+            using var connection = await OpenAsync(cancellationToken);
             var id = await connection.ExecuteScalarAsync<long>(new CommandDefinition(
                 commandText: sql,
-                parameters: new
-                {
-                    gig.Title,
-                    gig.Location,
-                    Date = gig.Date.ToUniversalTime().ToString("O"),
-                    gig.Description,
-                    gig.Price,
-                    gig.Notes,
-                    IsPrivate = gig.IsPrivate ? 1 : 0,
-                    gig.TicketUrl
-                },
+                parameters: ToParameters(gig),
                 cancellationToken: cancellationToken));
 
             return (int)id;
@@ -101,36 +113,23 @@ namespace SKAV.Infrastructure.Repositories
         public async Task UpdateGigAsync(Gig gig, CancellationToken cancellationToken)
         {
             const string sql = """
-        UPDATE Gigs
-        SET
-            Title = @Title,
-            Location = @Location,
-            Date = @Date,
-            Description = @Description,
-            Price = @Price,
-            Notes = @Notes,
-            IsPrivate = @IsPrivate,
-            TicketUrl = @TicketUrl
-        WHERE Id = @Id;
-        """;
+                UPDATE Gigs
+                SET
+                    Title = @Title,
+                    Location = @Location,
+                    Date = @Date,
+                    Description = @Description,
+                    Price = @Price,
+                    Notes = @Notes,
+                    IsPrivate = @IsPrivate,
+                    TicketUrl = @TicketUrl
+                WHERE Id = @Id;
+                """;
 
-            using var connection = _connectionFactory.CreateConnection();
-            connection.Open();
-
+            using var connection = await OpenAsync(cancellationToken);
             var affected = await connection.ExecuteAsync(new CommandDefinition(
                 commandText: sql,
-                parameters: new
-                {
-                    gig.Id,
-                    gig.Title,
-                    gig.Location,
-                    Date = gig.Date.ToUniversalTime().ToString("O"),
-                    gig.Description,
-                    gig.Price,
-                    gig.Notes,
-                    IsPrivate = gig.IsPrivate ? 1 : 0,
-                    gig.TicketUrl
-                },
+                parameters: ToParameters(gig),
                 cancellationToken: cancellationToken));
 
             if (affected == 0)
@@ -140,13 +139,11 @@ namespace SKAV.Infrastructure.Repositories
         public async Task DeleteGigAsync(int id, CancellationToken cancellationToken)
         {
             const string sql = """
-        DELETE FROM Gigs
-        WHERE Id = @Id;
-        """;
+                DELETE FROM Gigs
+                WHERE Id = @Id;
+                """;
 
-            using var connection = _connectionFactory.CreateConnection();
-            connection.Open();
-
+            using var connection = await OpenAsync(cancellationToken);
             var affected = await connection.ExecuteAsync(new CommandDefinition(
                 commandText: sql,
                 parameters: new { Id = id },
@@ -158,7 +155,7 @@ namespace SKAV.Infrastructure.Repositories
 
         private static Gig Map(GigRow row)
         {
-            var date = DateTime.Parse(row.Date, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
+            var date = DateTimeOffset.Parse(row.Date, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
 
             return new Gig
             {
@@ -172,6 +169,18 @@ namespace SKAV.Infrastructure.Repositories
                 IsPrivate = row.IsPrivate == 1,
                 TicketUrl = row.TicketUrl
             };
+        }
+
+        public async Task<int> GetGigCountAsync(CancellationToken cancellationToken)
+        {
+            const string sql = """
+                SELECT COUNT(*)
+                FROM Gigs;
+                """;
+            using var connection = await OpenAsync(cancellationToken);
+            return await connection.ExecuteScalarAsync<int>(new CommandDefinition(
+                commandText: sql,
+                cancellationToken: cancellationToken));
         }
 
         private sealed class GigRow

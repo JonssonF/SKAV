@@ -18,7 +18,7 @@ namespace SKAV.Domain.Models
         
         public required string Location { get; set; } = string.Empty;
         
-        public required DateTime Date { get; set; }
+        public required DateTimeOffset Date { get; set; }
 
         //Optional fields
 
