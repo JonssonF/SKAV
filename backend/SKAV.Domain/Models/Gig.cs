@@ -17,10 +17,11 @@ namespace SKAV.Domain.Models
         public required string Description { get; set; } = string.Empty;
         
         public required string Location { get; set; } = string.Empty;
-        
+
         public required DateTimeOffset Date { get; set; }
 
         //Optional fields
+        public string? Adress { get; set; }
 
         public decimal? Price { get; set; }
         

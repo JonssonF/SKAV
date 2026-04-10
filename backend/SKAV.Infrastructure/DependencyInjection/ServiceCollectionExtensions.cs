@@ -1,6 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SKAV.Application.Interfaces;
+using SKAV.Application.Services;
+using SKAV.Application.Services.Interface;
+using SKAV.Application.Validation.Gigs;
+using SKAV.Application.Validator.Gigs;
 using SKAV.Infrastructure.Database;
 using SKAV.Infrastructure.Repositories;
 
@@ -18,6 +22,8 @@ namespace SKAV.Infrastructure.DependencyInjection
             // Services
             services.AddSingleton<IDbConnectionFactory, SqliteConnectionFactory>();
             services.AddTransient<DatabaseInitializer>();
+            services.AddScoped<IGigService, GigService>();
+            services.AddScoped<IGigValidator, GigValidator>();
 
             // Repositories
             services.AddScoped<IGigRepository, GigRepository>();
