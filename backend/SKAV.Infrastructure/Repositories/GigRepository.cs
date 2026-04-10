@@ -183,6 +183,28 @@ namespace SKAV.Infrastructure.Repositories
                 cancellationToken: cancellationToken));
         }
 
+        public async Task<bool> ExistsAsync(string title, DateTimeOffset date, int? excludeId, CancellationToken ct)
+        {
+            const string sql = """
+                SELECT COUNT(1)
+                FROM Gigs
+                WHERE Title = @Title
+                AND Date = @Date
+                AND (@ExcludeId IS NULL OR ID != @ExcludeId);
+                """;
+
+            using var connection = await OpenAsync(ct);
+
+            var count = await connection.ExecuteScalarAsync<int>(sql, new
+            {
+                Title = title,
+                Date = date.ToUniversalTime().ToString("O"),
+                ExcludeId = excludeId
+            });
+
+            return count > 0;
+        }
+
         private sealed class GigRow
         {
             public int Id { get; init; }

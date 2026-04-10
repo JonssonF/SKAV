@@ -9,11 +9,12 @@ namespace SKAV.Application.Interfaces
 {
     public interface IGigRepository
     {
-            Task<IReadOnlyList<Gig>> GetAllGigsAsync(CancellationToken cancellationToken);
-            Task<Gig?> GetGigByIdAsync(int id, CancellationToken cancellationToken);
-            Task<int> CreateGigAsync(Gig gig, CancellationToken cancellationToken);
-            Task UpdateGigAsync(Gig gig, CancellationToken cancellationToken);
-            Task DeleteGigAsync(int id, CancellationToken cancellationToken);
-            Task<int> GetGigCountAsync(CancellationToken cancellationToken);
+            Task<IReadOnlyList<Gig>> GetAllGigsAsync(CancellationToken ct);
+            Task<Gig?> GetGigByIdAsync(int id, CancellationToken ct);
+            Task<int> CreateGigAsync(Gig gig, CancellationToken ct);
+            Task UpdateGigAsync(Gig gig, CancellationToken ct);
+            Task DeleteGigAsync(int id, CancellationToken ct);
+            Task<int> GetGigCountAsync(CancellationToken ct);
+            Task<bool> ExistsAsync(string title, DateTimeOffset date, int? excludeId, CancellationToken ct);
     }
 }
