@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SKAV.Application.DTOs.Gigs.Request
 {
-    public class CreateGigRequestDto
+    public class UpdateGigRequestDto
     {
         [Required(ErrorMessage = "Titel är obligatorisk")]
         [MinLength(3, ErrorMessage = "Minst {1} tecken tillåtna")]
