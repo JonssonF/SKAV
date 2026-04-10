@@ -11,7 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DTOs\Gigs\" />
     <Folder Include="Services\" />
   </ItemGroup>
 
