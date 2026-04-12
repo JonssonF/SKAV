@@ -16,7 +16,7 @@ namespace SKAV.Api.Controllers
             _service = service;
         }
 
-        [HttpGet]
+        [HttpPost]
         public async Task<IActionResult> GetAll(CancellationToken ct)
         {
             var result = await _service.GetAllAsync(ct);
@@ -24,7 +24,7 @@ namespace SKAV.Api.Controllers
             return Ok(result.Data);
         }
 
-        [HttpGet("{id}")]
+        [HttpPost("{id}")]
         public async Task<IActionResult> GetById(int id, CancellationToken ct)
         {
             var result = await _service.GetByIdAsync(id, ct);
@@ -46,7 +46,7 @@ namespace SKAV.Api.Controllers
             return CreatedAtAction(nameof(GetById), new { id = result.Data }, null);
         }
 
-        [HttpPut("{id}")]
+        [HttpPost("{id}")]
         public async Task<IActionResult> Update(int id, UpdateGigRequestDto request, CancellationToken ct)
         {
             var result = await _service.UpdateAsync(id, request, ct);
@@ -62,7 +62,7 @@ namespace SKAV.Api.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
+        [HttpPost("{id}")]
         public async Task<IActionResult> Delete(int id, CancellationToken ct)
         {
             var result = await _service.DeleteAsync(id, ct);
