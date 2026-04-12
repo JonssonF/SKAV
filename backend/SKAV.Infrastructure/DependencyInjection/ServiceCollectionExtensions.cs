@@ -24,11 +24,14 @@ namespace SKAV.Infrastructure.DependencyInjection
             services.AddTransient<DatabaseInitializer>();
             services.AddScoped<IGigService, GigService>();
             services.AddScoped<IGigValidator, GigValidator>();
+            services.AddScoped<IMemberService, MemberService>();
 
             // Repositories
             services.AddScoped<IGigRepository, GigRepository>();
+            services.AddScoped<IMemberRepository, MemberRepository>();
 
             // Options
+            services.AddScoped<SeedData>();
 
             return services;
         }
