@@ -10,8 +10,13 @@ namespace SKAV.Infrastructure.Database
     public sealed class DatabaseInitializer
     {
         private readonly IDbConnectionFactory _connectionFactory;
+        private readonly SeedData _seeder;
 
-        public DatabaseInitializer(IDbConnectionFactory connectionFactory) => _connectionFactory = connectionFactory;
+        public DatabaseInitializer(IDbConnectionFactory connectionFactory, SeedData seeder)
+        {
+            _connectionFactory = connectionFactory;
+            _seeder = seeder;
+        } 
 
         public async Task InitializeAsync()
         {
@@ -44,6 +49,22 @@ namespace SKAV.Infrastructure.Database
             """;
 
             await connection.ExecuteAsync(indexSql);
+
+
+            const string sqlMembers = """
+                CREATE TABLE IF NOT EXISTS Members (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Name TEXT NOT NULL,
+                    Role TEXT NOT NULL,
+                    Quote TEXT NULL,
+                    ImageUrl TEXT NULL,
+                    DisplayOrder INTEGER NOT NULL DEFAULT 0
+                );
+            """;
+
+            await connection.ExecuteAsync(sqlMembers);
+
+            await _seeder.SeedAsync(connection);
         }
     }
 }
