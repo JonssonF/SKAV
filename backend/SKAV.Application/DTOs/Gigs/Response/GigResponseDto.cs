@@ -12,6 +12,7 @@ namespace SKAV.Application.DTOs.Gigs.Response
         public string Title { get; set; } = null!;
         public string Description { get; set; } = null!;
         public string Location { get; set; } = null!;
+        public string? Adress { get; set; }
         public DateTimeOffset Date { get; set; }
         public decimal? Price { get; set; }
         public string? Notes { get; set; }

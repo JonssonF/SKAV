@@ -3,8 +3,6 @@ using SKAV.Application.DTOs.Gigs.Request;
 using SKAV.Application.DTOs.Gigs.Response;
 using SKAV.Application.Interfaces;
 using SKAV.Application.Services.Interface;
-using SKAV.Application.Validation;
-using SKAV.Application.Validation.Gigs;
 using SKAV.Application.Validator;
 using SKAV.Application.Validator.Gigs;
 using SKAV.Domain.Models;
@@ -21,8 +19,6 @@ public class GigService : IGigService
         _repo = repo;
         _validator = validator;
     }
-
-    // 🔹 GET ALL
     public async Task<Result<IEnumerable<GigResponseDto>>> GetAllAsync(CancellationToken ct)
     {
         var gigs = await _repo.GetAllGigsAsync(ct);
@@ -34,8 +30,6 @@ public class GigService : IGigService
 
         return Result<IEnumerable<GigResponseDto>>.Ok(result);
     }
-
-    // 🔹 GET BY ID
     public async Task<Result<GigResponseDto>> GetByIdAsync(int id, CancellationToken ct)
     {
         var gig = await _repo.GetGigByIdAsync(id, ct);
@@ -55,8 +49,6 @@ public class GigService : IGigService
 
         return Result<GigResponseDto>.Ok(MapToDto(gig));
     }
-
-    // 🔹 CREATE
     public async Task<Result<int>> CreateAsync(CreateGigRequestDto request, CancellationToken ct)
     {
         var errors = await _validator.ValidateCreateAsync(request, ct);
@@ -69,6 +61,7 @@ public class GigService : IGigService
             Title = request.Title,
             Description = request.Description,
             Location = request.Location,
+            Adress = request.Adress,
             Date = request.Date,
             Price = request.Price,
             Notes = request.Notes,
@@ -81,7 +74,6 @@ public class GigService : IGigService
         return Result<int>.Ok(id);
     }
 
-    // 🔹 UPDATE
     public async Task<Result> UpdateAsync(int id, UpdateGigRequestDto request, CancellationToken ct)
     {
         var existing = await _repo.GetGigByIdAsync(id, ct);
@@ -107,6 +99,7 @@ public class GigService : IGigService
         existing.Title = request.Title;
         existing.Description = request.Description;
         existing.Location = request.Location;
+        existing.Adress = request.Adress;
         existing.Date = request.Date;
         existing.Price = request.Price;
         existing.Notes = request.Notes;
@@ -147,6 +140,7 @@ public class GigService : IGigService
             Title = g.Title,
             Description = g.Description,
             Location = g.Location,
+            Adress = g.Adress,
             Date = g.Date,
             Price = g.Price,
             Notes = g.Notes,
