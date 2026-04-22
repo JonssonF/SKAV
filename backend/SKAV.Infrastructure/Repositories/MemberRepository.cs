@@ -1,6 +1,6 @@
 ﻿using Dapper;
 using SKAV.Application.Interfaces;
-using SKAV.Domain.Models;
+using SKAV.Domain.Entities;
 using SKAV.Infrastructure.Database;
 using System.Data;
 using System.Data.Common;

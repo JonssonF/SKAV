@@ -1,6 +1,6 @@
 ﻿using SKAV.Application.Common;
 using SKAV.Application.DTOs.Member;
-using SKAV.Domain.Models;
+using SKAV.Domain.Entities;
 
 namespace SKAV.Application.Services.Interface
 {

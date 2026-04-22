@@ -27,6 +27,9 @@ namespace SKAV.Infrastructure.DependencyInjection
             services.AddScoped<IGigValidator, GigValidator>();
             services.AddScoped<IMemberService, MemberService>();
             services.AddScoped<JwtService>();
+            services.AddScoped<IUnitOfWorkConnection, UnitOfWorkConnection>();
+            services.AddScoped<ICurrentUserService, CurrentUserService>();
+            
 
             // Repositories
             services.AddScoped<IGigRepository, GigRepository>();

@@ -3,7 +3,7 @@ using SKAV.Application.DTOs.Member;
 using SKAV.Application.Interfaces;
 using SKAV.Application.Services.Interface;
 using SKAV.Application.Validator;
-using SKAV.Domain.Models;
+using SKAV.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;

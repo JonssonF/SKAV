@@ -1,4 +1,4 @@
-﻿using SKAV.Domain.Models;
+﻿using SKAV.Domain.Entities;
 
 namespace SKAV.Application.Interfaces
 {

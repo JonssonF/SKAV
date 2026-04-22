@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SKAV.Application.DTOs.Gigs.Request;
+using SKAV.Application.Interfaces;
 using SKAV.Application.Services.Interface;
 
 namespace SKAV.Api.Controllers
@@ -14,6 +16,13 @@ namespace SKAV.Api.Controllers
         public GigsController(IGigService service)
         {
             _service = service;
+        }
+
+        [Authorize]
+        [HttpGet("me")]
+        public IActionResult Me([FromServices] ICurrentUserService currentUser)
+        {
+            return Ok(new { userId = currentUser.UserId });
         }
 
         [HttpGet]

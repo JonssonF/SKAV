@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using SKAV.Domain.Models;
+using SKAV.Domain.Entities;
 using System.Data;
 
 namespace SKAV.Infrastructure.Database

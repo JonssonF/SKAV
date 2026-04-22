@@ -1,23 +1,29 @@
 ﻿using SKAV.Application.Common;
+using SKAV.Application.Common.Helpers;
 using SKAV.Application.DTOs.Gigs.Request;
 using SKAV.Application.DTOs.Gigs.Response;
 using SKAV.Application.Interfaces;
 using SKAV.Application.Services.Interface;
 using SKAV.Application.Validator;
 using SKAV.Application.Validator.Gigs;
-using SKAV.Domain.Models;
+using SKAV.Domain.Entities;
 
 namespace SKAV.Application.Services;
 
 public class GigService : IGigService
 {
+    private readonly ICurrentUserService _currentUser;
     private readonly IGigRepository _repo;
     private readonly IGigValidator _validator;
+    private readonly IUnitOfWorkConnection _uow;
 
-    public GigService(IGigRepository repo, IGigValidator validator)
+    public GigService(IGigRepository repo, IGigValidator validator, IUnitOfWorkConnection uow, ICurrentUserService currentUser)
     {
+
+        _currentUser = currentUser;
         _repo = repo;
         _validator = validator;
+        _uow = uow;
     }
     public async Task<Result<IEnumerable<GigResponseDto>>> GetAllAsync(CancellationToken ct)
     {
@@ -69,9 +75,21 @@ public class GigService : IGigService
             IsPrivate = false
         };
 
-        var id = await _repo.CreateGigAsync(gig, ct);
+        AuditHelper.SetCreated(gig, _currentUser.UserId);
+        await _uow.BeginTransactionAsync(ct);
 
-        return Result<int>.Ok(id);
+        try
+        {
+        var id = await _repo.CreateGigAsync(gig, ct);
+            await _uow.CommitAsync();
+            return Result<int>.Ok(id);
+        }
+        catch (Exception)
+        {
+            await _uow.RollbackAsync();
+            throw;
+        }
+
     }
 
     public async Task<Result> UpdateAsync(int id, UpdateGigRequestDto request, CancellationToken ct)
@@ -105,9 +123,21 @@ public class GigService : IGigService
         existing.Notes = request.Notes;
         existing.TicketUrl = request.TicketUrl;
 
-        await _repo.UpdateGigAsync(existing, ct);
+        AuditHelper.SetUpdated(existing, _currentUser.UserId);
+        
+        await _uow.BeginTransactionAsync(ct);
 
-        return Result.Ok();
+        try
+        {
+            await _repo.UpdateGigAsync(existing, ct);
+            await _uow.CommitAsync();
+            return Result.Ok();
+        }
+        catch (Exception)
+        {
+            await _uow.RollbackAsync();
+            throw;
+        }
     }
 
     public async Task<Result> DeleteAsync(int id, CancellationToken ct)
@@ -127,9 +157,24 @@ public class GigService : IGigService
             });
         }
 
-        await _repo.DeleteGigAsync(id, ct);
+        AuditHelper.SetDeleted(existing, _currentUser.UserId);
 
-        return Result.Ok();
+        await _uow.BeginTransactionAsync(ct);
+
+        try
+        {
+            await _repo.DeleteGigAsync(id, ct);
+            await _uow.CommitAsync();
+            return Result.Ok();
+
+        }
+        catch (Exception)
+        {
+            await _uow.RollbackAsync();
+            throw;
+        }
+
+
     }
 
     private static GigResponseDto MapToDto(Gig g)

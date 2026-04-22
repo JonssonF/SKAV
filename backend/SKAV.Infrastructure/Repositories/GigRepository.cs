@@ -10,63 +10,22 @@ namespace SKAV.Infrastructure.Repositories
 {
     public sealed class GigRepository : IGigRepository
     {
-        private readonly IDbConnectionFactory _connectionFactory;
+        private readonly IUnitOfWorkConnection _connection;
 
-        public GigRepository(IDbConnectionFactory connectionFactory)
-            => _connectionFactory = connectionFactory;
-
-        private async Task<IDbConnection> OpenAsync(CancellationToken ct)
-        {
-            var conn = _connectionFactory.CreateConnection();
-
-            if (conn is DbConnection dbConn)
-                await dbConn.OpenAsync(ct);
-            else
-                conn.Open();
-
-            return conn;
-        }
-
-        private static object ToParameters(Gig gig) => new
-        {
-            gig.Id,
-            gig.Title,
-            gig.Location,
-            Date = gig.Date.ToUniversalTime().ToString("O"),
-            gig.Description,
-            gig.Price,
-            gig.Notes,
-            IsPrivate = gig.IsPrivate ? 1 : 0,
-            gig.TicketUrl,
-            gig.CreatedAt,
-            gig.CreatedBy,
-            gig.UpdatedAt,
-            gig.UpdatedBy,
-            gig.DeletedAt,
-            gig.DeletedBy
-        };
+        public GigRepository(IUnitOfWorkConnection connection)
+            => _connection = connection;
 
         public async Task<IReadOnlyList<Gig>> GetAllGigsAsync(CancellationToken cancellationToken)
         {
             const string sql = """
-                SELECT
-                    Id,
-                    Title,
-                    Description,
-                    Location,
-                    Date,
-                    Price,
-                    Notes,
-                    IsPrivate,
-                    TicketUrl
-                FROM Gigs
+                SELECT * FROM Gigs
                 WHERE DeletedAt IS NULL
                 ORDER BY Date DESC;
                 """;
 
-            using var connection = await OpenAsync(cancellationToken);
-            var rows = await connection.QueryAsync<GigRow>(new CommandDefinition(
+            var rows = await _connection.Connection.QueryAsync<GigRow>(new CommandDefinition(
                 commandText: sql,
+                transaction: _connection.Transaction,
                 cancellationToken: cancellationToken));
 
             return rows.Select(Map).ToList();
@@ -97,10 +56,10 @@ namespace SKAV.Infrastructure.Repositories
                 LIMIT 1;
                 """;
 
-            using var connection = await OpenAsync(cancellationToken);
-            var row = await connection.QuerySingleOrDefaultAsync<GigRow>(new CommandDefinition(
+            var row = await _connection.Connection.QuerySingleOrDefaultAsync<GigRow>(new CommandDefinition(
                 commandText: sql,
                 parameters: new { Id = id },
+                transaction: _connection.Transaction,
                 cancellationToken: cancellationToken));
 
             return row is null ? null : Map(row);
@@ -119,10 +78,10 @@ namespace SKAV.Infrastructure.Repositories
                 SELECT last_insert_rowid();
                 """;
 
-            using var connection = await OpenAsync(cancellationToken);
-            var id = await connection.ExecuteScalarAsync<long>(new CommandDefinition(
+            var id = await _connection.Connection.ExecuteScalarAsync<long>(new CommandDefinition(
                 commandText: sql,
                 parameters: ToParameters(gig),
+                transaction: _connection.Transaction,
                 cancellationToken: cancellationToken));
 
             return (int)id;
@@ -147,10 +106,10 @@ namespace SKAV.Infrastructure.Repositories
                 AND DeletedAt IS NULL;
                 """;
 
-            using var connection = await OpenAsync(cancellationToken);
-            var affected = await connection.ExecuteAsync(new CommandDefinition(
+            var affected = await _connection.Connection.ExecuteAsync(new CommandDefinition(
                 commandText: sql,
                 parameters: ToParameters(gig),
+                transaction: _connection.Transaction,
                 cancellationToken: cancellationToken));
 
             if (affected == 0)
@@ -168,10 +127,10 @@ namespace SKAV.Infrastructure.Repositories
                 AND DeletedAt IS NULL;
                 """;
 
-            using var connection = await OpenAsync(cancellationToken);
-            var affected = await connection.ExecuteAsync(new CommandDefinition(
+            var affected = await _connection.Connection.ExecuteAsync(new CommandDefinition(
                 commandText: sql,
                 parameters: new { Id = id },
+                transaction: _connection.Transaction,
                 cancellationToken: cancellationToken));
 
             if (affected == 0)
@@ -208,9 +167,9 @@ namespace SKAV.Infrastructure.Repositories
                 SELECT COUNT(*)
                 FROM Gigs;
                 """;
-            using var connection = await OpenAsync(cancellationToken);
-            return await connection.ExecuteScalarAsync<int>(new CommandDefinition(
+            return await _connection.Connection.ExecuteScalarAsync<int>(new CommandDefinition(
                 commandText: sql,
+                transaction: _connection.Transaction,   
                 cancellationToken: cancellationToken));
         }
 
@@ -225,17 +184,39 @@ namespace SKAV.Infrastructure.Repositories
                 AND (@ExcludeId IS NULL OR ID != @ExcludeId);
                 """;
 
-            using var connection = await OpenAsync(ct);
 
-            var count = await connection.ExecuteScalarAsync<int>(sql, new
-            {
-                Title = title,
-                Date = date.ToUniversalTime().ToString("O"),
-                ExcludeId = excludeId
-            });
+            var count = await _connection.Connection.ExecuteScalarAsync<int>(new CommandDefinition(
+                commandText: sql,
+                parameters: new
+                {
+                    Title = title,
+                    Date = date.ToUniversalTime().ToString("O"),
+                    ExcludeId = excludeId
+                },
+                transaction: _connection.Transaction,
+                cancellationToken: ct));
 
             return count > 0;
         }
+
+        private static object ToParameters(Gig gig) => new
+        {
+            gig.Id,
+            gig.Title,
+            gig.Location,
+            Date = gig.Date.ToUniversalTime().ToString("O"),
+            gig.Description,
+            gig.Price,
+            gig.Notes,
+            IsPrivate = gig.IsPrivate ? 1 : 0,
+            gig.TicketUrl,
+            gig.CreatedAt,
+            gig.CreatedBy,
+            gig.UpdatedAt,
+            gig.UpdatedBy,
+            gig.DeletedAt,
+            gig.DeletedBy
+        };
 
         private sealed class GigRow
         {
