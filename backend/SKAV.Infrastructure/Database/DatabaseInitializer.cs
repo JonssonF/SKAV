@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using BCrypt.Net;
+using Dapper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,7 +38,7 @@ namespace SKAV.Infrastructure.Database
                     Price REAL NULL CHECK (Price IS NULL OR Price >= 0),
                     Notes TEXT NULL,
                     IsPrivate INTEGER NOT NULL DEFAULT 0,
-                    TicketUrl TEXT NULL
+                    TicketUrl TEXT NULL,
                     CreatedAt TEXT NOT NULL,
                     CreatedBy INTEGER,
                     UpdatedAt TEXT,
@@ -80,7 +81,27 @@ namespace SKAV.Infrastructure.Database
             """;
             await connection.ExecuteAsync(sqlUsers);
 
-            await _seeder.SeedAsync(connection);
+            // Seed admin user if not exists
+            var exists = await connection.ExecuteScalarAsync<int>(
+            "SELECT COUNT(1) FROM Users WHERE Email = @Email",
+            new { Email = "admin@skav.se" });
+
+            if (exists == 0)
+            {
+                var hash = BCrypt.Net.BCrypt.HashPassword("1234");
+
+                await connection.ExecuteAsync("""
+            INSERT INTO Users (Email, PasswordHash, Role)
+            VALUES (@Email, @PasswordHash, @Role)
+            """, new
+                {
+                    Email = "admin@skav.se",
+                    PasswordHash = hash,
+                    Role = 1
+                });
+            }
+
+            await _seeder.SeedAsync(connection);            
         }
     }
 }

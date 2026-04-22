@@ -32,6 +32,7 @@ namespace SKAV.Infrastructure.DependencyInjection
             
 
             // Repositories
+            services.AddScoped<UserRepository>();
             services.AddScoped<IGigRepository, GigRepository>();
             services.AddScoped<IMemberRepository, MemberRepository>();
 

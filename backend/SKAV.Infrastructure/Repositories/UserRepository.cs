@@ -1,4 +1,6 @@
-﻿using SKAV.Infrastructure.Database;
+﻿using Dapper;
+using SKAV.Domain.Entities;
+using SKAV.Infrastructure.Database;
 using System.Data;
 using System.Data.Common;
 
@@ -13,16 +15,15 @@ namespace SKAV.Infrastructure.Repositories
             _connectionFactory = connectionFactory;
         }
 
-        private async Task<IDbConnection> OpenAsync(CancellationToken ct)
+        public async Task<User?> GetByEmailAsync(string email, CancellationToken ct)
         {
-            var conn = _connectionFactory.CreateConnection();
-            if (conn is DbConnection dbConn)
-                await dbConn.OpenAsync(ct);
-            else
-                conn.Open();
-            return conn;
-        }
+            using var conn = _connectionFactory.CreateConnection();
+            conn.Open();
 
+            return await conn.QuerySingleOrDefaultAsync<User>(
+                "SELECT Id, Email, PasswordHash, Role FROM Users WHERE Email = @Email",
+                new { Email = email });
+        }
 
     }
 }

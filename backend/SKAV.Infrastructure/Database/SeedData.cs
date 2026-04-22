@@ -8,11 +8,11 @@ namespace SKAV.Infrastructure.Database
     {
         public async Task SeedAsync(IDbConnection connection)
         {
-            await SeedBandMembers(connection);
+            await SeedMembers(connection);
             await SeedGigs(connection);
         }
 
-        private async Task SeedBandMembers(IDbConnection connection)
+        private async Task SeedMembers(IDbConnection connection)
         {
             var count = await connection.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM Members;");
 
@@ -28,7 +28,7 @@ namespace SKAV.Infrastructure.Database
             };
 
                 const string sql = """
-                INSERT INTO BandMembers (Name, Role, Quote, ImageUrl, DisplayOrder)
+                INSERT INTO Members (Name, Role, Quote, ImageUrl, DisplayOrder)
                 VALUES (@Name, @Role, @Quote, @ImageUrl, @DisplayOrder);
                 """;
 
@@ -42,11 +42,11 @@ namespace SKAV.Infrastructure.Database
             if (count > 0) return;
 
             const string sql = """
-            INSERT INTO Gigs (Title, Location, Adress, Date, Description, Price, Notes, IsPrivate, TicketUrl)
+            INSERT INTO Gigs (Title, Location, Adress, Date, Description, Price, Notes, IsPrivate, TicketUrl, CreatedAt)
             VALUES
-            ('Skavfesten', 'Varberg', 'Folkets park', '2026-06-15T20:00:00Z', 'Stor fest', 150, 'Fri entré före 21', 0, NULL),
-            ('Byfesten', 'Tvååker', 'Torget', '2026-07-01T19:00:00Z', 'Live på torget', 0, NULL, 0, NULL),
-            ('Privat Gig', 'Himle', 'Bygdegården', '2026-08-10T21:00:00Z', 'Företagsevent', 0, NULL, 1, NULL);
+            ('Skavfesten', 'Varberg', 'Folkets park', '2026-06-15T20:00:00Z', 'Stor fest', 150, 'Fri entré före 21', 0, NULL, CURRENT_TIMESTAMP),
+            ('Byfesten', 'Tvååker', 'Torget', '2026-07-01T19:00:00Z', 'Live på torget', 0, NULL, 0, NULL, CURRENT_TIMESTAMP),
+            ('Privat Gig', 'Himle', 'Bygdegården', '2026-08-10T21:00:00Z', 'Företagsevent', 0, NULL, 1, NULL, CURRENT_TIMESTAMP);
         """;
 
             await connection.ExecuteAsync(sql);
