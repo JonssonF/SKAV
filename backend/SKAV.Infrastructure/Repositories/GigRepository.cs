@@ -10,131 +10,143 @@ namespace SKAV.Infrastructure.Repositories
 {
     public sealed class GigRepository : IGigRepository
     {
-        private readonly IUnitOfWorkConnection _connection;
+        private readonly IUnitOfWorkConnection _uow;
+        private readonly IDbConnectionFactory _factory;
 
-        public GigRepository(IUnitOfWorkConnection connection)
-            => _connection = connection;
+        public GigRepository(IUnitOfWorkConnection uow, IDbConnectionFactory factory)
+        {
+            _uow = uow;
+            _factory = factory;
+        }
 
-        public async Task<IReadOnlyList<Gig>> GetAllGigsAsync(CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<Gig>> GetAllGigsAsync(CancellationToken ct)
         {
             const string sql = """
-                SELECT * FROM Gigs
-                WHERE DeletedAt IS NULL
-                ORDER BY Date DESC;
-                """;
+            SELECT * FROM Gigs
+            WHERE DeletedAt IS NULL
+            ORDER BY Date DESC;
+            """;
 
-            var rows = await _connection.Connection.QueryAsync<GigRow>(new CommandDefinition(
+            using var conn = _factory.CreateConnection();
+            conn.Open();
+
+            var rows = await conn.QueryAsync<GigRow>(new CommandDefinition(
                 commandText: sql,
-                transaction: _connection.Transaction,
-                cancellationToken: cancellationToken));
+                cancellationToken: ct));
 
             return rows.Select(Map).ToList();
         }
 
-        public async Task<Gig?> GetGigByIdAsync(int id, CancellationToken cancellationToken)
+        public async Task<Gig?> GetGigByIdAsync(int id, CancellationToken ct)
         {
             const string sql = """
-                SELECT
-                    Id,
-                    Title,
-                    Location,
-                    Date,
-                    Description,
-                    Price,
-                    Notes,
-                    IsPrivate,
-                    TicketUrl,
-                    CreatedAt,
-                    CreatedBy,
-                    UpdatedAt,
-                    UpdatedBy,
-                    DeletedAt,
-                    DeletedBy
-                FROM Gigs
-                WHERE Id = @Id
-                AND DeletedAt IS NULL
-                LIMIT 1;
-                """;
+            SELECT * FROM Gigs
+            WHERE Id = @Id
+            AND DeletedAt IS NULL
+            LIMIT 1;
+            """;
 
-            var row = await _connection.Connection.QuerySingleOrDefaultAsync<GigRow>(new CommandDefinition(
+            using var conn = _factory.CreateConnection();
+            conn.Open();
+
+            var row = await conn.QuerySingleOrDefaultAsync<GigRow>(new CommandDefinition(
                 commandText: sql,
                 parameters: new { Id = id },
-                transaction: _connection.Transaction,
-                cancellationToken: cancellationToken));
+                cancellationToken: ct));
 
             return row is null ? null : Map(row);
         }
 
-        public async Task<int> CreateGigAsync(Gig gig, CancellationToken cancellationToken)
+        public async Task<bool> ExistsAsync(string title, DateTimeOffset date, int? excludeId, CancellationToken ct)
         {
             const string sql = """
-                INSERT INTO Gigs 
-                (Title, Location, Date, Description, Price, Notes, IsPrivate, TicketUrl,
-                 CreatedAt, CreatedBy)
-                VALUES 
-                (@Title, @Location, @Date, @Description, @Price, @Notes, @IsPrivate, @TicketUrl,
-                 @CreatedAt, @CreatedBy);
+            SELECT COUNT(1) FROM Gigs
+            WHERE Title = @Title
+            AND Date = @Date
+            AND DeletedAt IS NULL
+            AND (@ExcludeId IS NULL OR Id != @ExcludeId);
+            """;
 
-                SELECT last_insert_rowid();
-                """;
+            using var conn = _factory.CreateConnection();
+            conn.Open();
 
-            var id = await _connection.Connection.ExecuteScalarAsync<long>(new CommandDefinition(
+            var count = await conn.ExecuteScalarAsync<int>(new CommandDefinition(
+                commandText: sql,
+                parameters: new { Title = title, Date = date.ToUniversalTime().ToString("O"), ExcludeId = excludeId },
+                cancellationToken: ct));
+
+            return count > 0;
+        }
+
+        // Skrivningar – använder uow med transaktion
+        public async Task<int> CreateGigAsync(Gig gig, CancellationToken ct)
+        {
+            const string sql = """
+            INSERT INTO Gigs 
+            (Title, Location, Date, Description, Price, Notes, IsPrivate, TicketUrl, CreatedAt, CreatedBy)
+            VALUES 
+            (@Title, @Location, @Date, @Description, @Price, @Notes, @IsPrivate, @TicketUrl, @CreatedAt, @CreatedBy);
+            SELECT last_insert_rowid();
+            """;
+
+            var id = await _uow.Connection.ExecuteScalarAsync<long>(new CommandDefinition(
                 commandText: sql,
                 parameters: ToParameters(gig),
-                transaction: _connection.Transaction,
-                cancellationToken: cancellationToken));
+                transaction: _uow.Transaction,
+                cancellationToken: ct));
 
             return (int)id;
         }
 
-        public async Task UpdateGigAsync(Gig gig, CancellationToken cancellationToken)
+        public async Task UpdateGigAsync(Gig gig, CancellationToken ct)
         {
             const string sql = """
-                UPDATE Gigs
-                SET
-                    Title = @Title,
-                    Location = @Location,
-                    Date = @Date,
-                    Description = @Description,
-                    Price = @Price,
-                    Notes = @Notes,
-                    IsPrivate = @IsPrivate,
-                    TicketUrl = @TicketUrl,
-                    UpdatedAt = @UpdatedAt,
-                    UpdatedBy = @UpdatedBy
-                WHERE Id = @Id
-                AND DeletedAt IS NULL;
-                """;
+            UPDATE Gigs
+            SET Title = @Title, Location = @Location, Date = @Date,
+                Description = @Description, Price = @Price, Notes = @Notes,
+                IsPrivate = @IsPrivate, TicketUrl = @TicketUrl,
+                UpdatedAt = @UpdatedAt, UpdatedBy = @UpdatedBy
+            WHERE Id = @Id AND DeletedAt IS NULL;
+            """;
 
-            var affected = await _connection.Connection.ExecuteAsync(new CommandDefinition(
+            var affected = await _uow.Connection.ExecuteAsync(new CommandDefinition(
                 commandText: sql,
                 parameters: ToParameters(gig),
-                transaction: _connection.Transaction,
-                cancellationToken: cancellationToken));
+                transaction: _uow.Transaction,
+                cancellationToken: ct));
 
             if (affected == 0)
                 throw new KeyNotFoundException($"Gig with id {gig.Id} not found.");
         }
 
-        public async Task DeleteGigAsync(int id, CancellationToken cancellationToken)
+        public async Task DeleteGigAsync(int id, CancellationToken ct)
         {
             const string sql = """
-                UPDATE Gigs
-                SET
-                    DeletedAt = @DeletedAt,
-                    DeletedBy = @DeletedBy
-                WHERE Id = @Id
-                AND DeletedAt IS NULL;
-                """;
+            UPDATE Gigs
+            SET DeletedAt = @DeletedAt, DeletedBy = @DeletedBy
+            WHERE Id = @Id AND DeletedAt IS NULL;
+            """;
 
-            var affected = await _connection.Connection.ExecuteAsync(new CommandDefinition(
+            var affected = await _uow.Connection.ExecuteAsync(new CommandDefinition(
                 commandText: sql,
                 parameters: new { Id = id },
-                transaction: _connection.Transaction,
-                cancellationToken: cancellationToken));
+                transaction: _uow.Transaction,
+                cancellationToken: ct));
 
             if (affected == 0)
                 throw new KeyNotFoundException($"Gig with id {id} not found.");
+        }
+
+        public async Task<int> GetGigCountAsync(CancellationToken ct)
+        {
+            const string sql = "SELECT COUNT(*) FROM Gigs;";
+
+            using var conn = _factory.CreateConnection();
+            conn.Open();
+
+            return await conn.ExecuteScalarAsync<int>(new CommandDefinition(
+                commandText: sql,
+                cancellationToken: ct));
         }
 
         private static Gig Map(GigRow row)
@@ -159,44 +171,6 @@ namespace SKAV.Infrastructure.Repositories
                 DeletedAt = row.DeletedAt,
                 DeletedBy = row.DeletedBy
             };
-        }
-
-        public async Task<int> GetGigCountAsync(CancellationToken cancellationToken)
-        {
-            const string sql = """
-                SELECT COUNT(*)
-                FROM Gigs;
-                """;
-            return await _connection.Connection.ExecuteScalarAsync<int>(new CommandDefinition(
-                commandText: sql,
-                transaction: _connection.Transaction,   
-                cancellationToken: cancellationToken));
-        }
-
-        public async Task<bool> ExistsAsync(string title, DateTimeOffset date, int? excludeId, CancellationToken ct)
-        {
-            const string sql = """
-                SELECT COUNT(1)
-                FROM Gigs
-                WHERE Title = @Title
-                AND Date = @Date
-                AND DeletedAt IS NULL
-                AND (@ExcludeId IS NULL OR ID != @ExcludeId);
-                """;
-
-
-            var count = await _connection.Connection.ExecuteScalarAsync<int>(new CommandDefinition(
-                commandText: sql,
-                parameters: new
-                {
-                    Title = title,
-                    Date = date.ToUniversalTime().ToString("O"),
-                    ExcludeId = excludeId
-                },
-                transaction: _connection.Transaction,
-                cancellationToken: ct));
-
-            return count > 0;
         }
 
         private static object ToParameters(Gig gig) => new

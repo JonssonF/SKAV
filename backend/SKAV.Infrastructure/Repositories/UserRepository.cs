@@ -7,37 +7,58 @@ using System.Data.Common;
 
 namespace SKAV.Infrastructure.Repositories
 {
-    public class UserRepository : IUserRepository
+    public sealed class UserRepository : IUserRepository
     {
-        private readonly IDbConnectionFactory _connectionFactory;
+        private readonly IUnitOfWorkConnection _connection;
 
-        public UserRepository(IDbConnectionFactory connectionFactory)
-        {
-            _connectionFactory = connectionFactory;
-        }
+        public UserRepository(IUnitOfWorkConnection connection)
+            => _connection = connection;
 
         public async Task<User?> GetByEmailAsync(string email, CancellationToken ct)
         {
-            using var conn = _connectionFactory.CreateConnection();
-            conn.Open();
+            const string sql = """
+                SELECT Id, Email, PasswordHash, Role
+                FROM Users
+                WHERE Email = @Email
+                LIMIT 1;
+                """;
 
-            return await conn.QuerySingleOrDefaultAsync<User>(
-                "SELECT Id, Email, PasswordHash, Role FROM Users WHERE Email = @Email",
-                new { Email = email });
+            return await _connection.Connection.QuerySingleOrDefaultAsync<User>(new CommandDefinition(
+                commandText: sql,
+                parameters: new { Email = email },
+                transaction: _connection.Transaction,
+                cancellationToken: ct));
+        }
+
+        public async Task<bool> EmailExistsAsync(string email, CancellationToken ct)
+        {
+            const string sql = """
+                SELECT COUNT(1)
+                FROM Users
+                WHERE Email = @Email;
+                """;
+
+            var count = await _connection.Connection.ExecuteScalarAsync<int>(new CommandDefinition(
+                commandText: sql,
+                parameters: new { Email = email },
+                transaction: _connection.Transaction,
+                cancellationToken: ct));
+
+            return count > 0;
         }
 
         public async Task CreateAsync(User user, CancellationToken ct)
         {
-            using var conn = _connectionFactory.CreateConnection();
-            conn.Open();
-            await conn.ExecuteAsync(
-                "INSERT INTO Users (Email, PasswordHash, Role) VALUES (@Email, @PasswordHash, @Role)",
-                new { user.Email, user.PasswordHash, Role = (int)user.Role });
-        }
+            const string sql = """
+                INSERT INTO Users (Email, PasswordHash, Role)
+                VALUES (@Email, @PasswordHash, @Role);
+                """;
 
-        public Task<bool> EmailExistsAsync(string email, CancellationToken ct)
-        {
-            throw new NotImplementedException();
+            await _connection.Connection.ExecuteAsync(new CommandDefinition(
+                commandText: sql,
+                parameters: new { user.Email, user.PasswordHash, Role = (int)user.Role },
+                transaction: _connection.Transaction,
+                cancellationToken: ct));
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using BCrypt.Net;
 using Dapper;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,11 +13,13 @@ namespace SKAV.Infrastructure.Database
     {
         private readonly IDbConnectionFactory _connectionFactory;
         private readonly SeedData _seeder;
+        private readonly IConfiguration _configuration;
 
-        public DatabaseInitializer(IDbConnectionFactory connectionFactory, SeedData seeder)
+        public DatabaseInitializer(IDbConnectionFactory connectionFactory, SeedData seeder, IConfiguration configuration)
         {
             _connectionFactory = connectionFactory;
             _seeder = seeder;
+            _configuration = configuration;
         } 
 
         public async Task InitializeAsync()
@@ -88,7 +91,9 @@ namespace SKAV.Infrastructure.Database
 
             if (exists == 0)
             {
-                var hash = BCrypt.Net.BCrypt.HashPassword("1234");
+                var adminPassword = _configuration["Seed:AdminPassword"]
+                ?? throw new InvalidOperationException("Admin seed password not configured.");
+                var hash = BCrypt.Net.BCrypt.HashPassword(adminPassword);
 
                 await connection.ExecuteAsync("""
             INSERT INTO Users (Email, PasswordHash, Role)
