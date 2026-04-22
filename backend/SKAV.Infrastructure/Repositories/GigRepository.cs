@@ -1,6 +1,6 @@
 ﻿using Dapper;
 using SKAV.Application.Interfaces;
-using SKAV.Domain.Models;
+using SKAV.Domain.Entities;
 using SKAV.Infrastructure.Database;
 using System.Data;
 using System.Data.Common;
@@ -37,7 +37,13 @@ namespace SKAV.Infrastructure.Repositories
             gig.Price,
             gig.Notes,
             IsPrivate = gig.IsPrivate ? 1 : 0,
-            gig.TicketUrl
+            gig.TicketUrl,
+            gig.CreatedAt,
+            gig.CreatedBy,
+            gig.UpdatedAt,
+            gig.UpdatedBy,
+            gig.DeletedAt,
+            gig.DeletedBy
         };
 
         public async Task<IReadOnlyList<Gig>> GetAllGigsAsync(CancellationToken cancellationToken)
@@ -54,6 +60,7 @@ namespace SKAV.Infrastructure.Repositories
                     IsPrivate,
                     TicketUrl
                 FROM Gigs
+                WHERE DeletedAt IS NULL
                 ORDER BY Date DESC;
                 """;
 
@@ -80,6 +87,7 @@ namespace SKAV.Infrastructure.Repositories
                     TicketUrl
                 FROM Gigs
                 WHERE Id = @Id
+                AND DeletedAt IS NULL
                 LIMIT 1;
                 """;
 
@@ -95,8 +103,12 @@ namespace SKAV.Infrastructure.Repositories
         public async Task<int> CreateGigAsync(Gig gig, CancellationToken cancellationToken)
         {
             const string sql = """
-                INSERT INTO Gigs (Title, Location, Date, Description, Price, Notes, IsPrivate, TicketUrl)
-                VALUES (@Title, @Location, @Date, @Description, @Price, @Notes, @IsPrivate, @TicketUrl);
+                INSERT INTO Gigs 
+                (Title, Location, Date, Description, Price, Notes, IsPrivate, TicketUrl,
+                 CreatedAt, CreatedBy)
+                VALUES 
+                (@Title, @Location, @Date, @Description, @Price, @Notes, @IsPrivate, @TicketUrl,
+                 @CreatedAt, @CreatedBy);
 
                 SELECT last_insert_rowid();
                 """;
@@ -122,8 +134,11 @@ namespace SKAV.Infrastructure.Repositories
                     Price = @Price,
                     Notes = @Notes,
                     IsPrivate = @IsPrivate,
-                    TicketUrl = @TicketUrl
-                WHERE Id = @Id;
+                    TicketUrl = @TicketUrl,
+                    UpdatedAt = @UpdatedAt,
+                    UpdatedBy = @UpdatedBy
+                WHERE Id = @Id
+                AND DeletedAt IS NULL;
                 """;
 
             using var connection = await OpenAsync(cancellationToken);
@@ -139,8 +154,12 @@ namespace SKAV.Infrastructure.Repositories
         public async Task DeleteGigAsync(int id, CancellationToken cancellationToken)
         {
             const string sql = """
-                DELETE FROM Gigs
-                WHERE Id = @Id;
+                UPDATE Gigs
+                SET
+                    DeletedAt = @DeletedAt,
+                    DeletedBy = @DeletedBy
+                WHERE Id = @Id
+                AND DeletedAt IS NULL;
                 """;
 
             using var connection = await OpenAsync(cancellationToken);
@@ -190,6 +209,7 @@ namespace SKAV.Infrastructure.Repositories
                 FROM Gigs
                 WHERE Title = @Title
                 AND Date = @Date
+                AND DeletedAt IS NULL
                 AND (@ExcludeId IS NULL OR ID != @ExcludeId);
                 """;
 
