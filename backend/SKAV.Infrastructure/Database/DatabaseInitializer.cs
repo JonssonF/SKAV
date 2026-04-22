@@ -70,6 +70,16 @@ namespace SKAV.Infrastructure.Database
 
             await connection.ExecuteAsync(sqlMembers);
 
+            const string sqlUsers = """
+            CREATE TABLE IF NOT EXISTS Users(
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                Email TEXT NOT NULL UNIQUE,
+                PasswordHash TEXT NOT NULL,
+                Role INTEGER NOT NULL
+            );
+            """;
+            await connection.ExecuteAsync(sqlUsers);
+
             await _seeder.SeedAsync(connection);
         }
     }

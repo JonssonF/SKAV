@@ -7,6 +7,7 @@ using SKAV.Application.Validation.Gigs;
 using SKAV.Application.Validator.Gigs;
 using SKAV.Infrastructure.Database;
 using SKAV.Infrastructure.Repositories;
+using SKAV.Infrastructure.Services;
 
 namespace SKAV.Infrastructure.DependencyInjection
 {
@@ -25,6 +26,7 @@ namespace SKAV.Infrastructure.DependencyInjection
             services.AddScoped<IGigService, GigService>();
             services.AddScoped<IGigValidator, GigValidator>();
             services.AddScoped<IMemberService, MemberService>();
+            services.AddScoped<JwtService>();
 
             // Repositories
             services.AddScoped<IGigRepository, GigRepository>();
