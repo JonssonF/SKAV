@@ -9,6 +9,7 @@ using SKAV.Application.Validator.User;
 using SKAV.Infrastructure.Database;
 using SKAV.Infrastructure.Repositories;
 using SKAV.Infrastructure.Services;
+using System.Reflection;
 
 namespace SKAV.Infrastructure.DependencyInjection
 {
@@ -20,31 +21,43 @@ namespace SKAV.Infrastructure.DependencyInjection
             // Validate configuration
             var connectionString = configuration.GetConnectionString("Default") 
                 ?? throw new InvalidOperationException("Connection string 'Default' not found.");
-            
+
+            // Automatically register services, repositories, and validators by convention
+            var assembly = Assembly.GetExecutingAssembly();
+
             // Services
-            services.AddScoped<ICurrentUserService, CurrentUserService>();
-            services.AddSingleton<IDbConnectionFactory, SqliteConnectionFactory>();
-            services.AddScoped<IGigService, GigService>();
-            services.AddScoped<IMemberService, MemberService>();
-            services.AddScoped<IUserService, UserService>();
+            RegisterByConvention(services, assembly, "Service");
 
             // Repositories
-            services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<IGigRepository, GigRepository>();
-            services.AddScoped<IMemberRepository, MemberRepository>();
+            RegisterByConvention(services, assembly, "Repository");
+
+            // Validators
+            RegisterByConvention(services, assembly, "Validator");
 
             // Options
+            services.AddSingleton<IDbConnectionFactory, SqliteConnectionFactory>();
             services.AddTransient<DatabaseInitializer>();
             services.AddScoped<JwtService>();
             services.AddScoped<SeedData>();
             services.AddScoped<IUnitOfWorkConnection, UnitOfWorkConnection>();
 
-            // Validators
-            services.AddScoped<IGigValidator, GigValidator>();
-            services.AddScoped<IUserValidator, UserValidator>();
-
-
             return services;
+        }
+        private static void RegisterByConvention(IServiceCollection services, Assembly assembly, string suffix)
+        {
+            var types = assembly.GetTypes()
+                .Where(t => t.IsClass && !t.IsAbstract);
+
+            foreach (var implementation in types)
+            {
+                var interfaceType = implementation.GetInterfaces()
+                    .FirstOrDefault(i => i.Name == $"I{implementation.Name}");
+
+                if (interfaceType != null && implementation.Name.EndsWith(suffix))
+                {
+                    services.AddScoped(interfaceType, implementation);
+                }
+            }
         }
     }
 }
