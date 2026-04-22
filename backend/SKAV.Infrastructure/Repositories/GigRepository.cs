@@ -84,7 +84,13 @@ namespace SKAV.Infrastructure.Repositories
                     Price,
                     Notes,
                     IsPrivate,
-                    TicketUrl
+                    TicketUrl,
+                    CreatedAt,
+                    CreatedBy,
+                    UpdatedAt,
+                    UpdatedBy,
+                    DeletedAt,
+                    DeletedBy
                 FROM Gigs
                 WHERE Id = @Id
                 AND DeletedAt IS NULL
@@ -186,7 +192,13 @@ namespace SKAV.Infrastructure.Repositories
                 Price = row.Price,
                 Notes = row.Notes,
                 IsPrivate = row.IsPrivate == 1,
-                TicketUrl = row.TicketUrl
+                TicketUrl = row.TicketUrl,
+                CreatedAt = row.CreatedAt,
+                CreatedBy = row.CreatedBy,
+                UpdatedAt = row.UpdatedAt,
+                UpdatedBy = row.UpdatedBy,
+                DeletedAt = row.DeletedAt,
+                DeletedBy = row.DeletedBy
             };
         }
 
@@ -236,6 +248,12 @@ namespace SKAV.Infrastructure.Repositories
             public string? Notes { get; init; }
             public int IsPrivate { get; init; }
             public string? TicketUrl { get; init; }
+            public DateTime CreatedAt { get; init; }
+            public int? CreatedBy { get; init; }
+            public DateTime? UpdatedAt { get; init; }
+            public int? UpdatedBy { get; init; }
+            public DateTime? DeletedAt { get; init; }
+            public int? DeletedBy { get; init; }
         }
     }
 }

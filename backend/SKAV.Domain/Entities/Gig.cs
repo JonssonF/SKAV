@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SKAV.Domain.Models
+﻿namespace SKAV.Domain.Entities
 {
-    public class Gig
+    public class Gig : BaseEntity
     {
         public int Id { get; set; }
 

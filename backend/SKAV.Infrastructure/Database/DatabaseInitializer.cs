@@ -38,6 +38,12 @@ namespace SKAV.Infrastructure.Database
                     Notes TEXT NULL,
                     IsPrivate INTEGER NOT NULL DEFAULT 0,
                     TicketUrl TEXT NULL
+                    CreatedAt TEXT NOT NULL,
+                    CreatedBy INTEGER,
+                    UpdatedAt TEXT,
+                    UpdatedBy INTEGER,
+                    DeletedAt TEXT,
+                    DeletedBy INTEGER
                 );
             """;
 

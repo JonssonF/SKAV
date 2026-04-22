@@ -1,4 +1,4 @@
-﻿namespace SKAV.Domain.Models
+﻿namespace SKAV.Domain.Entities
 {
     public class Member
     {
