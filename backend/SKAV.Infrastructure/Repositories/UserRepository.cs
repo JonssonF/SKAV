@@ -10,12 +10,17 @@ namespace SKAV.Infrastructure.Repositories
     public sealed class UserRepository : IUserRepository
     {
         private readonly IUnitOfWorkConnection _connection;
-
-        public UserRepository(IUnitOfWorkConnection connection)
-            => _connection = connection;
+        private readonly IDbConnectionFactory _factory;
+        public UserRepository(IUnitOfWorkConnection connection, IDbConnectionFactory factory)
+        {
+            _connection = connection;
+            _factory = factory;
+        }
 
         public async Task<User?> GetByEmailAsync(string email, CancellationToken ct)
         {
+            using var connection = _factory.CreateConnection();
+
             const string sql = """
                 SELECT Id, Email, PasswordHash, Role
                 FROM Users
@@ -23,7 +28,7 @@ namespace SKAV.Infrastructure.Repositories
                 LIMIT 1;
                 """;
 
-            return await _connection.Connection.QuerySingleOrDefaultAsync<User>(new CommandDefinition(
+            return await connection.QuerySingleOrDefaultAsync<User>(new CommandDefinition(
                 commandText: sql,
                 parameters: new { Email = email },
                 transaction: _connection.Transaction,
