@@ -4,24 +4,17 @@ using SKAV.Application.DTOs.Auth;
 using SKAV.Application.Interfaces;
 using SKAV.Application.Services.Interface;
 using SKAV.Application.Validator;
-using SKAV.Application.Validator.User;
+using SKAV.Application.Validators.User;
 using SKAV.Domain.Entities;
 using SKAV.Domain.Enumeration;
 
 namespace SKAV.Application.Services
 {
-    public class UserService : IUserService
+    public class UserService (IUserRepository repo, IUserValidator validator, IUnitOfWorkConnection uow) : IUserService
     {
-        private readonly IUserRepository _repo;
-        private readonly IUserValidator _validator;
-        private readonly IUnitOfWorkConnection _uow;
-
-        public UserService(IUserRepository repo, IUserValidator validator, IUnitOfWorkConnection uow)
-        {
-            _repo = repo;
-            _validator = validator;
-            _uow = uow;
-        }
+        private readonly IUserRepository _repo = repo;
+        private readonly IUserValidator _validator = validator;
+        private readonly IUnitOfWorkConnection _uow = uow;
 
         public async Task<Result> CreateUserAsync(CreateUserRequest request, CancellationToken ct)
         {

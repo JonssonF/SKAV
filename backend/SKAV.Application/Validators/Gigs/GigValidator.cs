@@ -3,16 +3,11 @@ using SKAV.Application.Interfaces;
 using SKAV.Application.Validator;
 using SKAV.Application.Validator.Gigs;
 
-namespace SKAV.Application.Validation.Gigs;
+namespace SKAV.Application.Validators.Gigs;
 
-public class GigValidator : IGigValidator
+public class GigValidator(IGigRepository repo) : IGigValidator
 {
-    private readonly IGigRepository _repo;
-
-    public GigValidator(IGigRepository repo)
-    {
-        _repo = repo;
-    }
+    private readonly IGigRepository _repo = repo;
 
     public async Task<List<ValidationError>> ValidateCreateAsync(CreateGigRequestDto request, CancellationToken ct)
     {
@@ -34,7 +29,7 @@ public class GigValidator : IGigValidator
         return errors;
     }
 
-    private void ValidateDate(DateTimeOffset date, List<ValidationError> errors)
+    private static void ValidateDate(DateTimeOffset date, List<ValidationError> errors)
     {
         var now = DateTimeOffset.UtcNow;
 

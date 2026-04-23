@@ -7,18 +7,11 @@ using SKAV.Application.Validators.Auth;
 
 namespace SKAV.Application.Services
 {
-    public class AuthService : IAuthService
+    public class AuthService(IUserRepository userRepository, IJwtService jwt, IAuthValidator validator) : IAuthService
     {
-        private readonly IAuthValidator _validator;
-        private readonly IUserRepository _userRepository;
-        private readonly IJwtService _jwt;
-
-        public AuthService(IUserRepository userRepository, IJwtService jwt, IAuthValidator validator)
-        {
-            _userRepository = userRepository;
-            _jwt = jwt;
-            _validator = validator;
-        }
+        private readonly IAuthValidator _validator = validator;
+        private readonly IUserRepository _userRepository = userRepository;
+        private readonly IJwtService _jwt = jwt;
 
         public async Task<Result<LoginResponseDto>> LoginAsync(LoginRequestDto request, CancellationToken ct)
         {
@@ -27,19 +20,18 @@ namespace SKAV.Application.Services
             if (errors.Any())
                 return Result<LoginResponseDto>.Fail(errors);
 
-            
             var user = await _userRepository.GetByEmailAsync(request.Email, ct);
             
             if (user is null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
             {
-                return Result<LoginResponseDto>.Fail(new List<ValidationError>
-                {
+                return Result<LoginResponseDto>.Fail(
+                [
                     new ValidationError
                     {
                         Message = "Invalid credentials",
                         Code = "INVALID_CREDENTIALS"
                     }
-                });
+                ]);
             }
             
             var token = _jwt.GenerateToken(user);

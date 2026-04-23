@@ -4,13 +4,9 @@ using SKAV.Domain.Entities;
 
 namespace SKAV.Infrastructure.Repositories
 {
-    public sealed class UserRepository : IUserRepository
+    public sealed class UserRepository(IUnitOfWorkConnection connection) : IUserRepository
     {
-        private readonly IUnitOfWorkConnection _connection;
-        public UserRepository(IUnitOfWorkConnection connection)
-        {
-            _connection = connection;
-        }
+        private readonly IUnitOfWorkConnection _connection = connection;
 
         public async Task<User?> GetByEmailAsync(string email, CancellationToken ct)
         {

@@ -1,25 +1,16 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SKAV.Application.DTOs.Auth;
 using SKAV.Application.Services.Interface;
-using SKAV.Domain.Enumeration;
-using SKAV.Infrastructure.Repositories;
-using System.Runtime.CompilerServices;
 
 namespace SKAV.Api.Controllers
 {
     [Route("api/admin")]
     [ApiController]
     [Authorize(Roles = "Admin")]
-    public class AdminController : ControllerBase
+    public class AdminController(IUserService userService) : ControllerBase
     {
-        private readonly IUserService _userService;
-
-        public AdminController(IUserService userService)
-        {
-            _userService = userService;
-        }
+        private readonly IUserService _userService = userService;
 
         [HttpPost("users")]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest request, CancellationToken ct)

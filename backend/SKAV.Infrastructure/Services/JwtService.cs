@@ -8,16 +8,10 @@ using System.Text;
 
 namespace SKAV.Infrastructure.Services
 {
-    public class JwtService : IJwtService
+    public class JwtService(IConfiguration config) : IJwtService
     {
-        private readonly string _key;
-        private readonly int _expiryHours;
-
-        public JwtService(IConfiguration config)
-        {
-            _key = config["Jwt:Key"]!;
-            _expiryHours = int.Parse(config["Jwt:ExpiryHours"]!);
-        }
+        private readonly string _key = config["Jwt:Key"]!;
+        private readonly int _expiryHours = int.Parse(config["Jwt:ExpiryHours"]!);
 
         public string GenerateToken(User user)
         {

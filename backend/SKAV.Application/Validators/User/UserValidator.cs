@@ -1,17 +1,13 @@
 ﻿using SKAV.Application.DTOs.Auth;
 using SKAV.Application.Interfaces;
+using SKAV.Application.Validator;
 using SKAV.Domain.Enumeration;
 
-namespace SKAV.Application.Validator.User
+namespace SKAV.Application.Validators.User
 {
-    public class UserValidator : IUserValidator
+    public class UserValidator(IUserRepository repo) : IUserValidator
     {
-        private readonly IUserRepository _userRepository;
-
-        public UserValidator(IUserRepository repo)
-        {
-            _userRepository = repo;
-        }
+        private readonly IUserRepository _userRepository = repo;
 
         public async Task<List<ValidationError>> ValidateCreateUserRequestAsync(CreateUserRequest request, CancellationToken ct)
         {
@@ -27,13 +23,13 @@ namespace SKAV.Application.Validator.User
             return errors;
         }
 
-        private void ValidateEmail(string email, List<ValidationError> errors)
+        private static void ValidateEmail(string email, List<ValidationError> errors)
         {
             if (string.IsNullOrWhiteSpace(email))
                 errors.Add(new ValidationError { Field = "Email", Message = "Email krävs.", Code = "EmailRequired" });
         }
 
-        private void ValidatePassword(string password, List<ValidationError> errors)
+        private static void ValidatePassword(string password, List<ValidationError> errors)
         {
             if (string.IsNullOrWhiteSpace(password))
                 errors.Add(new ValidationError { Field = "Password", Message = "Lösenord krävs.", Code = "PasswordRequired" });
@@ -41,7 +37,7 @@ namespace SKAV.Application.Validator.User
                 errors.Add(new ValidationError { Field = "Password", Message = "Lösenord måste vara minst 8 tecken.", Code = "PasswordTooShort" });
         }
 
-        private void ValidateRole(string role, List<ValidationError> errors)
+        private static void ValidateRole(string role, List<ValidationError> errors)
         {
             if (!Enum.TryParse<Roles>(role, ignoreCase: true, out _))
                 errors.Add(new ValidationError
