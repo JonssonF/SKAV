@@ -10,7 +10,7 @@ namespace SKAV.Application.Validator.User
     public interface IUserValidator
     {
         Task<List<ValidationError>> ValidateCreateUserRequestAsync(CreateUserRequest request, CancellationToken ct);
-        Task<List<ValidationError>> ValidateUpdateUserRequestAsync(UpdateUserRequest request, CancellationToken ct);
-        Task<List<ValidationError>> ValidateUserRequestAsync(User request, CancellationToken ct);
+        //Task<List<ValidationError>> ValidateUpdateUserRequestAsync(UpdateUserRequest request, CancellationToken ct);
+        //Task<List<ValidationError>> ValidateUserRequestAsync(User request, CancellationToken ct);
     }
 }

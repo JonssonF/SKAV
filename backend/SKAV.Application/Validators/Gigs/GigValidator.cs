@@ -1,6 +1,5 @@
 ﻿using SKAV.Application.DTOs.Gigs.Request;
 using SKAV.Application.Interfaces;
-using SKAV.Application.Validation;
 using SKAV.Application.Validator;
 using SKAV.Application.Validator.Gigs;
 

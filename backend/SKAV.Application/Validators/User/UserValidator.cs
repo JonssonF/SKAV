@@ -1,11 +1,6 @@
 ﻿using SKAV.Application.DTOs.Auth;
 using SKAV.Application.Interfaces;
 using SKAV.Domain.Enumeration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SKAV.Application.Validator.User
 {

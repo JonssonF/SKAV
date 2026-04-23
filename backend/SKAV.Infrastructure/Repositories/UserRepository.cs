@@ -1,25 +1,20 @@
 ﻿using Dapper;
 using SKAV.Application.Interfaces;
 using SKAV.Domain.Entities;
-using SKAV.Infrastructure.Database;
-using System.Data;
-using System.Data.Common;
 
 namespace SKAV.Infrastructure.Repositories
 {
     public sealed class UserRepository : IUserRepository
     {
         private readonly IUnitOfWorkConnection _connection;
-        private readonly IDbConnectionFactory _factory;
-        public UserRepository(IUnitOfWorkConnection connection, IDbConnectionFactory factory)
+        public UserRepository(IUnitOfWorkConnection connection)
         {
             _connection = connection;
-            _factory = factory;
         }
 
         public async Task<User?> GetByEmailAsync(string email, CancellationToken ct)
         {
-            using var connection = _factory.CreateConnection();
+            using var connection = _connection.Connection;
 
             const string sql = """
                 SELECT Id, Email, PasswordHash, Role
