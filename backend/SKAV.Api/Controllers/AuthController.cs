@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity.Data;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SKAV.Application.DTOs.Auth;
-using SKAV.Infrastructure.Repositories;
-using SKAV.Infrastructure.Services;
+using SKAV.Application.Services.Interface;
 
 namespace SKAV.Api.Controllers
 {
@@ -10,32 +8,24 @@ namespace SKAV.Api.Controllers
     [Route("api/auth")]
     public class AuthController : ControllerBase
     {
-        private readonly UserRepository _repo;
-        private readonly JwtService _jwt;
+        private readonly IAuthService _authService;
 
-        public AuthController(UserRepository repo, JwtService jwt)
+        public AuthController(IAuthService authService)
         {
-            _repo = repo;
-            _jwt = jwt;
+            _authService = authService;
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequestDto request, CancellationToken ct)
+        public async Task<ActionResult<LoginResponseDto>> Login(
+            [FromBody]LoginRequestDto request, CancellationToken ct)
         {
-            // Validate input
-            if (string.IsNullOrWhiteSpace(request?.Email) || string.IsNullOrWhiteSpace(request.Password))
-                return BadRequest("Email and password are required");
-
-            var user = await _repo.GetByEmailAsync(request.Email, ct);
-
-            // Prevent timing attacks: hash always runs
-            bool isValid = user != null && BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash);
-
-            if (!isValid)
-                return Unauthorized("Invalid credentials");
-
-            var token = _jwt.GenerateToken(user);
-            return Ok(new { token });
+            var result = await _authService.LoginAsync(request, ct);
+            
+            if (!result.Success)
+            {
+                return BadRequest(result.Errors);
+            }
+            return Ok(result.Data);
         }
     }
 }

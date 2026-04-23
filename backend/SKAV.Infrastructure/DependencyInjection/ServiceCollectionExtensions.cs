@@ -1,13 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SKAV.Application.Interfaces;
-using SKAV.Application.Services;
-using SKAV.Application.Services.Interface;
-using SKAV.Application.Validation.Gigs;
-using SKAV.Application.Validator.Gigs;
-using SKAV.Application.Validator.User;
 using SKAV.Infrastructure.Database;
-using SKAV.Infrastructure.Repositories;
 using SKAV.Infrastructure.Services;
 using System.Reflection;
 
@@ -27,7 +21,7 @@ namespace SKAV.Infrastructure.DependencyInjection
 
             // Services
             RegisterByConvention(services, assembly, "Service");
-
+            //services.AddScoped<IJwtService, JwtService>();
             // Repositories
             RegisterByConvention(services, assembly, "Repository");
 
