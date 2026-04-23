@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SKAV.Application.DTOs.Auth;
 using SKAV.Application.Services.Interface;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace SKAV.Api.Controllers
 {
@@ -9,18 +10,11 @@ namespace SKAV.Api.Controllers
     public class AuthController(IAuthService authService) : ControllerBase
     {
         private readonly IAuthService _authService = authService;
- 
+
         [HttpPost("login")]
-        public async Task<ActionResult<LoginResponseDto>> Login(
-            [FromBody]LoginRequestDto request, CancellationToken ct)
-        {
-            var result = await _authService.LoginAsync(request, ct);
-            
-            if (!result.Success)
-            {
-                return BadRequest(result.Errors);
-            }
-            return Ok(result.Data);
-        }
+        [SwaggerOperation ("Loggar in en användare")]
+        public async Task<LoginResponseDto> Login(
+            LoginRequestDto request, CancellationToken ct)
+            => await _authService.LoginAsync(request, ct);
     }
 }

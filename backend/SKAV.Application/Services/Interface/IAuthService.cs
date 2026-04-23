@@ -5,6 +5,6 @@ namespace SKAV.Application.Services.Interface
 {
     public interface IAuthService
     {
-        Task<Result<LoginResponseDto>> LoginAsync(LoginRequestDto request, CancellationToken ct);
+        Task<LoginResponseDto> LoginAsync(LoginRequestDto request, CancellationToken ct);
     }
 }

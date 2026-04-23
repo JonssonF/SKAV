@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SKAV.Application.Interfaces;
+using SKAV.Application.Services.Interface;
 using SKAV.Infrastructure.Database;
 using SKAV.Infrastructure.Services;
 using System.Reflection;
@@ -16,24 +17,27 @@ namespace SKAV.Infrastructure.DependencyInjection
             var connectionString = configuration.GetConnectionString("Default") 
                 ?? throw new InvalidOperationException("Connection string 'Default' not found.");
 
-            // Automatically register services, repositories, and validators by convention
-            var assembly = Assembly.GetExecutingAssembly();
+            // Assemblies to scan
+            var assemblies = new[]
+            {
+            typeof(IAuthService).Assembly,              // Application
+            typeof(SqliteConnectionFactory).Assembly    // Infrastructure
+        };
 
-            // Services
-            RegisterByConvention(services, assembly, "Service");
-            //services.AddScoped<IJwtService, JwtService>();
-            // Repositories
-            RegisterByConvention(services, assembly, "Repository");
+            // Register by convention
+            foreach (var assembly in assemblies)
+            {
+                RegisterByConvention(services, assembly, "Service");
+                RegisterByConvention(services, assembly, "Repository");
+                RegisterByConvention(services, assembly, "Validator");
+            }
 
-            // Validators
-            RegisterByConvention(services, assembly, "Validator");
-
-            // Options
+            // Explicit registrations
+            services.AddScoped<IJwtService, JwtService>();
             services.AddSingleton<IDbConnectionFactory, SqliteConnectionFactory>();
-            services.AddTransient<DatabaseInitializer>();
-            services.AddScoped<JwtService>();
-            services.AddScoped<SeedData>();
             services.AddScoped<IUnitOfWorkConnection, UnitOfWorkConnection>();
+            services.AddTransient<DatabaseInitializer>();
+            services.AddScoped<SeedData>();
 
             return services;
         }

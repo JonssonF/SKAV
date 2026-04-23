@@ -7,7 +7,7 @@ public class UnitOfWorkConnection : IUnitOfWorkConnection
 {
     private readonly IDbConnectionFactory _factory;
 
-    public IDbConnection Connection { get; private set; } = null!;
+    public IDbConnection? Connection { get; private set; }
     public IDbTransaction? Transaction { get; private set; }
 
     public UnitOfWorkConnection(IDbConnectionFactory factory)
@@ -29,15 +29,27 @@ public class UnitOfWorkConnection : IUnitOfWorkConnection
 
     public Task CommitAsync()
     {
-        Transaction?.Commit();
-        Dispose();
+        if (Transaction != null)
+        {
+            Transaction.Commit();
+            Dispose();
+            Transaction = null;
+            Connection = null;
+        }
+
         return Task.CompletedTask;
     }
 
     public Task RollbackAsync()
     {
-        Transaction?.Rollback();
-        Dispose();
+        if (Transaction != null)
+        {
+            Transaction.Rollback();
+            Dispose();
+            Transaction = null;
+            Connection = null;
+        }
+
         return Task.CompletedTask;
     }
 

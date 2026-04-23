@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Models;
@@ -13,9 +14,9 @@ namespace SKAV.Api
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            //JWT
-            var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!);
 
+            // JWT
+            var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!);
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -23,7 +24,6 @@ namespace SKAV.Api
                     {
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(key),
-
                         ValidateIssuer = false,
                         ValidateAudience = false
                     };
@@ -34,9 +34,7 @@ namespace SKAV.Api
             builder.Services.AddControllers();
             builder.Services.AddHttpContextAccessor();
 
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-
             builder.Services.AddSwaggerGen(options =>
             {
                 options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -60,7 +58,7 @@ namespace SKAV.Api
                                 Id = "Bearer"
                             }
                         },
-                        new string[] {}
+                        new List<string>()
                     }
                 });
             });
@@ -73,23 +71,16 @@ namespace SKAV.Api
                 dbInitializer.InitializeAsync().GetAwaiter().GetResult();
             }
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
-                app.UseSwaggerUI(options =>
-                {
-                    options.SwaggerEndpoint("/swagger/v1/swagger.json", "SKAV API v1");
-                });
+                app.UseSwaggerUI();
             }
 
             app.UseHttpsRedirection();
-
             app.UseAuthentication();
             app.UseAuthorization();
-
             app.MapControllers();
-
             app.Run();
         }
     }
