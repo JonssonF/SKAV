@@ -10,7 +10,7 @@ namespace SKAV.Api.Controllers
     public class AuthController(IAuthService authService) : ControllerBase
     {
         [HttpPost("login")]
-        [SwaggerOperation ("Loggar in en användare")]
+        [SwaggerOperation ("Loggar in en användare och returnerar en JWT-token")]
         public async Task<LoginResponseDto> Login(
             LoginRequestDto request, CancellationToken ct)
             => await authService.LoginAsync(request, ct);
