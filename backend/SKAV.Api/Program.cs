@@ -1,12 +1,7 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi;
-using Microsoft.OpenApi.Models;
+using SKAV.Api.Extensions;
 using SKAV.Domain.Exceptions;
 using SKAV.Infrastructure.Database;
 using SKAV.Infrastructure.DependencyInjection;
-using System.Text;
 
 namespace SKAV.Api
 {
@@ -16,55 +11,13 @@ namespace SKAV.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // JWT
-            var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!);
-            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
-                {
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(key),
-                        ValidateIssuer = false,
-                        ValidateAudience = false
-                    };
-                });
-
-            // Add services to the container.
+            builder.Services.AddJwtAuthentication(builder.Configuration);
             builder.Services.AddInfrastructure(builder.Configuration);
             builder.Services.AddControllers();
             builder.Services.AddHttpContextAccessor();
-
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen(options =>
-            {
-
-                options.EnableAnnotations();
-                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                {
-                    Name = "Authorization",
-                    Type = SecuritySchemeType.Http,
-                    Scheme = "bearer",
-                    BearerFormat = "JWT",
-                    In = ParameterLocation.Header,
-                    Description = "Enter: Bearer {your token}"
-                });
-
-                options.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
-                        },
-                        new List<string>()
-                    }
-                });
-            });
+            builder.Services.AddCorsPolicy();
+            builder.Services.AddSwaggerWithJwt();
 
             var app = builder.Build();
 
@@ -84,8 +37,8 @@ namespace SKAV.Api
             }
 
             app.UseMiddleware<ExceptionHandlingMiddleware>();
-
             app.UseHttpsRedirection();
+            app.UseCors("AllowFrontend");
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
