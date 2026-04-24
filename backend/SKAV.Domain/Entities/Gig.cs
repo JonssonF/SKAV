@@ -2,8 +2,6 @@
 {
     public class Gig : BaseEntity
     {
-        public int Id { get; set; }
-
         //Mandatory fields
 
         public required string Title { get; set; }
