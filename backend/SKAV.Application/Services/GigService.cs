@@ -21,7 +21,7 @@ public class GigService(
 {
     public async Task<IEnumerable<GigResponseDto>> GetAllAsync(CancellationToken ct)
     {
-        var gigs = await repo.GetAllGigsAsync(ct);
+        var gigs = await repo.GetAllAsync(ct);
 
         return gigs
             .Where(g => !g.IsPrivate)
@@ -31,7 +31,7 @@ public class GigService(
 
     public async Task<GigResponseDto> GetByIdAsync(int id, CancellationToken ct)
     {
-        var gig = await repo.GetGigByIdAsync(id, ct);
+        var gig = await repo.GetByIdAsync(id, ct);
 
         if (gig is null || gig.IsPrivate)
             throw new NotFoundException(BusinessRules.GigNotFound);
@@ -59,14 +59,14 @@ public class GigService(
         AuditHelper.SetCreated(gig, currentUser.UserId);
 
         using var scope = uow.BeginTransactionScope();
-        var id = await repo.CreateGigAsync(gig, ct);
+        var id = await repo.CreateAsync(gig, ct);
         await scope.CommitTransactionScopeAsync(ct);
         return id;
     }
 
     public async Task UpdateAsync(int id, UpdateGigRequestDto request, CancellationToken ct)
     {
-        var existing = await repo.GetGigByIdAsync(id, ct)
+        var existing = await repo.GetByIdAsync(id, ct)
             ?? throw new NotFoundException(BusinessRules.GigNotFound);
 
         await validator.ValidateUpdateAsync(id, request, ct);
@@ -83,19 +83,19 @@ public class GigService(
         AuditHelper.SetUpdated(existing, currentUser.UserId);
 
         using var scope = uow.BeginTransactionScope();
-        await repo.UpdateGigAsync(existing, ct);
+        await repo.UpdateAsync(existing, ct);
         await scope.CommitTransactionScopeAsync(ct);
     }
 
     public async Task DeleteAsync(int id, CancellationToken ct)
     {
-        var existing = await repo.GetGigByIdAsync(id, ct)
+        var existing = await repo.GetByIdAsync(id, ct)
             ?? throw new NotFoundException(BusinessRules.GigNotFound);
 
         AuditHelper.SetDeleted(existing, currentUser.UserId);
 
         using var scope = uow.BeginTransactionScope();
-        await repo.DeleteGigAsync(id, ct);
+        await repo.DeleteAsync(id, existing, ct);
         await scope.CommitTransactionScopeAsync(ct);
     }
 

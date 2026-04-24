@@ -34,7 +34,7 @@ public class GigValidator(IGigRepository repo) : IGigValidator
 
     private async Task ValidateExistsAsync(string title, DateTimeOffset date, int? excludeId, CancellationToken ct)
     {
-        var exists = await repo.ExistsAsync(title, date, excludeId, ct);
+        var exists = await repo.ExistsByTitleAndDateAsync(title, date, excludeId, ct);
         if (exists)
             throw new BusinessRuleException(
                 "Gig med samma titel och datum finns redan.",
