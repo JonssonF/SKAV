@@ -54,5 +54,10 @@
         /// Passar för längre fritext som citat och beskrivningar.
         /// </summary>
         public const string FreeText = @"^[\p{L}0-9\s\.\,\!\?\-:()'""]*$";
+
+        /// <summary>
+        /// Kräver minst 8 tecken, minst en bokstav, minst en siffra och specialtecken.
+        /// </summary>
+        public const string Password = @"^(?=.*[\p{L}])(?=.*\d)(?=.*[@$!%*?&\-_#])[^\s]{8,}$";
     }
 }

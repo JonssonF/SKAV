@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace SKAV.Application.DTOs.User
 {
@@ -6,6 +7,7 @@ namespace SKAV.Application.DTOs.User
     {
         [Required(ErrorMessage = "Roll är obligatorisk")]
         [RegularExpression("^(Admin|Editor)$", ErrorMessage = "Roll måste vara Admin eller Editor")]
+        [DefaultValue("Editor")]
         public required string Role { get; set; }
     }
 }
