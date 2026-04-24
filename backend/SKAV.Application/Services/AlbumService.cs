@@ -4,6 +4,7 @@ using SKAV.Application.Interfaces;
 using SKAV.Application.Interfaces.Repositories;
 using SKAV.Application.Interfaces.UoW;
 using SKAV.Application.Services.Interface;
+using SKAV.Application.Validators.Album;
 using SKAV.Domain.Consts;
 using SKAV.Domain.Entities;
 using SKAV.Domain.Exceptions;
@@ -11,9 +12,10 @@ using SKAV.Domain.Exceptions;
 namespace SKAV.Application.Services
 {
     public class AlbumService(
-    IAlbumRepository repo,
-    IUnitOfWork uow,
-    ICurrentUserService currentUser) : IAlbumService
+        IAlbumRepository repo,
+        IAlbumValidator validator,
+        IUnitOfWork uow,
+        ICurrentUserService currentUser) : IAlbumService
     {
         public async Task<IEnumerable<AlbumResponseDto>> GetAllAsync(CancellationToken ct)
         {
@@ -34,6 +36,8 @@ namespace SKAV.Application.Services
 
         public async Task<CreateAlbumResponseDto> CreateAsync(CreateAlbumRequestDto request, CancellationToken ct)
         {
+            await validator.ValidateCreateAsync(request, ct);
+
             var album = new Album
             {
                 Title = request.Title,
@@ -56,6 +60,8 @@ namespace SKAV.Application.Services
         {
             var existing = await repo.GetByIdAsync(id, ct)
                 ?? throw new NotFoundException(BusinessRules.AlbumNotFound);
+
+            await validator.ValidateUpdateAsync(id, request, ct);
 
             existing.Title = request.Title;
             existing.CoverImageUrl = request.CoverImageUrl;

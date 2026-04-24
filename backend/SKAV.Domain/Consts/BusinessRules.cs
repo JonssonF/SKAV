@@ -9,6 +9,10 @@
         public const string InvalidPassword = "InvalidPassword";
         public const string InvalidRole = "InvalidRole";
 
+        // Album
+        public const string AlbumNotFound = "AlbumNotFound";
+        public const string AlbumAlreadyExists = "AlbumAlreadyExists";
+
         // Gigs
         public const string GigNotFound = "GigNotFound";
         public const string GigAlreadyExists = "GigAlreadyExists";
@@ -19,11 +23,16 @@
         // Subscribers
         public const string SubscriberNotFound = "SubscriberNotFound";
 
-        // Albums, Songs, Lyrics
-        public const string AlbumNotFound = "AlbumNotFound";
+        // Songs
         public const string SongNotFound = "SongNotFound";
+        public const string SongAlreadyExists = "SongAlreadyExists";
+
+        // Lyrics
         public const string LyricsNotFound = "LyricsNotFound";
         public const string LyricsAlreadyExists = "LyricsAlreadyExists";
+
+        // Newsletter
+        public const string NoSubscribers = "NoSubscribers";
 
         // Validation
         public const string ValidationFailed = "ValidationFailed";

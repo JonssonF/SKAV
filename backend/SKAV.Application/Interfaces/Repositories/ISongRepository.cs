@@ -5,5 +5,6 @@ namespace SKAV.Application.Interfaces.Repositories
     public interface ISongRepository : IRepository<Song>
     {
         Task<IEnumerable<Song>> GetByAlbumIdAsync(int albumId, CancellationToken ct);
+        Task<bool> ExistsByTitleAndAlbumAsync(string title, int? albumId, int? excludeId, CancellationToken ct);
     }
 }

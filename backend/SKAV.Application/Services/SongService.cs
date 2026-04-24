@@ -4,6 +4,7 @@ using SKAV.Application.Interfaces;
 using SKAV.Application.Interfaces.Repositories;
 using SKAV.Application.Interfaces.UoW;
 using SKAV.Application.Services.Interface;
+using SKAV.Application.Validators.Song;
 using SKAV.Domain.Consts;
 using SKAV.Domain.Entities;
 using SKAV.Domain.Exceptions;
@@ -13,6 +14,7 @@ namespace SKAV.Application.Services
     public class SongService(
         ISongRepository repo,
         IAlbumRepository albumRepo,
+        ISongValidator validator,
         IUnitOfWork uow,
         ICurrentUserService currentUser) : ISongService
     {
@@ -37,6 +39,7 @@ namespace SKAV.Application.Services
         public async Task<CreateSongResponseDto> CreateAsync(CreateSongRequestDto request, CancellationToken ct)
         {
             await ValidateAlbumExistsAsync(request.AlbumId, ct);
+            await validator.ValidateCreateAsync(request, ct);
 
             var song = new Song
             {
@@ -63,6 +66,7 @@ namespace SKAV.Application.Services
                 ?? throw new NotFoundException(BusinessRules.SongNotFound);
 
             await ValidateAlbumExistsAsync(request.AlbumId, ct);
+            await validator.ValidateUpdateAsync(id, request, ct);
 
             existing.AlbumId = request.AlbumId;
             existing.Title = request.Title;

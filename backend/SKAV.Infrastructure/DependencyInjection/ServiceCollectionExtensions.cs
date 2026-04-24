@@ -39,12 +39,12 @@ namespace SKAV.Infrastructure.DependencyInjection
             services.AddSingleton<IDbConnectionFactory, SqliteConnectionFactory>();
             services.AddTransient<DatabaseInitializer>();
             services.AddScoped<SeedData>();
+            services.AddScoped<IEmailService, ResendEmailService>();
 
             // UnitOfWork registrations
             services.AddScoped<UnitOfWork>();
             services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<UnitOfWork>());
             services.AddScoped<IUnitOfWorkConnection>(sp => sp.GetRequiredService<UnitOfWork>());
-
 
             return services;
         }
