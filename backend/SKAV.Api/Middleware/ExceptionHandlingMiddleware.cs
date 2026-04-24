@@ -1,4 +1,5 @@
 ﻿using SKAV.Domain.Exceptions;
+using System.Text.Json;
 
 namespace SKAV.Domain.Exceptions
 {
@@ -37,6 +38,9 @@ namespace SKAV.Domain.Exceptions
                 errorCode,
                 message = ex.Message,
                 errors
+            }, new JsonSerializerOptions
+            {
+                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
             });
         }
     }
