@@ -41,7 +41,10 @@ namespace SKAV.Application.Services
             await repo.CreateAsync(subscriber, ct);
             await scope.CommitTransactionScopeAsync(ct);
 
-            return new SubscriberResponseDto();
+            return new SubscriberResponseDto
+            {
+                Email = subscriber.Email
+            };
         }
 
         public async Task<UnsubscribeResponseDto> UnsubscribeAsync(SubscriberRequestDto request, CancellationToken ct)
