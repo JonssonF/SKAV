@@ -12,7 +12,7 @@ namespace SKAV.Api
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -69,7 +69,10 @@ namespace SKAV.Api
             using (var scope = app.Services.CreateScope())
             {
                 var dbInitializer = scope.ServiceProvider.GetRequiredService<DatabaseInitializer>();
-                dbInitializer.InitializeAsync().GetAwaiter().GetResult();
+                await dbInitializer.InitializeAsync();
+
+                var seeder = scope.ServiceProvider.GetRequiredService<SeedData>();
+                await seeder.SeedAsync();
             }
 
             if (app.Environment.IsDevelopment())

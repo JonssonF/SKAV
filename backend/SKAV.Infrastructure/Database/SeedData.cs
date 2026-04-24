@@ -1,22 +1,27 @@
 ﻿using Dapper;
+using SKAV.Application.Common.Helpers;
+using SKAV.Application.Interfaces.Repositories;
+using SKAV.Application.Interfaces.UoW;
 using SKAV.Domain.Entities;
 using System.Data;
 
 namespace SKAV.Infrastructure.Database
 {
-    public class SeedData 
+    public class SeedData(
+        IMemberRepository memberRepo,
+        IGigRepository gigRepo,
+        IUnitOfWork uow)
     {
-        public async Task SeedAsync(IDbConnection connection)
+        public async Task SeedAsync(CancellationToken ct = default)
         {
-            await SeedMembers(connection);
-            await SeedGigs(connection);
+            await SeedMembersAsync(ct);
+            await SeedGigsAsync(ct);
         }
 
-        private async Task SeedMembers(IDbConnection connection)
+        private async Task SeedMembersAsync(CancellationToken ct)
         {
-            var count = await connection.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM Members;");
-
-            if (count > 0) return;
+            var existing = await memberRepo.GetAllAsync(ct);
+            if (existing.Any()) return;
 
             var members = new List<Member>
             {
@@ -27,33 +32,66 @@ namespace SKAV.Infrastructure.Database
                 new() { Name = "Jonas", Role = "Keyboard", DisplayOrder = 5 }
             };
 
-                const string sql = """
-                INSERT INTO Members (Name, Role, Quote, ImageUrl, DisplayOrder)
-                VALUES (@Name, @Role, @Quote, @ImageUrl, @DisplayOrder);
-                """;
+            using var scope = uow.BeginTransactionScope();
 
-            await connection.ExecuteAsync(sql, members);
+            foreach (var member in members)
+            {
+                AuditHelper.SetCreated(member, null);
+                await memberRepo.CreateAsync(member, ct);
+            }
+
+            await scope.CommitTransactionScopeAsync(ct);
         }
 
-        private async Task SeedGigs(IDbConnection connection)
+        private async Task SeedGigsAsync(CancellationToken ct)
         {
-            var count = await connection.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM Gigs;");
+            var existing = await gigRepo.GetAllAsync(ct);
+            if (existing.Any()) return;
 
-            if (count > 0) return;
+            var gigs = new List<Gig>
+            {
+                new()
+                {
+                    Title = "Skavfesten",
+                    Location = "Varberg",
+                    Adress = "Folkets park",
+                    Date = new DateTimeOffset(2026, 6, 15, 20, 0, 0, TimeSpan.Zero),
+                    Description = "Stor fest",
+                    Price = 150,
+                    Notes = "Fri entré före 21",
+                    IsPrivate = false
+                },
+                new()
+                {
+                    Title = "Byfesten",
+                    Location = "Tvååker",
+                    Adress = "Torget",
+                    Date = new DateTimeOffset(2026, 7, 1, 19, 0, 0, TimeSpan.Zero),
+                    Description = "Live på torget",
+                    Price = 0,
+                    IsPrivate = false
+                },
+                new()
+                {
+                    Title = "Privat Gig",
+                    Location = "Himle",
+                    Adress = "Bygdegården",
+                    Date = new DateTimeOffset(2026, 8, 10, 21, 0, 0, TimeSpan.Zero),
+                    Description = "Företagsevent",
+                    Price = 0,
+                    IsPrivate = true
+                }
+            };
 
-            const string sql = """
-            INSERT INTO Gigs (Title, Location, Adress, Date, Description, Price, Notes, IsPrivate, TicketUrl, CreatedAt)
-            VALUES
-            ('Skavfesten', 'Varberg', 'Folkets park', '2026-06-15T20:00:00Z', 'Stor fest', 150, 'Fri entré före 21', 0, NULL, CURRENT_TIMESTAMP),
-            ('Byfesten', 'Tvååker', 'Torget', '2026-07-01T19:00:00Z', 'Live på torget', 0, NULL, 0, NULL, CURRENT_TIMESTAMP),
-            ('Privat Gig', 'Himle', 'Bygdegården', '2026-08-10T21:00:00Z', 'Företagsevent', 0, NULL, 1, NULL, CURRENT_TIMESTAMP);
-        """;
+            using var scope = uow.BeginTransactionScope();
 
-            await connection.ExecuteAsync(sql);
+            foreach (var gig in gigs)
+            {
+                AuditHelper.SetCreated(gig, null);
+                await gigRepo.CreateAsync(gig, ct);
+            }
+
+            await scope.CommitTransactionScopeAsync(ct);
         }
     }
 }
-
-    
-        
- 
