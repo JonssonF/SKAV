@@ -1,19 +1,12 @@
-﻿using SKAV.Application.Common;
-using SKAV.Application.Common.Helpers;
+﻿using SKAV.Application.Common.Helpers;
 using SKAV.Application.DTOs.Member;
 using SKAV.Application.Interfaces;
 using SKAV.Application.Interfaces.Repositories;
 using SKAV.Application.Interfaces.UoW;
 using SKAV.Application.Services.Interface;
-using SKAV.Application.Validator;
 using SKAV.Domain.Consts;
 using SKAV.Domain.Entities;
 using SKAV.Domain.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SKAV.Application.Services
 {
@@ -57,7 +50,7 @@ namespace SKAV.Application.Services
             return id;
         }
 
-        public async Task UpdateAsync(int id, CreateMemberRequestDto request, CancellationToken ct)
+        public async Task UpdateAsync(int id, UpdateMemberRequestDto request, CancellationToken ct)
         {
             var existing = await repo.GetByIdAsync(id, ct)
                 ?? throw new NotFoundException(BusinessRules.MemberNotFound);
