@@ -15,6 +15,8 @@ namespace SKAV.Infrastructure.Database
     {
         public async Task InitializeAsync()
         {
+            SqlMapper.AddTypeHandler(new DateTimeOffsetHandler());
+
             using var connection = connectionFactory.CreateConnection();
             connection.Open();
 
@@ -30,7 +32,6 @@ namespace SKAV.Infrastructure.Database
                 Description TEXT NULL,
                 Price REAL NULL CHECK (Price IS NULL OR Price >= 0),
                 Notes TEXT NULL,
-                IsPrivate INTEGER NOT NULL DEFAULT 0,
                 TicketUrl TEXT NULL,
                 CreatedAt TEXT NOT NULL,
                 CreatedBy INTEGER,
@@ -81,6 +82,20 @@ namespace SKAV.Infrastructure.Database
             );
             """;
             await connection.ExecuteAsync(sqlUsers);
+
+            const string sqlSubscribers = """
+            CREATE TABLE IF NOT EXISTS Subscribers (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                Email TEXT NOT NULL UNIQUE,
+                CreatedAt TEXT NOT NULL,
+                CreatedBy INTEGER,
+                UpdatedAt TEXT,
+                UpdatedBy INTEGER,
+                DeletedAt TEXT,
+                DeletedBy INTEGER
+            );
+            """;
+            await connection.ExecuteAsync(sqlSubscribers);
 
             await SeedAdminAsync(connection);
         }

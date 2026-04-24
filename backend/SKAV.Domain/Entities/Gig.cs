@@ -22,8 +22,6 @@ namespace SKAV.Domain.Entities
         
         public string? Notes { get; set; }
 
-        public bool IsPrivate { get; set; } = false;
-        
         public string? TicketUrl { get; set; }
     }
 }

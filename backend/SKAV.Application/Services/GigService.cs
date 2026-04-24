@@ -1,11 +1,9 @@
-﻿using SKAV.Application.Common;
-using SKAV.Application.Common.Helpers;
+﻿using SKAV.Application.Common.Helpers;
 using SKAV.Application.DTOs.Gigs;
 using SKAV.Application.Interfaces;
 using SKAV.Application.Interfaces.Repositories;
 using SKAV.Application.Interfaces.UoW;
 using SKAV.Application.Services.Interface;
-using SKAV.Application.Validator;
 using SKAV.Application.Validator.Gigs;
 using SKAV.Domain.Consts;
 using SKAV.Domain.Entities;
@@ -24,7 +22,6 @@ public class GigService(
         var gigs = await repo.GetAllAsync(ct);
 
         return gigs
-            .Where(g => !g.IsPrivate)
             .OrderBy(g => g.Date)
             .Select(MapToDto);
     }
@@ -33,7 +30,7 @@ public class GigService(
     {
         var gig = await repo.GetByIdAsync(id, ct);
 
-        if (gig is null || gig.IsPrivate)
+        if (gig is null)
             throw new NotFoundException(BusinessRules.GigNotFound);
 
         return MapToDto(gig);
@@ -53,7 +50,6 @@ public class GigService(
             Price = request.Price,
             Notes = request.Notes,
             TicketUrl = request.TicketUrl,
-            IsPrivate = false
         };
 
         AuditHelper.SetCreated(gig, currentUser.UserId);

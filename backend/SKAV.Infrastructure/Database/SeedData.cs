@@ -59,7 +59,6 @@ namespace SKAV.Infrastructure.Database
                     Description = "Stor fest",
                     Price = 150,
                     Notes = "Fri entré före 21",
-                    IsPrivate = false
                 },
                 new()
                 {
@@ -69,7 +68,7 @@ namespace SKAV.Infrastructure.Database
                     Date = new DateTimeOffset(2026, 7, 1, 19, 0, 0, TimeSpan.Zero),
                     Description = "Live på torget",
                     Price = 0,
-                    IsPrivate = false
+                    Notes = "Ta med egen stol"
                 },
                 new()
                 {
@@ -79,7 +78,7 @@ namespace SKAV.Infrastructure.Database
                     Date = new DateTimeOffset(2026, 8, 10, 21, 0, 0, TimeSpan.Zero),
                     Description = "Företagsevent",
                     Price = 0,
-                    IsPrivate = true
+                    Notes = "Endast inbjudna"
                 }
             };
 

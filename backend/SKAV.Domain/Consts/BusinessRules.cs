@@ -16,6 +16,10 @@
         // Members
         public const string MemberNotFound = "MemberNotFound";
 
+        // Subscribers
+        public const string SubscriberNotFound = "SubscriberNotFound";
+
+
         // Validation
         public const string ValidationFailed = "ValidationFailed";
     }
