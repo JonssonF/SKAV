@@ -1,4 +1,5 @@
-﻿using SKAV.Application.DTOs.User;
+﻿using SKAV.Application.DTOs.Subscriber;
+using SKAV.Application.DTOs.User;
 using SKAV.Application.Interfaces;
 using SKAV.Application.Interfaces.Repositories;
 using SKAV.Application.Interfaces.UoW;
@@ -83,6 +84,17 @@ namespace SKAV.Application.Services
             await scope.CommitTransactionScopeAsync(ct);
 
             return new ChangePasswordResponseDto();
+        }
+        
+        public async Task<IEnumerable<UserResponseDto>> GetAllAsync(CancellationToken ct)
+        {
+            var users = await repo.GetAllAsync(ct);
+            return users.Select(u => new UserResponseDto
+            {
+                Id = u.Id,
+                Email = u.Email,
+                Role = u.Role.ToString()
+            });
         }
     }
 }

@@ -13,7 +13,16 @@ namespace SKAV.Application.Services
          ISubscriberRepository repo,
          IUnitOfWork uow) : ISubscriberService
     {
-        public async Task<SubscribeResponseDto> SubscribeAsync(SubscribeRequestDto request, CancellationToken ct)
+        public async Task<IEnumerable<SubscriberResponseDto>> GetAllAsync(CancellationToken ct)
+        {
+            var subscribers = await repo.GetAllAsync(ct);
+            return subscribers.Select(s => new SubscriberResponseDto
+            {
+                Email = s.Email,
+            });
+        }
+
+        public async Task<SubscriberResponseDto> SubscribeAsync(SubscriberRequestDto request, CancellationToken ct)
         {
             var exists = await repo.EmailExistsAsync(request.Email, ct);
             if (exists)
@@ -32,10 +41,10 @@ namespace SKAV.Application.Services
             await repo.CreateAsync(subscriber, ct);
             await scope.CommitTransactionScopeAsync(ct);
 
-            return new SubscribeResponseDto();
+            return new SubscriberResponseDto();
         }
 
-        public async Task<UnsubscribeResponseDto> UnsubscribeAsync(SubscribeRequestDto request, CancellationToken ct)
+        public async Task<UnsubscribeResponseDto> UnsubscribeAsync(SubscriberRequestDto request, CancellationToken ct)
         {
             var subscriber = await repo.GetByEmailAsync(request.Email, ct)
                 ?? throw new NotFoundException(BusinessRules.SubscriberNotFound);
