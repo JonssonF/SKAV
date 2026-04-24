@@ -28,15 +28,13 @@ public class GigService(
 
     public async Task<GigResponseDto> GetByIdAsync(int id, CancellationToken ct)
     {
-        var gig = await repo.GetByIdAsync(id, ct);
-
-        if (gig is null)
-            throw new NotFoundException(BusinessRules.GigNotFound);
+        var gig = await repo.GetByIdAsync(id, ct)
+            ?? throw new NotFoundException(BusinessRules.GigNotFound);
 
         return MapToDto(gig);
     }
 
-    public async Task<int> CreateAsync(CreateGigRequestDto request, CancellationToken ct)
+    public async Task<CreateGigResponseDto> CreateAsync(CreateGigRequestDto request, CancellationToken ct)
     {
         await validator.ValidateCreateAsync(request, ct);
 
@@ -57,10 +55,11 @@ public class GigService(
         using var scope = uow.BeginTransactionScope();
         var id = await repo.CreateAsync(gig, ct);
         await scope.CommitTransactionScopeAsync(ct);
-        return id;
+
+        return new CreateGigResponseDto { Id = id };
     }
 
-    public async Task UpdateAsync(int id, UpdateGigRequestDto request, CancellationToken ct)
+    public async Task<UpdateGigResponseDto> UpdateAsync(int id, UpdateGigRequestDto request, CancellationToken ct)
     {
         var existing = await repo.GetByIdAsync(id, ct)
             ?? throw new NotFoundException(BusinessRules.GigNotFound);
@@ -81,9 +80,11 @@ public class GigService(
         using var scope = uow.BeginTransactionScope();
         await repo.UpdateAsync(existing, ct);
         await scope.CommitTransactionScopeAsync(ct);
+
+        return new UpdateGigResponseDto();
     }
 
-    public async Task DeleteAsync(int id, CancellationToken ct)
+    public async Task<DeleteGigResponseDto> DeleteAsync(int id, CancellationToken ct)
     {
         var existing = await repo.GetByIdAsync(id, ct)
             ?? throw new NotFoundException(BusinessRules.GigNotFound);
@@ -93,6 +94,8 @@ public class GigService(
         using var scope = uow.BeginTransactionScope();
         await repo.DeleteAsync(id, existing, ct);
         await scope.CommitTransactionScopeAsync(ct);
+
+        return new DeleteGigResponseDto();
     }
 
     private static GigResponseDto MapToDto(Gig g) => new()

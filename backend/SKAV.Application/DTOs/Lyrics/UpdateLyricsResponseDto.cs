@@ -1,4 +1,4 @@
-﻿namespace SKAV.Application.DTOs.Lyric
+﻿namespace SKAV.Application.DTOs.Lyrics
 {
     public class UpdateLyricsResponseDto
     {

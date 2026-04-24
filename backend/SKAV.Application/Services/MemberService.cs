@@ -18,6 +18,7 @@ namespace SKAV.Application.Services
         public async Task<IEnumerable<MemberResponseDto>> GetAllAsync(CancellationToken ct)
         {
             var members = await repo.GetAllAsync(ct);
+
             return members
                 .OrderBy(m => m.DisplayOrder)
                 .Select(MapToDto);
@@ -31,7 +32,7 @@ namespace SKAV.Application.Services
             return MapToDto(member);
         }
 
-        public async Task<int> CreateAsync(CreateMemberRequestDto request, CancellationToken ct)
+        public async Task<CreateMemberResponseDto> CreateAsync(CreateMemberRequestDto request, CancellationToken ct)
         {
             var member = new Member
             {
@@ -39,7 +40,7 @@ namespace SKAV.Application.Services
                 Role = request.Role,
                 Quote = request.Quote,
                 ImageUrl = request.ImageUrl,
-                DisplayOrder = request.DisplayOrder
+                DisplayOrder = request.DisplayOrder,
             };
 
             AuditHelper.SetCreated(member, currentUser.UserId);
@@ -47,10 +48,11 @@ namespace SKAV.Application.Services
             using var scope = uow.BeginTransactionScope();
             var id = await repo.CreateAsync(member, ct);
             await scope.CommitTransactionScopeAsync(ct);
-            return id;
+
+            return new CreateMemberResponseDto { Id = id };
         }
 
-        public async Task UpdateAsync(int id, UpdateMemberRequestDto request, CancellationToken ct)
+        public async Task<UpdateMemberResponseDto> UpdateAsync(int id, UpdateMemberRequestDto request, CancellationToken ct)
         {
             var existing = await repo.GetByIdAsync(id, ct)
                 ?? throw new NotFoundException(BusinessRules.MemberNotFound);
@@ -66,9 +68,11 @@ namespace SKAV.Application.Services
             using var scope = uow.BeginTransactionScope();
             await repo.UpdateAsync(existing, ct);
             await scope.CommitTransactionScopeAsync(ct);
+
+            return new UpdateMemberResponseDto();
         }
 
-        public async Task DeleteAsync(int id, CancellationToken ct)
+        public async Task<DeleteMemberResponseDto> DeleteAsync(int id, CancellationToken ct)
         {
             var existing = await repo.GetByIdAsync(id, ct)
                 ?? throw new NotFoundException(BusinessRules.MemberNotFound);
@@ -78,6 +82,8 @@ namespace SKAV.Application.Services
             using var scope = uow.BeginTransactionScope();
             await repo.DeleteAsync(id, existing, ct);
             await scope.CommitTransactionScopeAsync(ct);
+
+            return new DeleteMemberResponseDto();
         }
 
         private static MemberResponseDto MapToDto(Member m) => new()
@@ -87,7 +93,7 @@ namespace SKAV.Application.Services
             Role = m.Role,
             Quote = m.Quote,
             ImageUrl = m.ImageUrl,
-            DisplayOrder = m.DisplayOrder
+            DisplayOrder = m.DisplayOrder,
         };
     }
 }

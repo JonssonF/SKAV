@@ -1,6 +1,6 @@
 ﻿namespace SKAV.Application.DTOs.Album
 {
-    internal class UpdateAlbumResponseDto
+    public class UpdateAlbumResponseDto
     {
     }
 }

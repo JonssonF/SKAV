@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SKAV.Application.DTOs.Lyric
+namespace SKAV.Application.DTOs.Lyrics
 {
-    public class CreateLyricsRequestDto
+    public class UpdateLyricsRequestDto
     {
         [Required(ErrorMessage = "SongId är obligatoriskt")]
         public required int SongId { get; set; }

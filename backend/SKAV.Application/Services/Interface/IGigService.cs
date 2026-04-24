@@ -7,8 +7,8 @@ namespace SKAV.Application.Services.Interface
     {
         Task<IEnumerable<GigResponseDto>> GetAllAsync(CancellationToken ct);
         Task<GigResponseDto> GetByIdAsync(int id, CancellationToken ct);
-        Task<int> CreateAsync(CreateGigRequestDto request, CancellationToken ct);
-        Task UpdateAsync(int id, UpdateGigRequestDto request, CancellationToken ct);
-        Task DeleteAsync(int id, CancellationToken ct);
+        Task<CreateGigResponseDto> CreateAsync(CreateGigRequestDto request, CancellationToken ct);
+        Task<UpdateGigResponseDto> UpdateAsync(int id, UpdateGigRequestDto request, CancellationToken ct);
+        Task<DeleteGigResponseDto> DeleteAsync(int id, CancellationToken ct);
     }
 }
