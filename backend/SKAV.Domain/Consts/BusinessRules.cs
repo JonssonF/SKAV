@@ -19,6 +19,11 @@
         // Subscribers
         public const string SubscriberNotFound = "SubscriberNotFound";
 
+        // Albums, Songs, Lyrics
+        public const string AlbumNotFound = "AlbumNotFound";
+        public const string SongNotFound = "SongNotFound";
+        public const string LyricsNotFound = "LyricsNotFound";
+        public const string LyricsAlreadyExists = "LyricsAlreadyExists";
 
         // Validation
         public const string ValidationFailed = "ValidationFailed";
