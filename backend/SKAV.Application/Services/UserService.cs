@@ -45,7 +45,7 @@ namespace SKAV.Application.Services
                 ?? throw new NotFoundException(BusinessRules.UserNotFound);
 
             using var scope = uow.BeginTransactionScope();
-            await repo.DeleteAsync(id, ct);
+            await repo.DeleteAsync(id, user, ct);
             await scope.CommitTransactionScopeAsync(ct);
 
             return new DeleteUserResponseDto();
@@ -67,7 +67,10 @@ namespace SKAV.Application.Services
 
         public async Task<ChangePasswordResponseDto> ChangePasswordAsync(ChangePasswordRequestDto request, CancellationToken ct)
         {
-            var user = await repo.GetByIdAsync(currentUser.UserId, ct)
+            var userId = currentUser.UserId
+                ?? throw new BusinessRuleException("Användaren är inte inloggad.", BusinessRules.InvalidCredentials);
+
+            var user = await repo.GetByIdAsync(userId, ct)
                 ?? throw new NotFoundException(BusinessRules.UserNotFound);
 
             if (!BCrypt.Net.BCrypt.Verify(request.CurrentPassword, user.PasswordHash))

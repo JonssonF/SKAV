@@ -1,7 +1,9 @@
-﻿using SKAV.Domain.Enumeration;
+﻿using SKAV.Domain.Attributes;
+using SKAV.Domain.Enumeration;
 
 namespace SKAV.Domain.Entities
 {
+    [TableName("Users")]
     public class User : BaseEntity
     {
         public string Email { get; set; } = null!;

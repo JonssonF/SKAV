@@ -1,5 +1,8 @@
-﻿namespace SKAV.Domain.Entities
+﻿using SKAV.Domain.Attributes;
+
+namespace SKAV.Domain.Entities
 {
+    [TableName("Gigs")]
     public class Gig : BaseEntity
     {
         //Mandatory fields
