@@ -1,66 +1,47 @@
 ﻿using SKAV.Application.Common;
 using SKAV.Application.Common.Helpers;
-using SKAV.Application.DTOs.Gigs.Request;
-using SKAV.Application.DTOs.Gigs.Response;
+using SKAV.Application.DTOs.Gigs;
 using SKAV.Application.Interfaces;
+using SKAV.Application.Interfaces.Repositories;
+using SKAV.Application.Interfaces.UoW;
 using SKAV.Application.Services.Interface;
 using SKAV.Application.Validator;
 using SKAV.Application.Validator.Gigs;
+using SKAV.Domain.Consts;
 using SKAV.Domain.Entities;
+using SKAV.Domain.Exceptions;
 
 namespace SKAV.Application.Services;
 
-public class GigService : IGigService
+public class GigService(
+    IGigRepository repo,
+    IGigValidator validator,
+    IUnitOfWork uow,
+    ICurrentUserService currentUser) : IGigService
 {
-    private readonly ICurrentUserService _currentUser;
-    private readonly IGigRepository _repo;
-    private readonly IGigValidator _validator;
-    private readonly IUnitOfWorkConnection _uow;
-
-    public GigService(IGigRepository repo, IGigValidator validator, IUnitOfWorkConnection uow, ICurrentUserService currentUser)
+    public async Task<IEnumerable<GigResponseDto>> GetAllAsync(CancellationToken ct)
     {
+        var gigs = await repo.GetAllGigsAsync(ct);
 
-        _currentUser = currentUser;
-        _repo = repo;
-        _validator = validator;
-        _uow = uow;
-    }
-    public async Task<Result<IEnumerable<GigResponseDto>>> GetAllAsync(CancellationToken ct)
-    {
-        var gigs = await _repo.GetAllGigsAsync(ct);
-
-        var result = gigs
+        return gigs
             .Where(g => !g.IsPrivate)
             .OrderBy(g => g.Date)
             .Select(MapToDto);
-
-        return Result<IEnumerable<GigResponseDto>>.Ok(result);
     }
-    public async Task<Result<GigResponseDto>> GetByIdAsync(int id, CancellationToken ct)
+
+    public async Task<GigResponseDto> GetByIdAsync(int id, CancellationToken ct)
     {
-        var gig = await _repo.GetGigByIdAsync(id, ct);
+        var gig = await repo.GetGigByIdAsync(id, ct);
 
         if (gig is null || gig.IsPrivate)
-        {
-            return Result<GigResponseDto>.Fail(new List<ValidationError>
-            {
-                new ValidationError
-                {
-                    Field = "Id",
-                    Message = "Gig hittades inte",
-                    Code = "NotFound"
-                }
-            });
-        }
+            throw new NotFoundException(BusinessRules.GigNotFound);
 
-        return Result<GigResponseDto>.Ok(MapToDto(gig));
+        return MapToDto(gig);
     }
-    public async Task<Result<int>> CreateAsync(CreateGigRequestDto request, CancellationToken ct)
-    {
-        var errors = await _validator.ValidateCreateAsync(request, ct);
 
-        if (errors.Any())
-            return Result<int>.Fail(errors);
+    public async Task<int> CreateAsync(CreateGigRequestDto request, CancellationToken ct)
+    {
+        await validator.ValidateCreateAsync(request, ct);
 
         var gig = new Gig
         {
@@ -75,44 +56,20 @@ public class GigService : IGigService
             IsPrivate = false
         };
 
-        AuditHelper.SetCreated(gig, _currentUser.UserId);
-        await _uow.BeginTransactionAsync(ct);
+        AuditHelper.SetCreated(gig, currentUser.UserId);
 
-        try
-        {
-        var id = await _repo.CreateGigAsync(gig, ct);
-            await _uow.CommitAsync();
-            return Result<int>.Ok(id);
-        }
-        catch (Exception)
-        {
-            await _uow.RollbackAsync();
-            throw;
-        }
-
+        using var scope = uow.BeginTransactionScope();
+        var id = await repo.CreateGigAsync(gig, ct);
+        await scope.CommitTransactionScopeAsync(ct);
+        return id;
     }
 
-    public async Task<Result> UpdateAsync(int id, UpdateGigRequestDto request, CancellationToken ct)
+    public async Task UpdateAsync(int id, UpdateGigRequestDto request, CancellationToken ct)
     {
-        var existing = await _repo.GetGigByIdAsync(id, ct);
+        var existing = await repo.GetGigByIdAsync(id, ct)
+            ?? throw new NotFoundException(BusinessRules.GigNotFound);
 
-        if (existing is null)
-        {
-            return Result.Fail(new List<ValidationError>
-            {
-                new ValidationError
-                {
-                    Field = "Id",
-                    Message = "Gig hittades inte",
-                    Code = "NotFound"
-                }
-            });
-        }
-
-        var errors = await _validator.ValidateUpdateAsync(id, request, ct);
-
-        if (errors.Any())
-            return Result.Fail(errors);
+        await validator.ValidateUpdateAsync(id, request, ct);
 
         existing.Title = request.Title;
         existing.Description = request.Description;
@@ -123,73 +80,35 @@ public class GigService : IGigService
         existing.Notes = request.Notes;
         existing.TicketUrl = request.TicketUrl;
 
-        AuditHelper.SetUpdated(existing, _currentUser.UserId);
-        
-        await _uow.BeginTransactionAsync(ct);
+        AuditHelper.SetUpdated(existing, currentUser.UserId);
 
-        try
-        {
-            await _repo.UpdateGigAsync(existing, ct);
-            await _uow.CommitAsync();
-            return Result.Ok();
-        }
-        catch (Exception)
-        {
-            await _uow.RollbackAsync();
-            throw;
-        }
+        using var scope = uow.BeginTransactionScope();
+        await repo.UpdateGigAsync(existing, ct);
+        await scope.CommitTransactionScopeAsync(ct);
     }
 
-    public async Task<Result> DeleteAsync(int id, CancellationToken ct)
+    public async Task DeleteAsync(int id, CancellationToken ct)
     {
-        var existing = await _repo.GetGigByIdAsync(id, ct);
+        var existing = await repo.GetGigByIdAsync(id, ct)
+            ?? throw new NotFoundException(BusinessRules.GigNotFound);
 
-        if (existing is null)
-        {
-            return Result.Fail(new List<ValidationError>
-            {
-                new ValidationError
-                {
-                    Field = "Id",
-                    Message = "Gig hittades inte",
-                    Code = "NotFound"
-                }
-            });
-        }
+        AuditHelper.SetDeleted(existing, currentUser.UserId);
 
-        AuditHelper.SetDeleted(existing, _currentUser.UserId);
-
-        await _uow.BeginTransactionAsync(ct);
-
-        try
-        {
-            await _repo.DeleteGigAsync(id, ct);
-            await _uow.CommitAsync();
-            return Result.Ok();
-
-        }
-        catch (Exception)
-        {
-            await _uow.RollbackAsync();
-            throw;
-        }
-
-
+        using var scope = uow.BeginTransactionScope();
+        await repo.DeleteGigAsync(id, ct);
+        await scope.CommitTransactionScopeAsync(ct);
     }
 
-    private static GigResponseDto MapToDto(Gig g)
+    private static GigResponseDto MapToDto(Gig g) => new()
     {
-        return new GigResponseDto
-        {
-            Id = g.Id,
-            Title = g.Title,
-            Description = g.Description,
-            Location = g.Location,
-            Adress = g.Adress,
-            Date = g.Date,
-            Price = g.Price,
-            Notes = g.Notes,
-            TicketUrl = g.TicketUrl
-        };
-    }
+        Id = g.Id,
+        Title = g.Title,
+        Description = g.Description,
+        Location = g.Location,
+        Adress = g.Adress,
+        Date = g.Date,
+        Price = g.Price,
+        Notes = g.Notes,
+        TicketUrl = g.TicketUrl
+    };
 }

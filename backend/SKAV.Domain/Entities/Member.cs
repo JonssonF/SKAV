@@ -1,6 +1,6 @@
 ﻿namespace SKAV.Domain.Entities
 {
-    public class Member
+    public class Member : BaseEntity
     {
         public int Id { get; set; }
         //Mandatory fields

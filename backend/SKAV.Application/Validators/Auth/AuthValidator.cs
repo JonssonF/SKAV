@@ -1,35 +1,17 @@
 ﻿using SKAV.Application.DTOs.Auth;
-using SKAV.Application.Validator;
+using SKAV.Domain.Exceptions;
 
 namespace SKAV.Application.Validators.Auth
 {
     public class AuthValidator : IAuthValidator
     {
-        public List<ValidationError> ValidateLoginAsync(
-        LoginRequestDto request, CancellationToken ct)
+        public void ValidateLogin(LoginRequestDto request)
         {
-            var errors = new List<ValidationError>();
-
             if (string.IsNullOrWhiteSpace(request.Email))
-            {
-                errors.Add(new ValidationError
-                {
-                    Field = "Email",
-                    Message = "Email krävs",
-                    Code = "REQUIRED"
-                });
-            }
+                throw new ValidationException("Email", "E-post krävs.");
 
             if (string.IsNullOrWhiteSpace(request.Password))
-            {
-                errors.Add(new ValidationError
-                {
-                    Field = "Password",
-                    Message = "Lösenord krävs",
-                    Code = "REQUIRED"
-                });
-            }
-            return errors;
+                throw new ValidationException("Password", "Lösenord krävs.");
         }
     }
 }

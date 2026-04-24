@@ -1,57 +1,66 @@
 ﻿using SKAV.Application.DTOs.Auth;
-using SKAV.Application.Interfaces;
+using SKAV.Application.DTOs.User;
+using SKAV.Application.Interfaces.Repositories;
 using SKAV.Application.Validator;
+using SKAV.Domain.Consts;
 using SKAV.Domain.Enumeration;
+using SKAV.Domain.Exceptions;
 
 namespace SKAV.Application.Validators.User
 {
     public class UserValidator(IUserRepository repo) : IUserValidator
     {
-        private readonly IUserRepository _userRepository = repo;
-
-        public async Task<List<ValidationError>> ValidateCreateUserRequestAsync(CreateUserRequest request, CancellationToken ct)
+        public async Task ValidateCreateAsync(CreateUserRequestDto request, CancellationToken ct)
         {
-            var errors = new List<ValidationError>();
-
-            ValidateEmail(request.Email, errors);
-            ValidatePassword(request.Password, errors);
-            ValidateRole(request.Role, errors);
-
-            if (errors.Count == 0)
-                await ValidateEmailExistsAsync(request.Email, errors, ct);
-
-            return errors;
+            ValidateEmail(request.Email);
+            ValidatePassword(request.Password);
+            ValidateRole(request.Role);
+            await ValidateEmailNotTakenAsync(request.Email, ct);
         }
 
-        private static void ValidateEmail(string email, List<ValidationError> errors)
+        public Task ValidateChangePasswordAsync(ChangePasswordRequestDto request, CancellationToken ct)
+        {
+            ValidatePassword(request.NewPassword);
+
+            if (request.NewPassword != request.ConfirmNewPassword)
+               throw new ValidationException("ConfirmNewPassword", "Lösenorden matchar inte.");
+
+            return Task.CompletedTask;
+        }
+
+        public void ValidateUpdateRole(UpdateUserRoleRequestDto request)
+        {
+            ValidateRole(request.Role);
+        }
+
+        private static void ValidateEmail(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
-                errors.Add(new ValidationError { Field = "Email", Message = "Email krävs.", Code = "EmailRequired" });
+                throw new ValidationException("Email", "E-post krävs.");
         }
 
-        private static void ValidatePassword(string password, List<ValidationError> errors)
+        private static void ValidatePassword(string password)
         {
             if (string.IsNullOrWhiteSpace(password))
-                errors.Add(new ValidationError { Field = "Password", Message = "Lösenord krävs.", Code = "PasswordRequired" });
-            else if (password.Length < 8)
-                errors.Add(new ValidationError { Field = "Password", Message = "Lösenord måste vara minst 8 tecken.", Code = "PasswordTooShort" });
+                throw new ValidationException("Password", "Lösenord krävs.");
+
+            if (password.Length < 8)
+                throw new ValidationException("Password", "Lösenord måste vara minst 8 tecken.");
         }
 
-        private static void ValidateRole(string role, List<ValidationError> errors)
+        private static void ValidateRole(string role)
         {
             if (!Enum.TryParse<Roles>(role, ignoreCase: true, out _))
-                errors.Add(new ValidationError
-                {
-                    Field = "Role",
-                    Message = $"Ogiltig roll. Tillåtna värden: {string.Join(", ", Enum.GetNames<Roles>())}",
-                    Code = "InvalidRole"
-                });
+                throw new ValidationException("Role",
+                    $"Ogiltig roll. Tillåtna värden: {string.Join(", ", Enum.GetNames<Roles>())}.");
         }
 
-        private async Task ValidateEmailExistsAsync(string email, List<ValidationError> errors, CancellationToken ct)
+        private async Task ValidateEmailNotTakenAsync(string email, CancellationToken ct)
         {
-            if (await _userRepository.EmailExistsAsync(email, ct))
-                errors.Add(new ValidationError { Field = "Email", Message = "Email är redan registrerad.", Code = "EmailAlreadyExists" });
+            if (await repo.EmailExistsAsync(email, ct))
+                throw new BusinessRuleException(
+                    "E-postadressen används redan.",
+                    BusinessRules.EmailAlreadyExists);
         }
     }
 }

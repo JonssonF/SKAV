@@ -1,10 +1,10 @@
-﻿using SKAV.Application.DTOs.Gigs.Request;
+﻿using SKAV.Application.DTOs.Gigs;
 
 namespace SKAV.Application.Validator.Gigs
 {
     public interface IGigValidator
     {
-        Task<List<ValidationError>> ValidateCreateAsync(CreateGigRequestDto request, CancellationToken ct);
-        Task<List<ValidationError>> ValidateUpdateAsync(int id, UpdateGigRequestDto request, CancellationToken ct);
+        Task ValidateCreateAsync(CreateGigRequestDto request, CancellationToken ct);
+        Task ValidateUpdateAsync(int id, UpdateGigRequestDto request, CancellationToken ct);
     }
 }

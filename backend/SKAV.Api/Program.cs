@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Models;
+using SKAV.Domain.Exceptions;
 using SKAV.Infrastructure.Database;
 using SKAV.Infrastructure.DependencyInjection;
 using System.Text;
@@ -76,6 +77,8 @@ namespace SKAV.Api
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
 
             app.UseHttpsRedirection();
             app.UseAuthentication();

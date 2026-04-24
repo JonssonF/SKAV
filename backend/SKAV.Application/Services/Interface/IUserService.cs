@@ -1,16 +1,12 @@
-﻿using SKAV.Application.Common;
-using SKAV.Application.DTOs.Auth;
-using SKAV.Application.Validator;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SKAV.Application.DTOs.User;
 
 namespace SKAV.Application.Services.Interface
 {
     public interface IUserService
     {
-        Task<Result> CreateUserAsync(CreateUserRequest request, CancellationToken ct);
+        Task<CreateUserResponseDto> CreateAsync(CreateUserRequestDto request, CancellationToken ct);
+        Task<DeleteUserResponseDto> DeleteAsync(int id, CancellationToken ct);
+        Task<UpdateUserRoleResponseDto> UpdateRoleAsync(int id, UpdateUserRoleRequestDto request, CancellationToken ct);
+        Task<ChangePasswordResponseDto> ChangePasswordAsync(ChangePasswordRequestDto request, CancellationToken ct);
     }
 }

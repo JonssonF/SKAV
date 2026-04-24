@@ -6,14 +6,10 @@ namespace SKAV.Application.Services.Interface
 {
     public interface IMemberService
     {
-        Task<Result<IEnumerable<MemberResponseDto>>> GetAllAsync(CancellationToken ct);
-
-        Task<Result<MemberResponseDto>> GetByIdAsync(int id, CancellationToken ct);
-
-        Task<Result<int>> CreateAsync(CreateMemberRequestDto request, CancellationToken ct);
-
-        Task<Result> UpdateAsync(int id, CreateMemberRequestDto request, CancellationToken ct);
-
-        Task<Result> DeleteAsync(int id, CancellationToken ct);
+        Task<IEnumerable<MemberResponseDto>> GetAllAsync(CancellationToken ct);
+        Task<MemberResponseDto> GetByIdAsync(int id, CancellationToken ct);
+        Task<int> CreateAsync(CreateMemberRequestDto request, CancellationToken ct);
+        Task UpdateAsync(int id, CreateMemberRequestDto request, CancellationToken ct);
+        Task DeleteAsync(int id, CancellationToken ct);
     }
 }

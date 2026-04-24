@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SKAV.Application.DTOs.Member
 {
-    public class CreateMemberRequestDto
+    public class UpdateMemberRequestDto
     {
         [Required(ErrorMessage = "Namn är obligatoriskt")]
         [MinLength(3, ErrorMessage = "Minst {1} tecken tillåtna")]

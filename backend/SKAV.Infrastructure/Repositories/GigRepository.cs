@@ -1,23 +1,19 @@
 ﻿using Dapper;
-using SKAV.Application.Interfaces;
+using SKAV.Application.Interfaces.Repositories;
+using SKAV.Application.Interfaces.UoW;
 using SKAV.Domain.Entities;
 using SKAV.Infrastructure.Database;
+using SKAV.Infrastructure.Database.UoW;
 using System.Data;
 using System.Data.Common;
 using System.Globalization;
 
 namespace SKAV.Infrastructure.Repositories
 {
-    public sealed class GigRepository : IGigRepository
+    public sealed class GigRepository(IUnitOfWorkConnection uow, IDbConnectionFactory db) : IGigRepository
     {
-        private readonly IUnitOfWorkConnection _uow;
-        private readonly IDbConnectionFactory _factory;
-
-        public GigRepository(IUnitOfWorkConnection uow, IDbConnectionFactory factory)
-        {
-            _uow = uow;
-            _factory = factory;
-        }
+        private readonly IUnitOfWorkConnection _uow = uow;
+        private readonly IDbConnectionFactory _db = db;      
 
         public async Task<IReadOnlyList<Gig>> GetAllGigsAsync(CancellationToken ct)
         {
@@ -27,7 +23,7 @@ namespace SKAV.Infrastructure.Repositories
             ORDER BY Date DESC;
             """;
 
-            using var conn = _factory.CreateConnection();
+            using var conn = _db.CreateConnection();
             conn.Open();
 
             var rows = await conn.QueryAsync<GigRow>(new CommandDefinition(
@@ -46,7 +42,7 @@ namespace SKAV.Infrastructure.Repositories
             LIMIT 1;
             """;
 
-            using var conn = _factory.CreateConnection();
+            using var conn = _db.CreateConnection();
             conn.Open();
 
             var row = await conn.QuerySingleOrDefaultAsync<GigRow>(new CommandDefinition(
@@ -67,7 +63,7 @@ namespace SKAV.Infrastructure.Repositories
             AND (@ExcludeId IS NULL OR Id != @ExcludeId);
             """;
 
-            using var conn = _factory.CreateConnection();
+            using var conn = _db.CreateConnection();
             conn.Open();
 
             var count = await conn.ExecuteScalarAsync<int>(new CommandDefinition(
@@ -78,7 +74,6 @@ namespace SKAV.Infrastructure.Repositories
             return count > 0;
         }
 
-        // Skrivningar – använder uow med transaktion
         public async Task<int> CreateGigAsync(Gig gig, CancellationToken ct)
         {
             const string sql = """
@@ -141,7 +136,7 @@ namespace SKAV.Infrastructure.Repositories
         {
             const string sql = "SELECT COUNT(*) FROM Gigs;";
 
-            using var conn = _factory.CreateConnection();
+            using var conn = _db.CreateConnection();
             conn.Open();
 
             return await conn.ExecuteScalarAsync<int>(new CommandDefinition(

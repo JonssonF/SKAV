@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SKAV.Application.DTOs.Auth
+namespace SKAV.Application.Interfaces.UoW
 {
-    internal class CreateUserResponse
+    public interface IUnitOfWork
     {
+        ITransactionScope BeginTransactionScope();
     }
 }

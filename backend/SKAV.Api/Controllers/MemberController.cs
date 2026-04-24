@@ -6,60 +6,34 @@
 
     [ApiController]
     [Route("api/members")]
-    public class MembersController : ControllerBase
+    public class MembersController(IMemberService service) : ControllerBase
     {
-        private readonly IMemberService _service;
-
-        public MembersController(IMemberService service)
-        {
-            _service = service;
-        }
-
         [HttpGet]
         public async Task<IActionResult> GetAll(CancellationToken ct)
-        {
-            var result = await _service.GetAllAsync(ct);
-            return Ok(result.Data);
-        }
+            => Ok(await service.GetAllAsync(ct));
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id, CancellationToken ct)
-        {
-            var result = await _service.GetByIdAsync(id, ct);
-
-            if (!result.Success)
-                return NotFound();
-
-            return Ok(result.Data);
-        }
+            => Ok(await service.GetByIdAsync(id, ct));
 
         [HttpPost]
         public async Task<IActionResult> Create(CreateMemberRequestDto request, CancellationToken ct)
         {
-            var result = await _service.CreateAsync(request, ct);
-
-            return CreatedAtAction(nameof(GetById), new { id = result.Data }, null);
+            var id = await service.CreateAsync(request, ct);
+            return CreatedAtAction(nameof(GetById), new { id }, null);
         }
-      
+
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, CreateMemberRequestDto request, CancellationToken ct)
         {
-            var result = await _service.UpdateAsync(id, request, ct);
-
-            if (!result.Success)
-                return NotFound();
-
+            await service.UpdateAsync(id, request, ct);
             return NoContent();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id, CancellationToken ct)
         {
-            var result = await _service.DeleteAsync(id, ct);
-
-            if (!result.Success)
-                return NotFound();
-
+            await service.DeleteAsync(id, ct);
             return NoContent();
         }
     }

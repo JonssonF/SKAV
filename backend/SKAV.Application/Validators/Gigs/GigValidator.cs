@@ -1,72 +1,43 @@
-﻿using SKAV.Application.DTOs.Gigs.Request;
-using SKAV.Application.Interfaces;
+﻿using SKAV.Application.DTOs.Gigs;
+using SKAV.Application.Interfaces.Repositories;
 using SKAV.Application.Validator;
 using SKAV.Application.Validator.Gigs;
+using SKAV.Domain.Consts;
+using SKAV.Domain.Exceptions;
 
 namespace SKAV.Application.Validators.Gigs;
 
 public class GigValidator(IGigRepository repo) : IGigValidator
 {
-    private readonly IGigRepository _repo = repo;
-
-    public async Task<List<ValidationError>> ValidateCreateAsync(CreateGigRequestDto request, CancellationToken ct)
+    public async Task ValidateCreateAsync(CreateGigRequestDto request, CancellationToken ct)
     {
-        var errors = new List<ValidationError>();
-
-        ValidateDate(request.Date, errors);
-        await ValidateExist(request.Title, request.Date, null, errors, ct);
-
-        return errors;
+        ValidateDate(request.Date);
+        await ValidateExistsAsync(request.Title, request.Date, null, ct);
     }
 
-    public async Task<List<ValidationError>> ValidateUpdateAsync(int id, UpdateGigRequestDto request, CancellationToken ct)
+    public async Task ValidateUpdateAsync(int id, UpdateGigRequestDto request, CancellationToken ct)
     {
-        var errors = new List<ValidationError>();
-
-        ValidateDate(request.Date, errors);
-        await ValidateExist(request.Title, request.Date, id, errors, ct);
-
-        return errors;
+        ValidateDate(request.Date);
+        await ValidateExistsAsync(request.Title, request.Date, id, ct);
     }
 
-    private static void ValidateDate(DateTimeOffset date, List<ValidationError> errors)
+    private static void ValidateDate(DateTimeOffset date)
     {
         var now = DateTimeOffset.UtcNow;
 
         if (date < now)
-        {
-            errors.Add(new ValidationError
-            {
-                Field = "Date",
-                Message = "Datum kan inte vara i det förflutna",
-                Code = "InvalidDatePast"
-            });
-        }
+            throw new ValidationException("Date", "Datum kan inte vara i det förflutna.");
 
         if (date > now.AddYears(1))
-        {
-            errors.Add(new ValidationError
-            {
-                Field = "Date",
-                Message = "Datum får max vara ett år framåt",
-                Code = "InvalidDateFuture"
-            });
-        }
+            throw new ValidationException("Date", "Datum får max vara ett år framåt.");
     }
 
-    private async Task ValidateExist(string title, DateTimeOffset date, int? excludeId,
-        List<ValidationError> errors, CancellationToken ct)
+    private async Task ValidateExistsAsync(string title, DateTimeOffset date, int? excludeId, CancellationToken ct)
     {
-        var exists = await _repo.ExistsAsync(title, date, excludeId, ct);
-
+        var exists = await repo.ExistsAsync(title, date, excludeId, ct);
         if (exists)
-        {
-            errors.Add(new ValidationError
-            {
-                Field = "Title",
-                Message = "Gig med samma titel och datum finns redan",
-                Code = "GigAlreadyExists"
-            });
-        }
+            throw new BusinessRuleException(
+                "Gig med samma titel och datum finns redan.",
+                BusinessRules.GigAlreadyExists);
     }
 }

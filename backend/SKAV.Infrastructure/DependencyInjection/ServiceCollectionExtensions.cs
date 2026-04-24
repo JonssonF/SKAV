@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SKAV.Application.Interfaces;
+using SKAV.Application.Interfaces.UoW;
 using SKAV.Application.Services.Interface;
 using SKAV.Infrastructure.Database;
+using SKAV.Infrastructure.Database.UoW;
 using SKAV.Infrastructure.Services;
 using System.Reflection;
 
@@ -35,9 +37,14 @@ namespace SKAV.Infrastructure.DependencyInjection
             // Explicit registrations
             services.AddScoped<IJwtService, JwtService>();
             services.AddSingleton<IDbConnectionFactory, SqliteConnectionFactory>();
-            services.AddScoped<IUnitOfWorkConnection, UnitOfWorkConnection>();
             services.AddTransient<DatabaseInitializer>();
             services.AddScoped<SeedData>();
+
+            // UnitOfWork registrations
+            services.AddScoped<UnitOfWork>();
+            services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<UnitOfWork>());
+            services.AddScoped<IUnitOfWorkConnection>(sp => sp.GetRequiredService<UnitOfWork>());
+
 
             return services;
         }

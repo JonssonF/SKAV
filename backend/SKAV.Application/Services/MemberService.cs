@@ -1,9 +1,14 @@
 ﻿using SKAV.Application.Common;
+using SKAV.Application.Common.Helpers;
 using SKAV.Application.DTOs.Member;
 using SKAV.Application.Interfaces;
+using SKAV.Application.Interfaces.Repositories;
+using SKAV.Application.Interfaces.UoW;
 using SKAV.Application.Services.Interface;
 using SKAV.Application.Validator;
+using SKAV.Domain.Consts;
 using SKAV.Domain.Entities;
+using SKAV.Domain.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,47 +17,28 @@ using System.Threading.Tasks;
 
 namespace SKAV.Application.Services
 {
-    public class MemberService : IMemberService
+    public class MemberService(
+        IMemberRepository repo,
+        IUnitOfWork uow,
+        ICurrentUserService currentUser) : IMemberService
     {
-        private readonly IMemberRepository _repo;
-
-        public MemberService(IMemberRepository repo)
+        public async Task<IEnumerable<MemberResponseDto>> GetAllAsync(CancellationToken ct)
         {
-            _repo = repo;
-        }
-
-        public async Task<Result<IEnumerable<MemberResponseDto>>> GetAllAsync(CancellationToken ct)
-        {
-            var members = await _repo.GetAllAsync(ct);
-
-            var result = members
+            var members = await repo.GetAllAsync(ct);
+            return members
                 .OrderBy(m => m.DisplayOrder)
                 .Select(MapToDto);
-
-            return Result<IEnumerable<MemberResponseDto>>.Ok(result);
         }
 
-        public async Task<Result<MemberResponseDto>> GetByIdAsync(int id, CancellationToken ct)
+        public async Task<MemberResponseDto> GetByIdAsync(int id, CancellationToken ct)
         {
-            var member = await _repo.GetByIdAsync(id, ct);
+            var member = await repo.GetByIdAsync(id, ct)
+                ?? throw new NotFoundException(BusinessRules.MemberNotFound);
 
-            if (member is null)
-            {
-                return Result<MemberResponseDto>.Fail(new()
-            {
-                new ValidationError
-                {
-                    Field = "Id",
-                    Message = "Bandmedlem hittades inte",
-                    Code = "NotFound"
-                }
-            });
-            }
-
-            return Result<MemberResponseDto>.Ok(MapToDto(member));
+            return MapToDto(member);
         }
 
-        public async Task<Result<int>> CreateAsync(CreateMemberRequestDto request, CancellationToken ct)
+        public async Task<int> CreateAsync(CreateMemberRequestDto request, CancellationToken ct)
         {
             var member = new Member
             {
@@ -63,27 +49,18 @@ namespace SKAV.Application.Services
                 DisplayOrder = request.DisplayOrder
             };
 
-            var id = await _repo.CreateAsync(member, ct);
+            AuditHelper.SetCreated(member, currentUser.UserId);
 
-            return Result<int>.Ok(id);
+            using var scope = uow.BeginTransactionScope();
+            var id = await repo.CreateAsync(member, ct);
+            await scope.CommitTransactionScopeAsync(ct);
+            return id;
         }
 
-        public async Task<Result> UpdateAsync(int id, CreateMemberRequestDto request, CancellationToken ct)
+        public async Task UpdateAsync(int id, CreateMemberRequestDto request, CancellationToken ct)
         {
-            var existing = await _repo.GetByIdAsync(id, ct);
-
-            if (existing is null)
-            {
-                return Result.Fail(new()
-            {
-                new ValidationError
-                {
-                    Field = "Id",
-                    Message = "Bandmedlem hittades inte",
-                    Code = "NotFound"
-                }
-            });
-            }
+            var existing = await repo.GetByIdAsync(id, ct)
+                ?? throw new NotFoundException(BusinessRules.MemberNotFound);
 
             existing.Name = request.Name;
             existing.Role = request.Role;
@@ -91,31 +68,23 @@ namespace SKAV.Application.Services
             existing.ImageUrl = request.ImageUrl;
             existing.DisplayOrder = request.DisplayOrder;
 
-            await _repo.UpdateAsync(existing, ct);
+            AuditHelper.SetUpdated(existing, currentUser.UserId);
 
-            return Result.Ok();
+            using var scope = uow.BeginTransactionScope();
+            await repo.UpdateAsync(existing, ct);
+            await scope.CommitTransactionScopeAsync(ct);
         }
 
-        public async Task<Result> DeleteAsync(int id, CancellationToken ct)
+        public async Task DeleteAsync(int id, CancellationToken ct)
         {
-            var existing = await _repo.GetByIdAsync(id, ct);
+            var existing = await repo.GetByIdAsync(id, ct)
+                ?? throw new NotFoundException(BusinessRules.MemberNotFound);
 
-            if (existing is null)
-            {
-                return Result.Fail(new()
-            {
-                new ValidationError
-                {
-                    Field = "Id",
-                    Message = "Bandmedlem hittades inte",
-                    Code = "NotFound"
-                }
-            });
-            }
+            AuditHelper.SetDeleted(existing, currentUser.UserId);
 
-            await _repo.DeleteAsync(id, ct);
-
-            return Result.Ok();
+            using var scope = uow.BeginTransactionScope();
+            await repo.DeleteAsync(id, existing, ct);
+            await scope.CommitTransactionScopeAsync(ct);
         }
 
         private static MemberResponseDto MapToDto(Member m) => new()

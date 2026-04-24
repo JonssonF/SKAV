@@ -5,6 +5,6 @@ namespace SKAV.Application.Validators.Auth
 {
     public interface IAuthValidator
     {
-        List<ValidationError> ValidateLoginAsync(LoginRequestDto request, CancellationToken ct);
+        void ValidateLogin(LoginRequestDto request);
     }
 }
