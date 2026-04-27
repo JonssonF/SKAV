@@ -53,16 +53,17 @@ namespace SKAV.Infrastructure.Database
                 CREATE TABLE IF NOT EXISTS Members (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
                     Name TEXT NOT NULL,
-                    Role TEXT NOT NULL,
                     Quote TEXT NULL,
                     ImageUrl TEXT NULL,
                     DisplayOrder INTEGER NOT NULL DEFAULT 0,
+                    UserId INTEGER NULL,
                     CreatedAt TEXT NOT NULL,
                     CreatedBy INTEGER,
                     UpdatedAt TEXT,
                     UpdatedBy INTEGER,
                     DeletedAt TEXT,
-                    DeletedBy INTEGER
+                    DeletedBy INTEGER,
+                    FOREIGN KEY (UserId) REFERENCES Users(Id)
                 );
                 """;
             await connection.ExecuteAsync(sqlMembers);
@@ -151,6 +152,45 @@ namespace SKAV.Infrastructure.Database
                 );
                 """;
             await connection.ExecuteAsync(sqlLyrics);
+
+            const string sqlInstruments = """
+                CREATE TABLE IF NOT EXISTS Instruments (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Name TEXT NOT NULL,
+                    Description TEXT NULL,
+                    CreatedAt TEXT NOT NULL,
+                    CreatedBy INTEGER,
+                    UpdatedAt TEXT,
+                    UpdatedBy INTEGER,
+                    DeletedAt TEXT,
+                    DeletedBy INTEGER
+                );
+                """;
+            await connection.ExecuteAsync(sqlInstruments);
+
+            const string sqlMemberInstruments = """
+                CREATE TABLE IF NOT EXISTS MemberInstruments (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    MemberId INTEGER NOT NULL,
+                    InstrumentId INTEGER NOT NULL,
+                    Details TEXT NULL,
+                    CreatedAt TEXT NOT NULL,
+                    CreatedBy INTEGER,
+                    UpdatedAt TEXT,
+                    UpdatedBy INTEGER,
+                    DeletedAt TEXT,
+                    DeletedBy INTEGER,
+                    FOREIGN KEY (MemberId) REFERENCES Members(Id),
+                    FOREIGN KEY (InstrumentId) REFERENCES Instruments(Id)
+                );
+                """;
+            await connection.ExecuteAsync(sqlMemberInstruments);
+
+            const string indexMemberInstrument = """
+                CREATE UNIQUE INDEX IF NOT EXISTS idx_member_instrument
+                ON MemberInstruments (MemberId, InstrumentId);
+                """;
+            await connection.ExecuteAsync(indexMemberInstrument);
 
             await SeedAdminAsync(connection);
         }

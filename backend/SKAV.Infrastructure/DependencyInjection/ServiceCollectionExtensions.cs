@@ -1,10 +1,12 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SKAV.Application.Interfaces;
+using SKAV.Application.Interfaces.Repositories;
 using SKAV.Application.Interfaces.UoW;
+using SKAV.Application.Services;
 using SKAV.Application.Services.Interface;
 using SKAV.Infrastructure.Database;
 using SKAV.Infrastructure.Database.UoW;
+using SKAV.Infrastructure.Repositories;
 using SKAV.Infrastructure.Services;
 using System.Reflection;
 
@@ -51,7 +53,7 @@ namespace SKAV.Infrastructure.DependencyInjection
         private static void RegisterByConvention(IServiceCollection services, Assembly assembly, string suffix)
         {
             var types = assembly.GetTypes()
-                .Where(t => t.IsClass && !t.IsAbstract);
+                .Where(t => t.IsClass && !t.IsAbstract && t.Name.EndsWith(suffix));
 
             foreach (var implementation in types)
             {

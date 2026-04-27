@@ -124,28 +124,32 @@ namespace SKAV.Infrastructure.Repositories
                 throw new KeyNotFoundException($"{typeof(T).Name} with id {id} not found.");
         }
 
-        private static List<string> GetInsertProperties()
-        {
-            return typeof(T).GetProperties()
-                .Where(p => p.Name != "Id"
-                         && p.Name != "UpdatedAt"
-                         && p.Name != "UpdatedBy"
-                         && p.Name != "DeletedAt"
-                         && p.Name != "DeletedBy")
+        private static List<string> GetInsertProperties() =>
+            typeof(T).GetProperties()
+                .Where(p =>
+                    p.Name is not "Id" and not "UpdatedAt" and not "UpdatedBy" and not "DeletedAt" and not "DeletedBy"
+                    && (p.PropertyType.IsPrimitive
+                        || p.PropertyType == typeof(string)
+                        || p.PropertyType == typeof(DateTime)
+                        || p.PropertyType == typeof(DateTime?)
+                        || p.PropertyType == typeof(DateTimeOffset)
+                        || p.PropertyType == typeof(DateTimeOffset?)
+                        || p.PropertyType.IsValueType))
                 .Select(p => p.Name)
                 .ToList();
-        }
 
-        private static List<string> GetUpdateProperties()
-        {
-            return typeof(T).GetProperties()
-                .Where(p => p.Name != "Id"
-                         && p.Name != "CreatedAt"
-                         && p.Name != "CreatedBy"
-                         && p.Name != "DeletedAt"
-                         && p.Name != "DeletedBy")
+        private static List<string> GetUpdateProperties() =>
+            typeof(T).GetProperties()
+                .Where(p =>
+                    p.Name is not "Id" and not "CreatedAt" and not "CreatedBy" and not "DeletedAt" and not "DeletedBy"
+                    && (p.PropertyType.IsPrimitive
+                        || p.PropertyType == typeof(string)
+                        || p.PropertyType == typeof(DateTime)
+                        || p.PropertyType == typeof(DateTime?)
+                        || p.PropertyType == typeof(DateTimeOffset)
+                        || p.PropertyType == typeof(DateTimeOffset?)
+                        || p.PropertyType.IsValueType))
                 .Select(p => p.Name)
                 .ToList();
-        }
     }
 }
