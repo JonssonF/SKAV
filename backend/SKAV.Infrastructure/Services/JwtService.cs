@@ -2,6 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using SKAV.Application.Services.Interface;
 using SKAV.Domain.Entities;
+using SKAV.Domain.Enumeration;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -15,12 +16,19 @@ namespace SKAV.Infrastructure.Services
 
         public string GenerateToken(User user)
         {
-            var claims = new[]
+            var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.Role.ToString())
             };
+
+            foreach (var role in Enum.GetValues<Roles>())
+            {
+                if (user.Roles.HasFlag(role))
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, role.ToString()));
+                }
+            }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_key));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

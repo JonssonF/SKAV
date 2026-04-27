@@ -1,7 +1,5 @@
-﻿using SKAV.Application.DTOs.Auth;
-using SKAV.Application.DTOs.User;
+﻿using SKAV.Application.DTOs.User;
 using SKAV.Application.Interfaces.Repositories;
-using SKAV.Application.Validator;
 using SKAV.Domain.Consts;
 using SKAV.Domain.Enumeration;
 using SKAV.Domain.Exceptions;
@@ -14,7 +12,7 @@ namespace SKAV.Application.Validators.User
         {
             ValidateEmail(request.Email);
             ValidatePassword(request.Password);
-            ValidateRole(request.Role);
+            ValidateRole(request.Roles);
             await ValidateEmailNotTakenAsync(request.Email, ct);
         }
 
@@ -30,7 +28,7 @@ namespace SKAV.Application.Validators.User
 
         public void ValidateUpdateRole(UpdateUserRoleRequestDto request)
         {
-            ValidateRole(request.Role);
+            ValidateRole(request.Roles);
         }
 
         private static void ValidateEmail(string email)
@@ -48,9 +46,9 @@ namespace SKAV.Application.Validators.User
                 throw new ValidationException("Password", "Lösenord måste vara minst 8 tecken.");
         }
 
-        private static void ValidateRole(string role)
+        private static void ValidateRole(Roles role)
         {
-            if (!Enum.TryParse<Roles>(role, ignoreCase: true, out _))
+            if (!Enum.IsDefined(typeof(Roles), role))
                 throw new ValidationException("Role",
                     $"Ogiltig roll. Tillåtna värden: {string.Join(", ", Enum.GetNames<Roles>())}.");
         }
