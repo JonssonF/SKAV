@@ -19,6 +19,8 @@
 
         // Members
         public const string MemberNotFound = "MemberNotFound";
+        public const string MemberAlreadyExists = "MemberAlreadyExists";
+        public const string Forbidden = "Forbidden";
 
         // Subscribers
         public const string SubscriberNotFound = "SubscriberNotFound";

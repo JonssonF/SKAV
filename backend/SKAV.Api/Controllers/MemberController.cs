@@ -1,5 +1,6 @@
 ﻿namespace SKAV.Api.Controllers
 {
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using SKAV.Application.DTOs.Member;
     using SKAV.Application.Services.Interface;
@@ -20,6 +21,7 @@
             => await service.GetByIdAsync(id, ct);
 
         [HttpPost]
+        [Authorize(Roles = "Admin,Editor")]
         [SwaggerOperation("Skapa en ny medlem")]
         public async Task<CreateMemberResponseDto> Create(CreateMemberRequestDto request, CancellationToken ct)
             => await service.CreateAsync(request, ct);
@@ -30,6 +32,7 @@
             => await service.UpdateAsync(id, request, ct);
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin,Editor")]
         [SwaggerOperation("Ta bort en befintlig medlem")]
         public async Task<DeleteMemberResponseDto> Delete(int id, CancellationToken ct)
             => await service.DeleteAsync(id, ct);

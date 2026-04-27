@@ -39,7 +39,7 @@ namespace SKAV.Tests.Api
             createResponse.EnsureSuccessStatusCode();
             var createdGig = await createResponse.Content.ReadFromJsonAsync<CreateGigResponseDto>();
             // Now, retrieve the created gig by ID
-            var response = await _client.GetAsync($"/api/gigs/{createdGig.Id}");
+            var response = await _client.GetAsync($"/api/gigs/{createdGig?.Id}");
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
@@ -66,7 +66,7 @@ namespace SKAV.Tests.Api
             createResponse.EnsureSuccessStatusCode();
             var createdGig = await createResponse.Content.ReadFromJsonAsync<CreateGigResponseDto>();
             // Now, update the created gig
-            var updateResponse = await _client.PutAsJsonAsync($"/api/gigs/{createdGig.Id}", new
+            var updateResponse = await _client.PutAsJsonAsync($"/api/gigs/{createdGig?.Id}", new
             {
                 Title = "Updated Test Gig",
                 Description = "Updated Test Description",

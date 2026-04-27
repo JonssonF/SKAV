@@ -1,5 +1,4 @@
-﻿using SKAV.Domain.Exceptions;
-using System.Text.Json;
+﻿using System.Text.Json;
 
 namespace SKAV.Domain.Exceptions
 {

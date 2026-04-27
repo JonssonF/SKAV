@@ -26,7 +26,7 @@ namespace SKAV.Application.Services
             {
                 Email = request.Email,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
-                Role = Enum.Parse<Roles>(request.Role, ignoreCase: true)
+                Roles = request.Roles
             };
 
             using var scope = uow.BeginTransactionScope();
@@ -36,7 +36,7 @@ namespace SKAV.Application.Services
             return new CreateUserResponseDto
             {
                 Email = user.Email,
-                Role = user.Role.ToString()
+                Roles = user.Roles
             };
         }
 
@@ -57,7 +57,7 @@ namespace SKAV.Application.Services
             var user = await repo.GetByIdAsync(id, ct)
                 ?? throw new NotFoundException(BusinessRules.UserNotFound);
 
-            user.Role = Enum.Parse<Roles>(request.Role, ignoreCase: true);
+            user.Roles = request.Roles;
 
             using var scope = uow.BeginTransactionScope();
             await repo.UpdateAsync(user, ct);
@@ -93,7 +93,7 @@ namespace SKAV.Application.Services
             {
                 Id = u.Id,
                 Email = u.Email,
-                Role = u.Role.ToString()
+                Roles = u.Roles
             });
         }
     }

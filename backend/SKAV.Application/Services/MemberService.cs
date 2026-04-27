@@ -6,6 +6,7 @@ using SKAV.Application.Interfaces.UoW;
 using SKAV.Application.Services.Interface;
 using SKAV.Domain.Consts;
 using SKAV.Domain.Entities;
+using SKAV.Domain.Enumeration;
 using SKAV.Domain.Exceptions;
 
 namespace SKAV.Application.Services
@@ -37,7 +38,6 @@ namespace SKAV.Application.Services
             var member = new Member
             {
                 Name = request.Name,
-                Role = request.Role,
                 Quote = request.Quote,
                 ImageUrl = request.ImageUrl,
                 DisplayOrder = request.DisplayOrder,
@@ -57,8 +57,15 @@ namespace SKAV.Application.Services
             var existing = await repo.GetByIdAsync(id, ct)
                 ?? throw new NotFoundException(BusinessRules.MemberNotFound);
 
+            if (!currentUser.Roles.HasFlag(Roles.Admin) && 
+                !currentUser.Roles.HasFlag(Roles.Editor) &&
+                existing.UserId != currentUser.UserId)
+            {
+                throw new ForbiddenException(BusinessRules.Forbidden);
+            }
+
+
             existing.Name = request.Name;
-            existing.Role = request.Role;
             existing.Quote = request.Quote;
             existing.ImageUrl = request.ImageUrl;
             existing.DisplayOrder = request.DisplayOrder;
@@ -90,7 +97,6 @@ namespace SKAV.Application.Services
         {
             Id = m.Id,
             Name = m.Name,
-            Role = m.Role,
             Quote = m.Quote,
             ImageUrl = m.ImageUrl,
             DisplayOrder = m.DisplayOrder,

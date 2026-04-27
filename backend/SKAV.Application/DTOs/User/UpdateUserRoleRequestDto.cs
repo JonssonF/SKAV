@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using SKAV.Domain.Enumeration;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace SKAV.Application.DTOs.User
@@ -6,8 +7,8 @@ namespace SKAV.Application.DTOs.User
     public class UpdateUserRoleRequestDto
     {
         [Required(ErrorMessage = "Roll är obligatorisk")]
-        [RegularExpression("^(Admin|Editor)$", ErrorMessage = "Roll måste vara Admin eller Editor")]
-        [DefaultValue("Editor")]
-        public required string Role { get; set; }
+        [RegularExpression("^(Editor|Member)$", ErrorMessage = "Roll måste vara Admin, Editor eller Member")]
+        [DefaultValue(Roles.Member)]
+        public required Roles Roles { get; set; }
     }
 }
