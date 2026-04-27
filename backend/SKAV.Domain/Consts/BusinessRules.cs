@@ -22,6 +22,11 @@
         public const string MemberAlreadyExists = "MemberAlreadyExists";
         public const string Forbidden = "Forbidden";
 
+        // Instruments
+        public const string InstrumentNotFound = "InstrumentNotFound";
+        public const string InstrumentAlreadyExists = "InstrumentAlreadyExists";
+        public const string MemberInstrumentNotFound = "MemberInstrumentNotFound";
+
         // Subscribers
         public const string SubscriberNotFound = "SubscriberNotFound";
 

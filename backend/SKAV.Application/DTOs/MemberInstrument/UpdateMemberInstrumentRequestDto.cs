@@ -1,4 +1,4 @@
-﻿namespace SKAV.Application.DTOs.Instrument
+﻿namespace SKAV.Application.DTOs.MemberInstrument
 {
     public class UpdateMemberInstrumentRequestDto
     {

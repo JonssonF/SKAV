@@ -10,16 +10,10 @@ namespace SKAV.Infrastructure.Database
     public class SeedData(
         IMemberRepository memberRepo,
         IGigRepository gigRepo,
-        IInstrumentRepository intrumentRepo,
+        IInstrumentRepository instrumentRepo,
         IMemberInstrumentRepository memberInstrumentRepo,
         IUnitOfWork uow)
-    {
-        public async Task SeedAsync(CancellationToken ct = default)
-        {
-            await SeedMembersAsync(ct);
-            await SeedGigsAsync(ct);
-        }
-
+    {   
         public async Task SeedAsync(CancellationToken ct = default)
         {
             await SeedInstrumentsAsync(ct);

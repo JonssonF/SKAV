@@ -2,5 +2,6 @@
 {
     public class CreateInstrumentResponseDto
     {
+        public required int Id { get; set; }    
     }
 }
