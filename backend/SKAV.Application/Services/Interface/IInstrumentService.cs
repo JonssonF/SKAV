@@ -1,4 +1,6 @@
-﻿namespace SKAV.Application.Services.Interface
+﻿using SKAV.Application.DTOs.Instrument;
+
+namespace SKAV.Application.Services.Interface
 {
     public interface IInstrumentService
     {
