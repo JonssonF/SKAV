@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      Seed__AdminPassword: "1234"
+      Seed__AdminPassword: ${{ secrets.SEED_ADMIN_PASSWORD }}
       FORCE_JAVASCRIPT_ACTION_TO_NODE24: true
 
     steps:
