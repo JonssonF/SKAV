@@ -17,32 +17,38 @@ namespace SKAV.Application.Services
 {
     public class MemberInstrumentService : IMemberInstrumentService
     {
-        private readonly IMemberInstrumentRepository _repo;
+        private readonly IMemberInstrumentRepository _memberInstrumentRepository;
+        private readonly IInstrumentRepository _instrumentRepository;
         private readonly IUnitOfWork _uow;
         private readonly ICurrentUserService _currentUser;
 
-        public MemberInstrumentService(IMemberInstrumentRepository repo, IUnitOfWork uow, ICurrentUserService currentUser)
+        public MemberInstrumentService(IMemberInstrumentRepository memberInstrumentRepository, IInstrumentRepository instrumentRepository, IUnitOfWork uow, ICurrentUserService currentUser)
         {
-            _repo = repo;
+            _memberInstrumentRepository = memberInstrumentRepository;
+            _instrumentRepository = instrumentRepository;
             _uow = uow;
             _currentUser = currentUser;
         }
 
         public async Task<IEnumerable<MemberInstrumentResponseDto>> GetAllAsync(CancellationToken ct)
         {
-            var memberInstruments = await _repo.GetAllAsync(ct);
+            var memberInstruments = await _memberInstrumentRepository.GetAllAsync(ct);
             return memberInstruments.Select(MapToDto);
         }
 
         public async Task<MemberInstrumentResponseDto> GetByIdAsync(int id, CancellationToken ct)
         {
-            var memberInstrument = await _repo.GetByIdAsync(id, ct)
+            var memberInstrument = await _memberInstrumentRepository.GetByIdAsync(id, ct)
                 ?? throw new NotFoundException(BusinessRules.MemberInstrumentNotFound);
             return MapToDto(memberInstrument);
         }
 
         public async Task<CreateMemberInstrumentResponseDto> CreateAsync(CreateMemberInstrumentRequestDto request, CancellationToken ct)
         {
+            var instrumentExists = await _instrumentRepository.ExistsAsync(request.InstrumentId, ct);
+            if (instrumentExists)
+                throw new NotFoundException(BusinessRules.InstrumentNotFound);
+
             var memberInstrument = new MemberInstrument
             {
                 MemberId = request.MemberId,
@@ -51,32 +57,33 @@ namespace SKAV.Application.Services
             };
             AuditHelper.SetCreated(memberInstrument, _currentUser.UserId);
             using var scope = _uow.BeginTransactionScope();
-            var id = await _repo.CreateAsync(memberInstrument, ct);
+            var id = await _memberInstrumentRepository.CreateAsync(memberInstrument, ct);
             await scope.CommitTransactionScopeAsync(ct);
             return new CreateMemberInstrumentResponseDto { Id = id };
         }
 
         public async Task<UpdateMemberInstrumentResponseDto> UpdateAsync(int id, UpdateMemberInstrumentRequestDto request, CancellationToken ct)
         {
-            var memberInstrument = await _repo.GetByIdAsync(id, ct)
+            var memberInstrument = await _memberInstrumentRepository.GetByIdAsync(id, ct)
                 ?? throw new NotFoundException(BusinessRules.MemberInstrumentNotFound);
             memberInstrument.MemberId = request.MemberId;
             memberInstrument.InstrumentId = request.InstrumentId;
             memberInstrument.Details = request.Details;
             AuditHelper.SetUpdated(memberInstrument, _currentUser.UserId);
             using var scope = _uow.BeginTransactionScope();
-            await _repo.UpdateAsync(memberInstrument, ct);
+            await _memberInstrumentRepository.UpdateAsync(memberInstrument, ct);
             await scope.CommitTransactionScopeAsync(ct);
             return new UpdateMemberInstrumentResponseDto();
         }
 
         public async Task<DeleteMemberInstrumentResponseDto> DeleteAsync(int id, CancellationToken ct)
         {
-            var memberInstrument = await _repo.GetByIdAsync(id, ct)
+            var memberInstrument = await _memberInstrumentRepository.GetByIdAsync(id, ct)
                 ?? throw new NotFoundException(BusinessRules.MemberInstrumentNotFound);
+
             AuditHelper.SetDeleted(memberInstrument, _currentUser.UserId);
             using var scope = _uow.BeginTransactionScope();
-            await _repo.DeleteAsync(id, memberInstrument, ct);
+            await _memberInstrumentRepository.DeleteAsync(id, memberInstrument, ct);
             await scope.CommitTransactionScopeAsync(ct);
             return new DeleteMemberInstrumentResponseDto();
         }
