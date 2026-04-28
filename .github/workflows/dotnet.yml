@@ -7,6 +7,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      Seed__AdminPassword: "1234"
+      FORCE_JAVASCRIPT_ACTION_TO_NODE24: true
+
     steps:
     - uses: actions/checkout@v4
 
