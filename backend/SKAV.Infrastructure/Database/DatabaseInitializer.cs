@@ -210,7 +210,7 @@ namespace SKAV.Infrastructure.Database
             var hash = BCrypt.Net.BCrypt.HashPassword(adminPassword);
 
             await connection.ExecuteAsync(@"
-                INSERT INTO Users (Email, PasswordHash, Role, CreatedAt)
+                INSERT OR IGNORE INTO Users (Email, PasswordHash, Role, CreatedAt)
                 VALUES (@Email, @PasswordHash, @Role, @CreatedAt)",
                 new
                 {
