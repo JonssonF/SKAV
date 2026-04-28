@@ -26,7 +26,7 @@ namespace SKAV.Application.Validators.Album
                     BusinessRules.AlbumAlreadyExists);
         }
 
-        private async Task ValidateAlbumExistsAsync(int? albumId, CancellationToken ct)
+        public async Task ValidateAlbumExistsAsync(int? albumId, CancellationToken ct)
         {
             if (albumId is null) return;
 

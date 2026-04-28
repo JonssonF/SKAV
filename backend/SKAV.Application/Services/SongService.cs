@@ -14,7 +14,6 @@ namespace SKAV.Application.Services
 {
     public class SongService(
         ISongRepository repo,
-        IAlbumRepository albumRepo,
         IAlbumValidator albumValidator,
         ISongValidator songValidator,
         IUnitOfWork uow,
