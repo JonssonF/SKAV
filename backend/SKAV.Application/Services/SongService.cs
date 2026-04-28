@@ -4,6 +4,7 @@ using SKAV.Application.Interfaces;
 using SKAV.Application.Interfaces.Repositories;
 using SKAV.Application.Interfaces.UoW;
 using SKAV.Application.Services.Interface;
+using SKAV.Application.Validators.Album;
 using SKAV.Application.Validators.Song;
 using SKAV.Domain.Consts;
 using SKAV.Domain.Entities;
@@ -13,8 +14,8 @@ namespace SKAV.Application.Services
 {
     public class SongService(
         ISongRepository repo,
-        IAlbumRepository albumRepo,
-        ISongValidator validator,
+        IAlbumValidator albumValidator,
+        ISongValidator songValidator,
         IUnitOfWork uow,
         ICurrentUserService currentUser) : ISongService
     {
@@ -38,8 +39,8 @@ namespace SKAV.Application.Services
 
         public async Task<CreateSongResponseDto> CreateAsync(CreateSongRequestDto request, CancellationToken ct)
         {
-            await ValidateAlbumExistsAsync(request.AlbumId, ct);
-            await validator.ValidateCreateAsync(request, ct);
+            await albumValidator.ValidateAlbumExistsAsync(request.AlbumId, ct);
+            await songValidator.ValidateCreateAsync(request, ct);
 
             var song = new Song
             {
@@ -65,8 +66,8 @@ namespace SKAV.Application.Services
             var existing = await repo.GetByIdAsync(id, ct)
                 ?? throw new NotFoundException(BusinessRules.SongNotFound);
 
-            await ValidateAlbumExistsAsync(request.AlbumId, ct);
-            await validator.ValidateUpdateAsync(id, request, ct);
+            await albumValidator.ValidateAlbumExistsAsync(request.AlbumId, ct);
+            await songValidator.ValidateUpdateAsync(id, request, ct);
 
             existing.AlbumId = request.AlbumId;
             existing.Title = request.Title;
@@ -96,15 +97,6 @@ namespace SKAV.Application.Services
             await scope.CommitTransactionScopeAsync(ct);
 
             return new DeleteSongResponseDto();
-        }
-
-        private async Task ValidateAlbumExistsAsync(int? albumId, CancellationToken ct)
-        {
-            if (albumId is null) return;
-
-            var albumExists = await albumRepo.ExistsAsync(albumId.Value, ct);
-            if (!albumExists)
-                throw new NotFoundException(BusinessRules.AlbumNotFound);
         }
 
         private static SongResponseDto MapToDto(Song s) => new()
