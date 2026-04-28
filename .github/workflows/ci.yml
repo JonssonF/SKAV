@@ -7,6 +7,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      Seed__AdminPassword: "1234"
+
     steps:
     - uses: actions/checkout@v4
 
