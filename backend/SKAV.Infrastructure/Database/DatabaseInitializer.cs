@@ -3,6 +3,7 @@ using Dapper;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -194,28 +195,30 @@ namespace SKAV.Infrastructure.Database
 
             await SeedAdminAsync(connection);
         }
-
-        private async Task SeedAdminAsync(System.Data.IDbConnection connection)
+        private async Task SeedAdminAsync(IDbConnection connection)
         {
+            var adminPassword = configuration["Seed:AdminPassword"]
+                ?? throw new InvalidOperationException("Admin seed password not configured.");
+
             var exists = await connection.ExecuteScalarAsync<int>(
                 "SELECT COUNT(1) FROM Users WHERE Email = @Email",
                 new { Email = "admin@skav.se" });
 
-            if (exists > 0) return;
+            if (exists > 0)
+                return;
 
-            var adminPassword = configuration["Seed:AdminPassword"]
-                ?? throw new InvalidOperationException("Admin seed password not configured.");
+            var hash = BCrypt.Net.BCrypt.HashPassword(adminPassword);
 
-            await connection.ExecuteAsync("""
-            INSERT INTO Users (Email, PasswordHash, Role, CreatedAt)
-            VALUES (@Email, @PasswordHash, @Role, @CreatedAt)
-            """, new
-            {
-                Email = "admin@skav.se",
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(adminPassword),
-                Role = 1,
-                CreatedAt = DateTime.UtcNow.ToString("O")
-            });
+            await connection.ExecuteAsync(@"
+                INSERT INTO Users (Email, PasswordHash, Role, CreatedAt)
+                VALUES (@Email, @PasswordHash, @Role, @CreatedAt)",
+                new
+                {
+                    Email = "admin@skav.se",
+                    PasswordHash = hash,
+                    Role = 1,
+                    CreatedAt = DateTime.UtcNow.ToString("O")
+                });
         }
     }
 }
