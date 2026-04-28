@@ -20,6 +20,7 @@ namespace SKAV.Infrastructure.Repositories
             Uow = uow;
         }
 
+        // Get the table name from the [TableName] attribute on the entity class
         private static string GetTableName()
         {
             var attribute = typeof(T).GetCustomAttribute<TableNameAttribute>()
@@ -123,7 +124,7 @@ namespace SKAV.Infrastructure.Repositories
             if (affected == 0)
                 throw new KeyNotFoundException($"{typeof(T).Name} with id {id} not found.");
         }
-
+        // Get properties to include in INSERT statements, excluding Id, UpdatedAt, UpdatedBy, DeletedAt, DeletedBy
         private static List<string> GetInsertProperties() =>
             typeof(T).GetProperties()
                 .Where(p =>
@@ -138,6 +139,7 @@ namespace SKAV.Infrastructure.Repositories
                 .Select(p => p.Name)
                 .ToList();
 
+        // Get properties to include in UPDATE statements, excluding Id, CreatedAt, CreatedBy, DeletedAt, DeletedBy
         private static List<string> GetUpdateProperties() =>
             typeof(T).GetProperties()
                 .Where(p =>
