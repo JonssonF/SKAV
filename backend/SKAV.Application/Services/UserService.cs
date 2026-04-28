@@ -1,12 +1,10 @@
-﻿using SKAV.Application.DTOs.Subscriber;
-using SKAV.Application.DTOs.User;
+﻿using SKAV.Application.DTOs.User;
 using SKAV.Application.Interfaces;
 using SKAV.Application.Interfaces.Repositories;
 using SKAV.Application.Interfaces.UoW;
 using SKAV.Application.Services.Interface;
 using SKAV.Domain.Consts;
 using SKAV.Domain.Entities;
-using SKAV.Domain.Enumeration;
 using SKAV.Domain.Exceptions;
 
 namespace SKAV.Application.Services

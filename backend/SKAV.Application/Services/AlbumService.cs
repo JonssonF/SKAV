@@ -36,7 +36,6 @@ namespace SKAV.Application.Services
 
         public async Task<CreateAlbumResponseDto> CreateAsync(CreateAlbumRequestDto request, CancellationToken ct)
         {
-            
 
             await validator.ValidateCreateAsync(request, ct);
 

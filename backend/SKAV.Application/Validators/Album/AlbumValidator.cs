@@ -25,5 +25,14 @@ namespace SKAV.Application.Validators.Album
                     "Ett album med samma titel finns redan.",
                     BusinessRules.AlbumAlreadyExists);
         }
+
+        private async Task ValidateAlbumExistsAsync(int? albumId, CancellationToken ct)
+        {
+            if (albumId is null) return;
+
+            var albumExists = await repo.ExistsAsync(albumId.Value, ct);
+            if (!albumExists)
+                throw new NotFoundException(BusinessRules.AlbumNotFound);
+        }
     }
 }

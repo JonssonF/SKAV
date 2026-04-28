@@ -7,11 +7,6 @@ using SKAV.Application.Services.Interface;
 using SKAV.Domain.Consts;
 using SKAV.Domain.Entities;
 using SKAV.Domain.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SKAV.Application.Services
 {
@@ -46,7 +41,7 @@ namespace SKAV.Application.Services
         public async Task<CreateMemberInstrumentResponseDto> CreateAsync(CreateMemberInstrumentRequestDto request, CancellationToken ct)
         {
             var instrumentExists = await _instrumentRepository.ExistsAsync(request.InstrumentId, ct);
-            if (instrumentExists)
+            if (!instrumentExists)
                 throw new NotFoundException(BusinessRules.InstrumentNotFound);
 
             var memberInstrument = new MemberInstrument
