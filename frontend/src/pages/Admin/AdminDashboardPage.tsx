@@ -15,7 +15,7 @@ export function AdminDashboardPage() {
     <Container py="xl">
       <Group justify="space-between" mb="lg">
         <div>
-          <Title order={1}>Admin</Title>
+          <Title order={1}>SKAV - Behind the scenes</Title>
           <Text c="dimmed">Inloggad som {user?.email}</Text>
         </div>
         <Button variant="light" color="red" onClick={handleLogout}>
