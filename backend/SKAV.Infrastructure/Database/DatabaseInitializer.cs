@@ -74,7 +74,7 @@ namespace SKAV.Infrastructure.Database
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
                     Email TEXT NOT NULL UNIQUE,
                     PasswordHash TEXT NOT NULL,
-                    Role INTEGER NOT NULL,
+                    Roles INTEGER NOT NULL,
                     CreatedAt TEXT NOT NULL,
                     CreatedBy INTEGER,
                     UpdatedAt TEXT,
@@ -210,13 +210,13 @@ namespace SKAV.Infrastructure.Database
             var hash = BCrypt.Net.BCrypt.HashPassword(adminPassword);
 
             await connection.ExecuteAsync(@"
-                INSERT OR IGNORE INTO Users (Email, PasswordHash, Role, CreatedAt)
-                VALUES (@Email, @PasswordHash, @Role, @CreatedAt)",
+                INSERT OR IGNORE INTO Users (Email, PasswordHash, Roles, CreatedAt)
+                VALUES (@Email, @PasswordHash, @Roles, @CreatedAt)",
                 new
                 {
                     Email = "admin@skav.se",
                     PasswordHash = hash,
-                    Role = 1,
+                    Roles = 1,
                     CreatedAt = DateTime.UtcNow.ToString("O")
                 });
         }

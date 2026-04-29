@@ -9,6 +9,11 @@ const publicItems = [
   { label: 'Album', path: '/albums' },
 ];
 
+const adminItems = [
+  { label: 'Dashboard', path: '/admin' },
+  { label: 'Spelningar', path: '/admin/gigs' },
+];
+
 export function AppLayout() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -55,22 +60,14 @@ export function AppLayout() {
         {isAuthenticated && (isAdmin || isEditor) && (
           <>
             <Divider my="sm" label="Hantera" />
-            <NavLink
-              label="Dashboard"
-              active={location.pathname === '/admin'}
-              onClick={() => navigate('/admin')}
-            />
-          </>
-        )}
-
-        {isAuthenticated && isMember && !isAdmin && !isEditor && (
-          <>
-            <Divider my="sm" label="Min profil" />
-            <NavLink
-              label="Mitt kort"
-              active={location.pathname === '/admin/profile'}
-              onClick={() => navigate('/admin/profile')}
-            />
+            {adminItems.map((item) => (
+              <NavLink
+                key={item.path}
+                label={item.label}
+                active={location.pathname === item.path}
+                onClick={() => navigate(item.path)}
+              />
+            ))}
           </>
         )}
       </AppShell.Navbar>

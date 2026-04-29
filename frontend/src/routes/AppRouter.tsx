@@ -6,16 +6,15 @@ import { GigsPage } from '../pages/GigsPage';
 import { MembersPage } from '../pages/MembersPage';
 import { LoginPage } from '../pages/LoginPage';
 import { AdminDashboardPage } from '../pages/AdminDashboardPage';
+import { AdminGigsPage } from '../pages/AdminGigsPage';
 import { ProtectedRoute } from './ProtectedRoute';
 
 export function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Login — utan navbar/header */}
         <Route path="/login" element={<LoginPage />} />
 
-        {/* Alla andra sidor — med navbar/header */}
         <Route element={<AppLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/albums" element={<AlbumsPage />} />
@@ -26,6 +25,14 @@ export function AppRouter() {
             element={
               <ProtectedRoute>
                 <AdminDashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/gigs"
+            element={
+              <ProtectedRoute>
+                <AdminGigsPage />
               </ProtectedRoute>
             }
           />
