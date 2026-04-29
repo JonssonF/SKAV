@@ -1,14 +1,20 @@
-import { AppShell, NavLink, Title, Group } from '@mantine/core';
+import { AppShell, NavLink, Title, Group, Divider } from '@mantine/core';
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
+import { useAuth } from '../../providers/AuthProvider';
 
-const navItems = [
+const publicItems = [
   { label: 'Hem', path: '/' },
   { label: 'Album', path: '/albums' },
+];
+
+const adminItems = [
+  { label: 'Dashboard', path: '/admin' },
 ];
 
 export function AppLayout() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   return (
     <AppShell
@@ -23,7 +29,7 @@ export function AppLayout() {
       </AppShell.Header>
 
       <AppShell.Navbar p="sm">
-        {navItems.map((item) => (
+        {publicItems.map((item) => (
           <NavLink
             key={item.path}
             label={item.label}
@@ -31,6 +37,31 @@ export function AppLayout() {
             onClick={() => navigate(item.path)}
           />
         ))}
+
+        {isAuthenticated && (
+          <>
+            <Divider my="sm" label="Admin" />
+            {adminItems.map((item) => (
+              <NavLink
+                key={item.path}
+                label={item.label}
+                active={location.pathname === item.path}
+                onClick={() => navigate(item.path)}
+              />
+            ))}
+          </>
+        )}
+
+        {!isAuthenticated && (
+          <>
+            <Divider my="sm" />
+            <NavLink
+              label="Logga in"
+              active={location.pathname === '/login'}
+              onClick={() => navigate('/login')}
+            />
+          </>
+        )}
       </AppShell.Navbar>
 
       <AppShell.Main>
