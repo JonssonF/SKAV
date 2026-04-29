@@ -45,5 +45,23 @@ namespace SKAV.Infrastructure.Repositories
                 parameters: new { Title = title, AlbumId = albumId, ExcludeId = excludeId },
                 cancellationToken: ct)) > 0;
         }
+
+        public async Task<bool> ExistsByTrackNumberAndAlbumAsync(
+            int? trackNumber, int? albumId, int? excludeId, CancellationToken ct)
+        {
+            using var conn = Db.CreateConnection();
+            conn.Open();
+            const string sql = """
+            SELECT COUNT(1) FROM Songs
+            WHERE TrackNumber = @TrackNumber
+            AND (@AlbumId IS NULL AND AlbumId IS NULL OR AlbumId = @AlbumId)
+            AND DeletedAt IS NULL
+            AND (@ExcludeId IS NULL OR Id != @ExcludeId);
+            """;
+            return await conn.ExecuteScalarAsync<int>(new CommandDefinition(
+                commandText: sql,
+                parameters: new { TrackNumber = trackNumber, AlbumId = albumId, ExcludeId = excludeId },
+                cancellationToken: ct)) > 0;
+        }
     }
 }
