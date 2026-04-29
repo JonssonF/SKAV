@@ -1,5 +1,5 @@
 import apiClient from './axios';
-import type { AlbumResponse, CreateAlbumRequest, CreateAlbumResponse } from '../types/api.types';
+import type { AlbumResponse, CreateAlbumRequest, CreateAlbumResponse } from '../types/album.types';
 
 export const albumsApi = {
   getAll: async (): Promise<AlbumResponse[]> => {
