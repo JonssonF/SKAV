@@ -1,129 +1,170 @@
-# 🎸 SKAV – Byns bästa band  
-Fullstack-projekt för bandet **SKAV**, byggt med React frontend och ASP.NET Core backend uppdelad enligt clean architecture.
-Tanken är att jag ska hosta denna hemsida själv med en Raspberry PI5.
+# 🎸 SKAV – Byns bästa band
+
+Fullstack-hemsida för bandet **SKAV**, byggd med React + Mantine frontend och ASP.NET Core 8 backend med Dapper + SQLite.
+Publik sida för fans och ett admin-läge för bandet att hantera innehåll.
+
+Målet är att självhosta allt på en **Raspberry Pi 5**.
+
 ---
 
 ## 🛠 Tech Stack
 
-### **Frontend**
-- React 19 + TypeScript  
-- Vite  
-- Tailwind CSS  
-- React Router  
-- Axios
+### Frontend
+- React 19 + TypeScript
+- Vite (dev-server & build)
+- Mantine v9 (UI-komponenter)
+- TanStack React Query (API-cache & state)
+- React Router v7 (routing)
+- Axios (HTTP-klient med JWT-interceptor)
 
-### **Backend**
-- ASP.NET Core 8 (Web API)  
-- Entity Framework Core (SQLite som standard)  
-- Lagerstruktur:
-- SKAV.API – Controllers, Program.cs, DI
-- SKAV.Application – Interfaces, services, DTOs
-- SKAV.Domain – Entities/Models
-- SKAV.Infrastructure – DbContext, EF Core, Repository
+### Backend
+- ASP.NET Core 8 (Web API)
+- Dapper (micro ORM)
+- SQLite
+- JWT-autentisering med BCrypt-hashade lösenord
+- Clean Architecture (4 lager)
+
+---
+
+## 📂 Projektstruktur
+
+```
+SKAV/
+├── backend/
+│   ├── SKAV.Api/              # Controllers, middleware, Program.cs
+│   ├── SKAV.Application/      # Services, DTOs, validators, interfaces
+│   ├── SKAV.Domain/           # Entities, exceptions, konstanter
+│   └── SKAV.Infrastructure/   # Repositories, UoW, databas, JWT
+│
+└── frontend/
+    └── src/
+        ├── api/               # Axios-setup + API-anrop per domän
+        ├── components/        # Återanvändbara komponenter (layout, common)
+        ├── features/          # Domänlogik per feature (hooks, komponenter)
+        │   ├── albums/
+        │   ├── gigs/
+        │   ├── members/
+        │   └── songs/
+        ├── hooks/             # Generella React hooks
+        ├── pages/             # Sidkomponenter (publika + admin)
+        ├── providers/         # AuthProvider (JWT, roller)
+        ├── routes/            # React Router + ProtectedRoute
+        ├── types/             # TypeScript interfaces (speglar backend DTOs)
+        └── utils/             # Hjälpfunktioner (felhantering m.m.)
+```
 
 ---
 
 ## 🎤 Funktioner
 
-| Område | Funktion |
-|--------|----------|
-| Publik sida | Startsida, giglistor, galleri, texter, kontakt |
-| Backend-data | Venue (plats), Gig (spelning) |
-| Admin (planeras) | JWT-login, CRUD för gig och innehåll |
-| Platsinfo | Latitude/Longitude per Venue (för karta/väder) |
-| Databas | SQLite lokalt, går enkelt att byta till SQL Server/PostgreSQL |
+### Publikt (alla besökare)
+| Sida | Beskrivning |
+|------|-------------|
+| Hem | Startsida |
+| Spelningar | Kommande och tidigare gigs med datum, plats, pris |
+| Bandet | Bandmedlemmar med bild, citat, instrument |
+| Musik | Album (expanderbara med spårlista) + singlar |
+
+### Admin (kräver inloggning)
+| Funktion | Beskrivning |
+|----------|-------------|
+| Inloggning | JWT-baserad auth via `/login` (dold från navigation) |
+| Spelningar | Skapa, redigera, ta bort gigs med datumvalidering |
+| Album | CRUD för album med releasedatum och Spotify-länk |
+| Låtar | CRUD med album-koppling (eller singel), spårnummer, längd |
+| Rollbaserad meny | Admin/Editor ser admin-alternativ, Member ser sin profil |
+| Dark/Light mode | Växla tema via knapp i headern |
+
+### Felhantering
+- Backend-valideringsfel visas direkt under rätt formulärfält
+- BusinessRule-fel mappas till relevanta fält via errorCode
+- Toast-notifieringar för success/error vid CRUD-operationer
+- Global 401-hantering — automatisk utloggning vid utgången token
 
 ---
 
-## 📂 Projektstruktur
-```plaintext
-SKAV/
-├── SKAV.sln
-│
-├── backend/
-│   ├── SKAV.API/                 # Controllers + DI + Swagger
-│   │   ├── Controllers/
-│   │   ├── Program.cs
-│   │   ├── appsettings.json
-│   │   └── SKAV.API.csproj
-│   │
-│   ├── SKAV.Application/         # Use cases / Services + Interfaces
-│   │   ├── Interfaces/
-│   │   ├── Services/
-│   │   └── SKAV.Application.csproj
-│   │
-│   ├── SKAV.Domain/              # Entities / Models
-│   │   ├── Models/
-│   │   └── SKAV.Domain.csproj
-│   │
-│   ├── SKAV.Infrastructure/      # Dapper + SQLite + Repositories + DB init
-│   │   ├── Database/             # ConnectionFactory, DbInitializer, Schema
-│   │   ├── Repositories/
-│   │   └── SKAV.Infrastructure.csproj
-│
-├── frontend/
-│   └── ...
+## 🔐 Autentisering
 
-```
+- JWT-tokens med roller (Admin, Editor, Member)
+- Token parsas i frontend för att visa rollbaserad navigation
+- Axios-interceptor bifogar token automatiskt på varje request
+- Skyddade routes via `ProtectedRoute`-komponent
+- Login-sidan är fristående utan navbar — bandet bokmärker `/login`
+
 ---
 
-📌 Domain-modeller
-Venue
-```csharp
-public class Venue
-{
-    public int Id { get; set; }
-    public required string Name { get; set; }
-    public required string StreetAddress { get; set; }
-    public required string ZipCode { get; set; }
-    public required string City { get; set; }
-    public string Country { get; set; } = "Sverige";
+## 🏗 Arkitektur
 
-    public int? Capacity { get; set; }
-    public double? Latitude { get; set; }
-    public double? Longitude { get; set; }
-
-    public ICollection<Gig> Gigs { get; set; } = new List<Gig>();
-}
+### Backend — Clean Architecture
 ```
-Gig
-```csharp
-public class Gig
-{
-    public int Id { get; set; }
-    public required string Title { get; set; }
-
-    public DateTime StartUtc { get; set; }
-    public DateTime? DoorsOpenUtc { get; set; }
-
-    public int VenueId { get; set; }
-    public Venue? Venue { get; set; }
-
-    public decimal? TicketPrice { get; set; }
-    public string? ExternalTicketUrl { get; set; }
-
-    public string? Notes { get; set; }
-    public int? AgeLimit { get; set; }
-
-    public DateTime CreatedUtc { get; set; } = DateTime.UtcNow;
-    public DateTime? UpdatedUtc { get; set; }
-    public string? Slug { get; set; }
-}
+Api → Application ← Infrastructure
+              ↑
+           Domain (inga beroenden)
 ```
-🚀 Planer framåt
-✅ Venue & Gig modeller klara
-⬜ API endpoints (/api/gigs, /api/venues)
-⬜ Seed-data
-⬜ Automatisk lat/long via geocoding API (t.ex. Geoapify/OpenStreetMap)
-⬜ Admin med JWT
-⬜ Bilduppladdning
-⬜ Deployment (Docker / Raspberry Pi)
 
-🛡️ Säkerhet (planeras)
-JWT-baserad autentisering
-Hashade lösenord (BCrypt)
-CORS för frontend
-Hemligheter i appsettings.Development.json eller environment variables
+- **Controllers** — tunna one-liners, returnerar DTOs direkt
+- **Services** — affärslogik med UnitOfWork-transaktioner
+- **Repositories** — generiskt BaseRepository med Dapper
+- **Validators** — kastar typade exceptions
+- **Soft delete** — alla entiteter med audit trail
 
-📜 Licens
+### Frontend — Feature-baserad
+```
+Types → API → Hooks → Pages
+  ↕       ↕      ↕       ↕
+DTOs → Repos → Services → Controllers (backend-motsvarighet)
+```
+
+---
+
+## 🚀 Roadmap
+
+### ✅ Klart
+- JWT-autentisering med rollhantering
+- CRUD: Spelningar, Album, Låtar, Medlemmar
+- Publik musiksida med album + singlar
+- Rollbaserad navigation (Admin/Editor/Member)
+- Felhantering med fältvalidering från backend
+- Dark/Light mode
+- React Query caching med automatisk invalidering
+
+### 🔜 Nästa steg
+- Subscribers — CRUD + nyhetsbrevsprenumeration
+- Dashboard — StatsRing med prenumeranter, spelningar, besökare
+- Besöksräknare — backend-endpoint för sidvisningar
+- Members admin — profilredigering med avatar och rollhantering
+- Lyrics — CRUD med slug-generering och publik visning
+- Instruments — many-to-many koppling mellan medlem och instrument
+
+### 🔮 Framtid
+- Orval — autogenererad API-klient från Swagger/OpenAPI
+- Bilduppladdning — medlemsbilder, albumomslag
+- Nyhetsbrev — e-postutskick via Resend API
+- Kontaktformulär — med e-postnotifiering
+- Docker Compose — containerisering av frontend + backend
+- Raspberry Pi 5 — självhostning med HTTPS via Let's Encrypt
+
+---
+
+## 💻 Kom igång
+
+### Backend
+```bash
+cd backend/SKAV.Api
+dotnet run
+```
+Lyssnar på `http://localhost:5249`. Swagger: `http://localhost:5249/swagger`
+
+### Frontend
+```bash
+cd frontend
+npm install
+npm run dev
+```
+Öppnas på `http://localhost:5173`
+
+---
+
+## 📜 Licens
+
 Detta projekt är skapat för lärande och för bandet SKAV.
