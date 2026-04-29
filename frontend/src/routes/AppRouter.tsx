@@ -1,13 +1,15 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AppLayout } from '../components/layout/AppLayout';
 import { HomePage } from '../pages/HomePage';
-import { AlbumsPage } from '../pages/AlbumsPage';
 import { GigsPage } from '../pages/GigsPage';
 import { MembersPage } from '../pages/MembersPage';
 import { LoginPage } from '../pages/LoginPage';
-import { AdminDashboardPage } from '../pages/AdminDashboardPage';
-import { AdminGigsPage } from '../pages/AdminGigsPage';
+import { AdminDashboardPage } from '../pages/Admin/AdminDashboardPage';
+import { AdminGigsPage } from '../pages/Admin/AdminGigsPage';
 import { ProtectedRoute } from './ProtectedRoute';
+import { AdminAlbumPage } from '../pages/Admin/AdminAlbumPage';
+import { MusicPage } from '../pages/MusicPage';
+import { AdminSongsPage } from '../pages/Admin/AdminSongsPage';
 
 export function AppRouter() {
   return (
@@ -17,7 +19,7 @@ export function AppRouter() {
 
         <Route element={<AppLayout />}>
           <Route path="/" element={<HomePage />} />
-          <Route path="/albums" element={<AlbumsPage />} />
+          <Route path="/music" element={<MusicPage />} />
           <Route path="/gigs" element={<GigsPage />} />
           <Route path="/members" element={<MembersPage />} />
           <Route
@@ -29,6 +31,14 @@ export function AppRouter() {
             }
           />
           <Route
+            path="/admin/albums"
+            element={
+              <ProtectedRoute>
+                <AdminAlbumPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/admin/gigs"
             element={
               <ProtectedRoute>
@@ -36,6 +46,14 @@ export function AppRouter() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/admin/songs"
+            element={
+                <ProtectedRoute>
+                <AdminSongsPage />
+                </ProtectedRoute>
+            }
+            />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -1,5 +1,5 @@
 import { Container, Title, Text, Button, Group } from '@mantine/core';
-import { useAuth } from '../providers/AuthProvider';
+import { useAuth } from '../../providers/AuthProvider';
 import { useNavigate } from 'react-router-dom';
 
 export function AdminDashboardPage() {
