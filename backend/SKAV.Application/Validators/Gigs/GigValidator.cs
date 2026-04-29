@@ -1,6 +1,5 @@
 ﻿using SKAV.Application.DTOs.Gigs;
 using SKAV.Application.Interfaces.Repositories;
-using SKAV.Application.Validator;
 using SKAV.Application.Validator.Gigs;
 using SKAV.Domain.Consts;
 using SKAV.Domain.Exceptions;
@@ -28,8 +27,8 @@ public class GigValidator(IGigRepository repo) : IGigValidator
         if (date < now)
             throw new ValidationException("Date", "Datum kan inte vara i det förflutna.");
 
-        if (date > now.AddYears(1))
-            throw new ValidationException("Date", "Datum får max vara ett år framåt.");
+        if (date > now.AddYears(2))
+            throw new ValidationException("Date", "Datum får max vara två år framåt.");
     }
 
     private async Task ValidateExistsAsync(string title, DateTimeOffset date, int? excludeId, CancellationToken ct)

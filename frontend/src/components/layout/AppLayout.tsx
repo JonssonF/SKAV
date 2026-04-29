@@ -4,14 +4,16 @@ import { useAuth } from '../../providers/AuthProvider';
 
 const publicItems = [
   { label: 'Hem', path: '/' },
-  { label: 'Spelningar', path: '/gigs' },
   { label: 'Bandet', path: '/members' },
-  { label: 'Album', path: '/albums' },
+  { label: 'Spelningar', path: '/gigs' },
+  { label: 'Musik', path: '/music' },
 ];
 
 const adminItems = [
-  { label: 'Dashboard', path: '/admin' },
-  { label: 'Spelningar', path: '/admin/gigs' },
+    { label: 'Album', path: '/admin/albums' },
+    { label: 'Dashboard', path: '/admin' },
+    { label: 'Spelningar', path: '/admin/gigs' },
+    { label: 'Låtar', path: '/admin/songs' },
 ];
 
 export function AppLayout() {

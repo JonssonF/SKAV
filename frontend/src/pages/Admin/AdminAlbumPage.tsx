@@ -11,29 +11,29 @@ import {
   Loader,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { useGigs, useCreateGig, useUpdateGig, useDeleteGig } from '../features/gigs/hooks/useGigs';
-import { GigForm } from '../features/gigs/components/GigForm';
-import { getApiErrors, getApiMessage } from '../utils/getApiErrors';
-import type { GigResponse } from '../types/gig.types';
+import { useAlbums, useCreateAlbum, useUpdateAlbum, useDeleteAlbum } from '../../features/albums/hooks/useAlbums';
+import { AlbumForm } from '../../features/albums/components/AlbumForm';
+import { getApiErrors, getApiMessage } from '../../utils/getApiErrors';
+import type { AlbumResponse } from '../../types/album.types';
 
-export function AdminGigsPage() {
-  const { data: gigs, isLoading, error } = useGigs();
-  const createGig = useCreateGig();
-  const updateGig = useUpdateGig();
-  const deleteGig = useDeleteGig();
+export function AdminAlbumPage() {
+  const { data: albums, isLoading, error } = useAlbums();
+  const createAlbum = useCreateAlbum();
+  const updateAlbum = useUpdateAlbum();
+  const deleteAlbum = useDeleteAlbum();
 
   const [createOpen, setCreateOpen] = useState(false);
-  const [editGig, setEditGig] = useState<GigResponse | null>(null);
+  const [editAlbum, setEditAlbum] = useState<AlbumResponse | null>(null);
   const [formErrors, setFormErrors] = useState<Record<string, string> | null>(null);
 
-  const handleCreate = (data: Parameters<typeof createGig.mutate>[0]) => {
+  const handleCreate = (data: Parameters<typeof createAlbum.mutate>[0]) => {
     setFormErrors(null);
-    createGig.mutate(data, {
+    createAlbum.mutate(data, {
       onSuccess: () => {
         setCreateOpen(false);
         notifications.show({
-          title: 'Spelning skapad',
-          message: 'Den nya spelningen har lagts till.',
+          title: 'Album skapat',
+          message: 'Det nya albumet har lagts till.',
           color: 'green',
         });
       },
@@ -52,16 +52,16 @@ export function AdminGigsPage() {
     });
   };
 
-  const handleUpdate = (data: Parameters<typeof updateGig.mutate>[0]['data']) => {
-    if (!editGig) return;
+  const handleUpdate = (data: Parameters<typeof updateAlbum.mutate>[0]['data']) => {
+    if (!editAlbum) return;
     setFormErrors(null);
-    updateGig.mutate(
-      { id: editGig.id, data },
+    updateAlbum.mutate(
+      { id: editAlbum.id, data },
       {
         onSuccess: () => {
-          setEditGig(null);
+          setEditAlbum(null);
           notifications.show({
-            title: 'Spelning uppdaterad',
+            title: 'Album uppdaterat',
             message: 'Ändringarna har sparats.',
             color: 'green',
           });
@@ -82,13 +82,13 @@ export function AdminGigsPage() {
     );
   };
 
-  const handleDelete = (gig: GigResponse) => {
-    if (!window.confirm(`Vill du ta bort "${gig.title}"?`)) return;
-    deleteGig.mutate(gig.id, {
+  const handleDelete = (album: AlbumResponse) => {
+    if (!window.confirm(`Vill du ta bort "${album.title}"?`)) return;
+    deleteAlbum.mutate(album.id, {
       onSuccess: () => {
         notifications.show({
-          title: 'Spelning borttagen',
-          message: `"${gig.title}" har tagits bort.`,
+          title: 'Album borttaget',
+          message: `"${album.title}" har tagits bort.`,
           color: 'green',
         });
       },
@@ -102,14 +102,13 @@ export function AdminGigsPage() {
     });
   };
 
-  // Rensa errors när modaler stängs
   const handleCloseCreate = () => {
     setCreateOpen(false);
     setFormErrors(null);
   };
 
   const handleCloseEdit = () => {
-    setEditGig(null);
+    setEditAlbum(null);
     setFormErrors(null);
   };
 
@@ -125,7 +124,7 @@ export function AdminGigsPage() {
     return (
       <Container py="xl">
         <Alert color="red" title="Något gick fel">
-          Kunde inte hämta spelningar.
+          Kunde inte hämta album.
         </Alert>
       </Container>
     );
@@ -134,40 +133,38 @@ export function AdminGigsPage() {
   return (
     <Container py="xl">
       <Group justify="space-between" mb="lg">
-        <Title order={1}>Hantera spelningar</Title>
-        <Button onClick={() => setCreateOpen(true)}>Ny spelning</Button>
+        <Title order={1}>Hantera album</Title>
+        <Button onClick={() => setCreateOpen(true)}>Nytt album</Button>
       </Group>
 
-      {!gigs || gigs.length === 0 ? (
-        <Text c="dimmed">Inga spelningar än. Skapa den första!</Text>
+      {!albums || albums.length === 0 ? (
+        <Text c="dimmed">Inga album än. Skapa det första!</Text>
       ) : (
         <Table striped highlightOnHover>
           <Table.Thead>
             <Table.Tr>
               <Table.Th>Titel</Table.Th>
-              <Table.Th>Plats</Table.Th>
-              <Table.Th>Datum</Table.Th>
-              <Table.Th>Pris</Table.Th>
+              <Table.Th>Releasedatum</Table.Th>
+              <Table.Th>Beskrivning</Table.Th>
               <Table.Th />
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
-            {gigs.map((gig) => (
-              <Table.Tr key={gig.id}>
-                <Table.Td>{gig.title}</Table.Td>
-                <Table.Td>{gig.location}</Table.Td>
+            {albums.map((album) => (
+              <Table.Tr key={album.id}>
+                <Table.Td>{album.title}</Table.Td>
                 <Table.Td>
-                  {new Date(gig.date).toLocaleDateString('sv-SE')}
+                  {album.releaseDate
+                    ? new Date(album.releaseDate).toLocaleDateString('sv-SE')
+                    : '-'}
                 </Table.Td>
-                <Table.Td>
-                  {gig.price != null ? `${gig.price} kr` : 'Gratis'}
-                </Table.Td>
+                <Table.Td>{album.description ?? '-'}</Table.Td>
                 <Table.Td>
                   <Group gap="xs">
                     <Button
                       variant="light"
                       size="xs"
-                      onClick={() => setEditGig(gig)}
+                      onClick={() => setEditAlbum(album)}
                     >
                       Redigera
                     </Button>
@@ -175,8 +172,8 @@ export function AdminGigsPage() {
                       variant="light"
                       color="red"
                       size="xs"
-                      onClick={() => handleDelete(gig)}
-                      loading={deleteGig.isPending}
+                      onClick={() => handleDelete(album)}
+                      loading={deleteAlbum.isPending}
                     >
                       Ta bort
                     </Button>
@@ -191,27 +188,27 @@ export function AdminGigsPage() {
       <Modal
         opened={createOpen}
         onClose={handleCloseCreate}
-        title="Ny spelning"
+        title="Nytt album"
         size="lg"
       >
-        <GigForm
+        <AlbumForm
           onSubmit={handleCreate}
-          loading={createGig.isPending}
+          loading={createAlbum.isPending}
           errors={formErrors}
         />
       </Modal>
 
       <Modal
-        opened={editGig !== null}
+        opened={editAlbum !== null}
         onClose={handleCloseEdit}
-        title="Redigera spelning"
+        title="Redigera album"
         size="lg"
       >
-        {editGig && (
-          <GigForm
-            initialData={editGig}
+        {editAlbum && (
+          <AlbumForm
+            initialData={editAlbum}
             onSubmit={handleUpdate}
-            loading={updateGig.isPending}
+            loading={updateAlbum.isPending}
             errors={formErrors}
           />
         )}
