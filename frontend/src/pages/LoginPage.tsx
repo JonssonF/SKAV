@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import {
-  Container,
+  Center,
   Paper,
   Title,
   TextInput,
@@ -32,7 +32,7 @@ export function LoginPage() {
     try {
       const response = await authApi.login({ email, password });
       login(response.token);
-      navigate('/admin');
+      navigate('/');
     } catch (err) {
       if (err instanceof AxiosError && err.response?.data) {
         const apiError = err.response.data as ApiError;
@@ -45,45 +45,43 @@ export function LoginPage() {
     }
   };
 
-
-
   return (
-    <Container size={420} py={80}>
-      <Title ta="center" mb="lg">
-        Logga in
-      </Title>
+    <Center h="60vh">
+      <Paper withBorder shadow="md" p="xl" radius="md" w={400}>
+        <Stack gap="md">
+          <Title ta="center" order={2}>SKAV</Title>
 
-      <Paper withBorder shadow="md" p="xl" radius="md">
-        <form onSubmit={handleSubmit}>
-          <Stack gap="md">
-            {error && (
-              <Alert color="red" variant="light">
-                {error}
-              </Alert>
-            )}
+          {error && (
+            <Alert color="red" variant="light">
+              {error}
+            </Alert>
+          )}
 
-            <TextInput
-              label="E-post"
-              placeholder="din@email.se"
-              value={email}
-              onChange={(e) => setEmail(e.currentTarget.value)}
-              required
-            />
+          <form onSubmit={handleSubmit}>
+            <Stack gap="md">
+              <TextInput
+                label="E-post"
+                placeholder="din@email.se"
+                value={email}
+                onChange={(e) => setEmail(e.currentTarget.value)}
+                required
+              />
 
-            <PasswordInput
-              label="Lösenord"
-              placeholder="Ditt lösenord"
-              value={password}
-              onChange={(e) => setPassword(e.currentTarget.value)}
-              required
-            />
+              <PasswordInput
+                label="Lösenord"
+                placeholder="Ditt lösenord"
+                value={password}
+                onChange={(e) => setPassword(e.currentTarget.value)}
+                required
+              />
 
-            <Button type="submit" fullWidth loading={loading}>
-              Logga in
-            </Button>
-          </Stack>
-        </form>
+              <Button type="submit" fullWidth loading={loading}>
+                Logga in
+              </Button>
+            </Stack>
+          </form>
+        </Stack>
       </Paper>
-    </Container>
+    </Center>
   );
 }

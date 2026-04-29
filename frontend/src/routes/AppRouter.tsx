@@ -12,12 +12,15 @@ export function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Login — utan navbar/header */}
+        <Route path="/login" element={<LoginPage />} />
+
+        {/* Alla andra sidor — med navbar/header */}
         <Route element={<AppLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/albums" element={<AlbumsPage />} />
           <Route path="/gigs" element={<GigsPage />} />
           <Route path="/members" element={<MembersPage />} />
-          <Route path="/login" element={<LoginPage />} />
           <Route
             path="/admin"
             element={

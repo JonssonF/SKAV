@@ -1,4 +1,4 @@
-import { AppShell, NavLink, Title, Group, Divider } from '@mantine/core';
+import { AppShell, NavLink, Title, Group, Divider, Button } from '@mantine/core';
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../../providers/AuthProvider';
 
@@ -9,14 +9,19 @@ const publicItems = [
   { label: 'Album', path: '/albums' },
 ];
 
-const adminItems = [
-  { label: 'Dashboard', path: '/admin' },
-];
-
 export function AppLayout() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user, logout } = useAuth();
+
+  const isAdmin = user?.roles.includes('Admin') ?? false;
+  const isEditor = user?.roles.includes('Editor') ?? false;
+  const isMember = user?.roles.includes('Member') ?? false;
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   return (
     <AppShell
@@ -25,8 +30,15 @@ export function AppLayout() {
       padding="md"
     >
       <AppShell.Header>
-        <Group h="100%" px="md">
+        <Group h="100%" px="md" justify="space-between">
           <Title order={3}>SKAV</Title>
+          {isAuthenticated && (
+            <Group gap="sm">
+              <Button variant="subtle" size="xs" color="gray" onClick={handleLogout}>
+                Logga ut
+              </Button>
+            </Group>
+          )}
         </Group>
       </AppShell.Header>
 
@@ -40,27 +52,24 @@ export function AppLayout() {
           />
         ))}
 
-        {isAuthenticated && (
+        {isAuthenticated && (isAdmin || isEditor) && (
           <>
-            <Divider my="sm" label="Admin" />
-            {adminItems.map((item) => (
-              <NavLink
-                key={item.path}
-                label={item.label}
-                active={location.pathname === item.path}
-                onClick={() => navigate(item.path)}
-              />
-            ))}
+            <Divider my="sm" label="Hantera" />
+            <NavLink
+              label="Dashboard"
+              active={location.pathname === '/admin'}
+              onClick={() => navigate('/admin')}
+            />
           </>
         )}
 
-        {!isAuthenticated && (
+        {isAuthenticated && isMember && !isAdmin && !isEditor && (
           <>
-            <Divider my="sm" />
+            <Divider my="sm" label="Min profil" />
             <NavLink
-              label="Logga in"
-              active={location.pathname === '/login'}
-              onClick={() => navigate('/login')}
+              label="Mitt kort"
+              active={location.pathname === '/admin/profile'}
+              onClick={() => navigate('/admin/profile')}
             />
           </>
         )}
