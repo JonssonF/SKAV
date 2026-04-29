@@ -1,4 +1,5 @@
-import { MantineProvider } from '@mantine/core';
+import { createTheme, MantineProvider } from '@mantine/core';
+import { useLocalStorage } from '@mantine/hooks';
 import { Notifications } from '@mantine/notifications';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './providers/AuthProvider';
@@ -18,11 +19,21 @@ const queryClient = new QueryClient({
   },
 });
 
+const theme = createTheme({
+  primaryColor: 'blue',
+  defaultRadius: 'md',
+});
+
 function App() {
+  const [colorScheme] = useLocalStorage<'light' | 'dark'>({
+    key: 'color-scheme',
+    defaultValue: 'dark',
+  });
+
   return (
     <QueryClientProvider client={queryClient}>
-      <MantineProvider>
-        <Notifications position="bottom-right" />
+      <MantineProvider theme={theme} forceColorScheme={colorScheme}>
+        <Notifications position="top-right" />
         <AuthProvider>
           <AppRouter />
         </AuthProvider>
