@@ -3,7 +3,7 @@
 Fullstack-hemsida för bandet **SKAV**, byggd med React + Mantine frontend och ASP.NET Core 8 backend med Dapper + SQLite.
 Publik sida för fans och ett admin-läge för bandet att hantera innehåll.
 
-Målet är att självhosta allt på en **Raspberry Pi 5**.
+Målet är att självhosta fullt fungerande fullstack applikation på en **Raspberry Pi 5**.
 
 ---
 
