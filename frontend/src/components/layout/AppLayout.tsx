@@ -4,6 +4,8 @@ import { useAuth } from '../../providers/AuthProvider';
 
 const publicItems = [
   { label: 'Hem', path: '/' },
+  { label: 'Spelningar', path: '/gigs' },
+  { label: 'Bandet', path: '/members' },
   { label: 'Album', path: '/albums' },
 ];
 
