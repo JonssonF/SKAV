@@ -13,6 +13,13 @@ appsettings.*.json
 *.db-shm
 *.db-wal
 
+# Frontend build output
+node_modules/
+dist/
+dist-ssr/
+*.local
+.vite/
+
 # User-specific files
 *.rsuser
 *.suo
