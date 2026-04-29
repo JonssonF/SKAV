@@ -145,24 +145,6 @@ DTOs → Repos → Services → Controllers (backend-motsvarighet)
 - Raspberry Pi 5 — självhostning med HTTPS via Let's Encrypt
 
 ---
-
-## 💻 Kom igång
-
-### Backend
-```bash
-cd backend/SKAV.Api
-dotnet run
-```
-Lyssnar på `http://localhost:5249`. Swagger: `http://localhost:5249/swagger`
-
-### Frontend
-```bash
-cd frontend
-npm install
-npm run dev
-```
-Öppnas på `http://localhost:5173`
-
 ---
 
 ## 📜 Licens
