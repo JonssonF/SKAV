@@ -3,7 +3,7 @@
 Fullstack-hemsida för bandet **SKAV**, byggd med React + Mantine frontend och ASP.NET Core 8 backend med Dapper + SQLite.
 Publik sida för fans och ett admin-läge för bandet att hantera innehåll.
 
-Målet är att självhosta allt på en **Raspberry Pi 5**.
+Målet är att självhosta fullt fungerande fullstack applikation på en **Raspberry Pi 5**.
 
 ---
 
@@ -145,24 +145,6 @@ DTOs → Repos → Services → Controllers (backend-motsvarighet)
 - Raspberry Pi 5 — självhostning med HTTPS via Let's Encrypt
 
 ---
-
-## 💻 Kom igång
-
-### Backend
-```bash
-cd backend/SKAV.Api
-dotnet run
-```
-Lyssnar på `http://localhost:5249`. Swagger: `http://localhost:5249/swagger`
-
-### Frontend
-```bash
-cd frontend
-npm install
-npm run dev
-```
-Öppnas på `http://localhost:5173`
-
 ---
 
 ## 📜 Licens
