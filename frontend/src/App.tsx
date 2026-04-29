@@ -1,6 +1,7 @@
 import { MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AuthProvider } from './providers/AuthProvider';
 import { AppRouter } from './routes/AppRouter';
 
 import '@mantine/core/styles.css';
@@ -22,7 +23,9 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <MantineProvider>
         <Notifications position="bottom-right" />
-        <AppRouter />
+        <AuthProvider>
+          <AppRouter />
+        </AuthProvider>
       </MantineProvider>
     </QueryClientProvider>
   );
