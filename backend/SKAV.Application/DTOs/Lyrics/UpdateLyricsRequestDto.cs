@@ -8,7 +8,7 @@ namespace SKAV.Application.DTOs.Lyrics
         public required int SongId { get; set; }
 
         [Required(ErrorMessage = "Låttext är obligatorisk")]
-        [MaxLength(100, ErrorMessage = "Max {1} tecken")]
+        [MaxLength(5000, ErrorMessage = "Max {1} tecken")]
         public required string Body { get; set; }
     }
 }
