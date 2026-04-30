@@ -30,7 +30,7 @@ export function GigForm({ initialData, onSubmit, loading, errors }: GigFormProps
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
-  const [date, setDate] = useState<string>('');
+  const [date, setDate] = useState<string | null>(null);
   const [adress, setAdress] = useState('');
   const [price, setPrice] = useState<number | string>('');
   const [notes, setNotes] = useState('');
