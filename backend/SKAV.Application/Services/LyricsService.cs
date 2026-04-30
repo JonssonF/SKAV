@@ -23,6 +23,12 @@ namespace SKAV.Application.Services
             return lyricsList.Select(MapToDto);
         }
 
+        public async Task<LyricsResponseDto?> GetBySongIdAsync(int songId, CancellationToken ct)
+        {
+            var lyrics = await repo.GetBySongIdAsync(songId, ct);
+            return lyrics is null ? null : MapToDto(lyrics);
+        }
+
         public async Task<LyricsResponseDto> GetBySlugAsync(string slug, CancellationToken ct)
         {
             var lyrics = await repo.GetBySlugAsync(slug, ct)
