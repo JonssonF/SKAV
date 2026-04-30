@@ -2,6 +2,13 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { lyricsApi } from '../../../api/lyrics.api';
 import type { CreateLyricsRequest, UpdateLyricsRequest } from '../../../types/lyrics.types';
 
+export function useLyrics() {
+  return useQuery({
+    queryKey: ['lyrics'],
+    queryFn: lyricsApi.getAll,
+  });
+}
+
 export function useLyricsBySlug(slug: string) {
   return useQuery({
     queryKey: ['lyrics', slug],
