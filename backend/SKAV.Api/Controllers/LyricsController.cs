@@ -14,6 +14,11 @@ namespace SKAV.Api.Controllers
         public async Task<IEnumerable<LyricsResponseDto>> GetAll(CancellationToken ct)
             => await service.GetAllAsync(ct);
 
+        [HttpGet("by-song/{songId}")]
+        [SwaggerOperation("Hämtar låttext baserat på låt-ID")]
+        public async Task<LyricsResponseDto?> GetBySongId(int songId, CancellationToken ct)
+            => await service.GetBySongIdAsync(songId, ct);
+
         [HttpGet("{slug}")]
         [SwaggerOperation("Hämtar låttext via slug")]
         public async Task<LyricsResponseDto> GetBySlug(string slug, CancellationToken ct)
