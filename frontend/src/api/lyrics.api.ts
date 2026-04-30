@@ -13,6 +13,11 @@ export const lyricsApi = {
     return response.data;
     },
 
+    getBySongId: async (songId: number): Promise<LyricsResponse> => {
+        const response = await apiClient.get<LyricsResponse>(`/lyrics/song/${songId}`);
+        return response.data;
+    },
+
     getBySlug: async (slug: string): Promise<LyricsResponse> => {
         const response = await apiClient.get<LyricsResponse>(`/lyrics/${slug}`);
         return response.data;
