@@ -14,6 +14,10 @@ import { useAlbums } from '../features/albums/hooks/useAlbums';
 import { useSongs } from '../features/songs/hooks/useSongs';
 import type { AlbumResponse } from '../types/album.types';
 import type { SongResponse } from '../types/song.types';
+import { useState } from 'react';
+import { Collapse } from '@mantine/core';
+import { lyricsApi } from '../api/lyrics.api';
+import type { LyricsResponse } from '../types/lyrics.types';
 
 // Hjälpfunktion — formaterar sekunder till "3:42"
 function formatDuration(seconds?: number): string {
@@ -24,34 +28,104 @@ function formatDuration(seconds?: number): string {
 }
 
 function SongRow({ song, index }: { song: SongResponse; index: number }) {
+  const [open, setOpen] = useState(false);
+  const [lyrics, setLyrics] = useState<LyricsResponse | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [checked, setChecked] = useState(false);
+
+  const handleClick = async () => {
+    // Om redan öppen, stäng
+    if (open) {
+      setOpen(false);
+      return;
+    }
+
+    // Hämta lyrics första gången man klickar
+    if (!checked) {
+      setLoading(true);
+      try {
+        const slug = song.title
+          .toLowerCase()
+          .replace(/[åä]/g, 'a')
+          .replace(/[ö]/g, 'o')
+          .replace(/[é]/g, 'e')
+          .replace(/[^a-z0-9\s-]/g, '')
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-')
+          .replace(/^-|-$/g, '');
+
+        const data = await lyricsApi.getBySlug(slug);
+        setLyrics(data);
+      } catch {
+        // Ingen låttext finns — det är ok
+        setLyrics(null);
+      } finally {
+        setLoading(false);
+        setChecked(true);
+      }
+    }
+
+    setOpen(true);
+  };
+
   return (
-    <Group justify="space-between" py="xs" style={{ borderBottom: '1px solid var(--mantine-color-default-border)' }}>
-      <Group gap="md">
-        <Text size="sm" c="dimmed" w={24} ta="right">
-          {song.trackNumber ?? index + 1}
-        </Text>
-        <div>
-          <Text size="sm">{song.title}</Text>
-          {song.writer && (
-            <Text size="xs" c="dimmed">{song.writer}</Text>
+    <div>
+      <Group
+        justify="space-between"
+        py="xs"
+        style={{
+          borderBottom: '1px solid var(--mantine-color-default-border)',
+          cursor: 'pointer',
+        }}
+        onClick={handleClick}
+      >
+        <Group gap="md">
+          <Text size="sm" c="dimmed" w={24} ta="right">
+            {song.trackNumber ?? index + 1}
+          </Text>
+          <div>
+            <Text size="sm">{song.title}</Text>
+            {song.writer && (
+              <Text size="xs" c="dimmed">{song.writer}</Text>
+            )}
+          </div>
+        </Group>
+        <Group gap="md">
+          {song.spotifyUrl && (
+            <Text
+              size="xs"
+              component="a"
+              href={song.spotifyUrl}
+              target="_blank"
+              c="blue"
+              onClick={(e: React.MouseEvent) => e.stopPropagation()}
+            >
+              Spotify
+            </Text>
+          )}
+          <Text size="sm" c="dimmed">{formatDuration(song.durationSeconds)}</Text>
+        </Group>
+      </Group>
+
+      <Collapse expanded={open}>
+        <div style={{ padding: '12px 0 12px 36px' }}>
+          {loading ? (
+            <Loader size="sm" />
+          ) : lyrics ? (
+            <Text
+              size="sm"
+              style={{ whiteSpace: 'pre-line' }}
+            >
+              {lyrics.body}
+            </Text>
+          ) : (
+            <Text size="sm" c="dimmed" fs="italic">
+              Ingen låttext tillagd.
+            </Text>
           )}
         </div>
-      </Group>
-      <Group gap="md">
-        {song.spotifyUrl && (
-          <Text
-            size="xs"
-            component="a"
-            href={song.spotifyUrl}
-            target="_blank"
-            c="blue"
-          >
-            Spotify
-          </Text>
-        )}
-        <Text size="sm" c="dimmed">{formatDuration(song.durationSeconds)}</Text>
-      </Group>
-    </Group>
+      </Collapse>
+    </div>
   );
 }
 

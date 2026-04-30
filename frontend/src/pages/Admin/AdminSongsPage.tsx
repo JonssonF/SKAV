@@ -17,6 +17,9 @@ import { useAlbums } from '../../features/albums/hooks/useAlbums';
 import { SongForm } from '../../features/songs/components/SongForm';
 import { getApiErrors, getApiMessage } from '../../utils/getApiErrors';
 import type { SongResponse } from '../../types/song.types';
+import { useCreateLyrics, useUpdateLyrics } from '../../features/lyrics/hooks/useLyrics';
+import { LyricsForm } from '../../features/lyrics/components/LyricsForm';
+import type { LyricsResponse } from '../../types/lyrics.types';
 
 function formatDuration(seconds?: number): string {
   if (!seconds) return '-';
@@ -35,6 +38,11 @@ export function AdminSongsPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [editSong, setEditSong] = useState<SongResponse | null>(null);
   const [formErrors, setFormErrors] = useState<Record<string, string> | null>(null);
+  const createLyrics = useCreateLyrics();
+  const updateLyrics = useUpdateLyrics();
+  const [lyricsSong, setLyricsSong] = useState<SongResponse | null>(null);
+  const [existingLyrics, setExistingLyrics] = useState<LyricsResponse | null>(null);
+  const [lyricsLoading, setLyricsLoading] = useState(false);
 
   // Hjälpfunktion — hitta albumtitel från ID
   const getAlbumTitle = (albumId?: number) => {
@@ -118,6 +126,90 @@ export function AdminSongsPage() {
     });
   };
 
+  const handleOpenLyrics = async (song: SongResponse) => {
+    setLyricsSong(song);
+    setExistingLyrics(null);
+    setLyricsLoading(true);
+
+    // Försök hämta befintlig låttext via slug
+    try {
+      const slug = song.title
+        .toLowerCase()
+        .replace(/[åä]/g, 'a')
+        .replace(/[ö]/g, 'o')
+        .replace(/[é]/g, 'e')
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '');
+
+      const response = await fetch(`http://localhost:5249/api/lyrics/${slug}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setExistingLyrics(data);
+      }
+    } catch {
+      // Ingen befintlig låttext — det är ok
+    } finally {
+      setLyricsLoading(false);
+    }
+  };
+
+  const handleLyricsSubmit = (body: string) => {
+    if (!lyricsSong) return;
+
+    if (existingLyrics) {
+      // Uppdatera befintlig
+      updateLyrics.mutate(
+        { id: existingLyrics.id, data: { songId: lyricsSong.id, body } },
+        {
+          onSuccess: () => {
+            setLyricsSong(null);
+            notifications.show({
+              title: 'Låttext uppdaterad',
+              message: `Texten för "${lyricsSong.title}" har sparats.`,
+              color: 'green',
+            });
+          },
+          onError: (err) => {
+            notifications.show({
+              title: 'Något gick fel',
+              message: getApiMessage(err),
+              color: 'red',
+            });
+          },
+        }
+      );
+    } else {
+      // Skapa ny
+      createLyrics.mutate(
+        { songId: lyricsSong.id, body },
+        {
+          onSuccess: () => {
+            setLyricsSong(null);
+            notifications.show({
+              title: 'Låttext sparad',
+              message: `Texten för "${lyricsSong.title}" har lagts till.`,
+              color: 'green',
+            });
+          },
+          onError: (err) => {
+            notifications.show({
+              title: 'Något gick fel',
+              message: getApiMessage(err),
+              color: 'red',
+            });
+          },
+        }
+      );
+    }
+  };
+
   const handleCloseCreate = () => {
     setCreateOpen(false);
     setFormErrors(null);
@@ -181,6 +273,14 @@ export function AdminSongsPage() {
                   <Group gap="xs">
                     <Button
                       variant="light"
+                      color="violet"
+                      size="xs"
+                      onClick={() => handleOpenLyrics(song)}
+                    >
+                      Låttext
+                    </Button>
+                    <Button
+                      variant="light"
                       size="xs"
                       onClick={() => setEditSong(song)}
                     >
@@ -229,6 +329,25 @@ export function AdminSongsPage() {
             loading={updateSong.isPending}
             errors={formErrors}
           />
+        )}
+      </Modal>
+            <Modal
+        opened={lyricsSong !== null}
+        onClose={() => setLyricsSong(null)}
+        title={lyricsSong ? `Låttext — ${lyricsSong.title}` : 'Låttext'}
+        size="lg"
+      >
+        {lyricsLoading ? (
+          <Group justify="center" py="xl"><Loader /></Group>
+        ) : (
+          lyricsSong && (
+            <LyricsForm
+              songId={lyricsSong.id}
+              initialData={existingLyrics}
+              onSubmit={handleLyricsSubmit}
+              loading={createLyrics.isPending || updateLyrics.isPending}
+            />
+          )
         )}
       </Modal>
     </Container>

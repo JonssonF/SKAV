@@ -1,4 +1,3 @@
-// === Album ===
 export interface AlbumResponse {
   id: number;
   title: string;
