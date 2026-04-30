@@ -29,7 +29,7 @@ export function AlbumForm({ initialData, onSubmit, loading, errors }: AlbumFormP
   // Ett state per fält — samma mönster som GigForm
   const [title, setTitle] = useState('');
   const [coverImageUrl, setCoverImageUrl] = useState('');
-  const [releaseDate, setReleaseDate] = useState<string>('');
+  const [releaseDate, setReleaseDate] = useState<string | null>(null);
   const [spotifyUrl, setSpotifyUrl] = useState('');
   const [description, setDescription] = useState('');
 
@@ -38,7 +38,7 @@ export function AlbumForm({ initialData, onSubmit, loading, errors }: AlbumFormP
     if (initialData) {
       setTitle(initialData.title);
       setCoverImageUrl(initialData.coverImageUrl ?? '');
-      setReleaseDate(initialData.releaseDate ?? '');
+      setReleaseDate(initialData.releaseDate ?? null);
       setSpotifyUrl(initialData.spotifyUrl ?? '');
       setDescription(initialData.description ?? '');
     }
