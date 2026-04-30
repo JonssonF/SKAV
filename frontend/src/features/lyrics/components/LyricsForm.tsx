@@ -9,7 +9,7 @@ interface LyricsFormProps {
   loading?: boolean;
 }
 
-export function LyricsForm({ songId, initialData, onSubmit, loading }: LyricsFormProps) {
+export function LyricsForm({initialData, onSubmit, loading }: LyricsFormProps) {
   const [body, setBody] = useState('');
 
   useEffect(() => {

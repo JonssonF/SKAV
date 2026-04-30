@@ -7,6 +7,12 @@ import type{
 } from '../types/lyrics.types';
 
 export const lyricsApi = {
+
+    getAll: async (): Promise<LyricsResponse[]> => {
+    const response = await apiClient.get<LyricsResponse[]>('/lyrics');
+    return response.data;
+    },
+
     getBySlug: async (slug: string): Promise<LyricsResponse> => {
         const response = await apiClient.get<LyricsResponse>(`/lyrics/${slug}`);
         return response.data;
