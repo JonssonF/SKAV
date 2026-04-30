@@ -9,6 +9,11 @@ namespace SKAV.Api.Controllers
     [ApiController]
     public class LyricsController(ILyricsService service) : ControllerBase
     {
+        [HttpGet]
+        [SwaggerOperation("Hämtar alla låttexter")]
+        public async Task<IEnumerable<LyricsResponseDto>> GetAll(CancellationToken ct)
+            => await service.GetAllAsync(ct);
+
         [HttpGet("{slug}")]
         [SwaggerOperation("Hämtar låttext via slug")]
         public async Task<LyricsResponseDto> GetBySlug(string slug, CancellationToken ct)

@@ -17,6 +17,12 @@ namespace SKAV.Application.Services
         IUnitOfWork uow,
         ICurrentUserService currentUser) : ILyricsService
     {
+        public async Task<IEnumerable<LyricsResponseDto>> GetAllAsync(CancellationToken ct)
+        {
+            var lyricsList = await repo.GetAllAsync(ct);
+            return lyricsList.Select(MapToDto);
+        }
+
         public async Task<LyricsResponseDto> GetBySlugAsync(string slug, CancellationToken ct)
         {
             var lyrics = await repo.GetBySlugAsync(slug, ct)
