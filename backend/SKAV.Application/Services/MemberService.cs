@@ -4,6 +4,7 @@ using SKAV.Application.Interfaces;
 using SKAV.Application.Interfaces.Repositories;
 using SKAV.Application.Interfaces.UoW;
 using SKAV.Application.Services.Interface;
+using SKAV.Application.Validators.Members;
 using SKAV.Domain.Consts;
 using SKAV.Domain.Entities;
 using SKAV.Domain.Enumeration;
@@ -14,7 +15,8 @@ namespace SKAV.Application.Services
     public class MemberService(
         IMemberRepository repo,
         IUnitOfWork uow,
-        ICurrentUserService currentUser) : IMemberService
+        ICurrentUserService currentUser,
+        IMemberValidator memberValidator) : IMemberService
     {
         public async Task<IEnumerable<MemberResponseDto>> GetAllAsync(CancellationToken ct)
         {
@@ -42,7 +44,8 @@ namespace SKAV.Application.Services
                 ImageUrl = request.ImageUrl,
                 DisplayOrder = request.DisplayOrder,
             };
-
+            
+            await memberValidator.ValidateCreateAsync(request, ct);
             AuditHelper.SetCreated(member, currentUser.UserId);
 
             using var scope = uow.BeginTransactionScope();
@@ -70,6 +73,7 @@ namespace SKAV.Application.Services
             existing.ImageUrl = request.ImageUrl;
             existing.DisplayOrder = request.DisplayOrder;
 
+            await memberValidator.ValidateUpdateAsync(id, request, ct);
             AuditHelper.SetUpdated(existing, currentUser.UserId);
 
             using var scope = uow.BeginTransactionScope();

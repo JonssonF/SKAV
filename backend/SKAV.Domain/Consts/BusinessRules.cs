@@ -2,6 +2,9 @@
 {
     public static class BusinessRules
     {
+        // General
+        public const string Forbidden = "Forbidden";
+
         // Auth
         public const string InvalidCredentials = "InvalidCredentials";
         public const string EmailAlreadyExists = "EmailAlreadyExists";
@@ -20,7 +23,7 @@
         // Members
         public const string MemberNotFound = "MemberNotFound";
         public const string MemberAlreadyExists = "MemberAlreadyExists";
-        public const string Forbidden = "Forbidden";
+        public const string MemberDisplayOrderExists = "MemberDisplayOrderExists";
 
         // Instruments
         public const string InstrumentNotFound = "InstrumentNotFound";
