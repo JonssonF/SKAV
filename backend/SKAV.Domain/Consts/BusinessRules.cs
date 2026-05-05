@@ -16,6 +16,11 @@
         public const string AlbumNotFound = "AlbumNotFound";
         public const string AlbumAlreadyExists = "AlbumAlreadyExists";
 
+        // Booking
+        public const string BookingRequestNotFound = "BookingRequestNotFound";
+        public const string BookingRecipientNotFound = "BookingRecipientNotFound";
+        public const string BookingRecipientAlreadyExists = "BookingRecipientAlreadyExists";
+
         // Gigs
         public const string GigNotFound = "GigNotFound";
         public const string GigAlreadyExists = "GigAlreadyExists";
