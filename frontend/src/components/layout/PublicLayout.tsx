@@ -8,8 +8,8 @@ const navItems = [
   { label: 'Om', href: '#om' },
   { label: 'Bandet', href: '#bandet' },
   { label: 'Spelningar', href: '#spelningar' },
-  { label: 'Boka', href: '#boka' },
   { label: 'Musik', href: '#musik' },
+  { label: 'Boka', href: '#boka' },
 ];
 
 export function PublicLayout({ children }: { children: React.ReactNode }) {

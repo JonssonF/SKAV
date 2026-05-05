@@ -4,6 +4,7 @@ import { HeroSection } from '../components/sections/HeroSection';
 import { MusicSection } from '../features/songs/components/MusicSection';
 import { FooterSection } from '../components/sections/FooterSection';
 import { AboutSection } from '../features/about/components/AboutSection';
+import { BookingSection } from '../features/booking/components/BookingSection';
 
 export function HomePage() {
   return (
@@ -16,6 +17,7 @@ export function HomePage() {
         <AboutSection />
       </section>
 
+
       <section id="bandet">
         <MembersSection />
       </section>
@@ -26,6 +28,10 @@ export function HomePage() {
 
       <section id="musik">
          <MusicSection />
+      </section>
+      
+      <section id="boka">
+        <BookingSection />
       </section>
 
       <FooterSection />
