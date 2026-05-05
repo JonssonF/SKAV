@@ -13,13 +13,6 @@ namespace SKAV.Application.DTOs.Member
         [DefaultValue("Klas")]
         public required string Name { get; set; }
 
-        [Required(ErrorMessage = "Roll är obligatorisk")]
-        [MinLength(3, ErrorMessage = "Minst {1} tecken tillåtna")]
-        [MaxLength(100, ErrorMessage = "Max {1} tecken tillåtna")]
-        [RegularExpression(ValidationRegularExpression.Role, ErrorMessage = "Ogiltiga tecken i roll")]
-        [DefaultValue("Medlem")]
-        public required string Role { get; set; }
-
         [MaxLength(300, ErrorMessage = "Max {1} tecken tillåtna")]
         [RegularExpression(ValidationRegularExpression.FreeText, ErrorMessage = "Ogiltiga tecken i citat")]
         [DefaultValue("Inget citat")]
