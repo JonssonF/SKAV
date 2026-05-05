@@ -1,12 +1,16 @@
 ﻿using BCrypt.Net;
 using Dapper;
 using Microsoft.Extensions.Configuration;
+using SKAV.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Numerics;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace SKAV.Infrastructure.Database
 {
@@ -192,6 +196,43 @@ namespace SKAV.Infrastructure.Database
                 ON MemberInstruments (MemberId, InstrumentId);
                 """;
             await connection.ExecuteAsync(indexMemberInstrument);
+
+            const string sqlBookingRequests = """
+                
+                CREATE TABLE IF NOT EXISTS BookingRequests(
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Name TEXT NOT NULL,
+                    Email TEXT NOT NULL,
+                    Phone TEXT,
+                    EventDate TEXT,
+                    EventType TEXT,
+                    Message TEXT NOT NULL,
+                    IsRead INTEGER NOT NULL DEFAULT 0,
+                    CreatedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    CreatedBy INTEGER,
+                    UpdatedAt TEXT,
+                    UpdatedBy INTEGER,
+                    DeletedAt TEXT,
+                    DeletedBy INTEGER
+                );
+                """;
+            await connection.ExecuteAsync(sqlBookingRequests);
+
+            const string sqlBookingNotificationRecipients = """
+                CREATE TABLE IF NOT EXISTS BookingNotificationRecipients(
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Email TEXT NOT NULL,
+                    MemberId INTEGER,
+                    CreatedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    CreatedBy INTEGER,
+                    UpdatedAt TEXT,
+                    UpdatedBy INTEGER,
+                    DeletedAt TEXT,
+                    DeletedBy INTEGER,
+                    FOREIGN KEY(MemberId) REFERENCES Members(Id)
+                );
+            """;
+            await connection.ExecuteAsync(sqlBookingNotificationRecipients);
 
             await SeedAdminAsync(connection);
         }
