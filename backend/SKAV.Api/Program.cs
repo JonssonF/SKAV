@@ -13,6 +13,7 @@ namespace SKAV.Api
 
             builder.Services.AddJwtAuthentication(builder.Configuration);
             builder.Services.AddInfrastructure(builder.Configuration);
+            builder.Services.AddRateLimiting();
             builder.Services.AddControllers();
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddEndpointsApiExplorer();
@@ -34,6 +35,7 @@ namespace SKAV.Api
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
+                app.UseRateLimiter();
             }
 
             app.UseMiddleware<ExceptionHandlingMiddleware>();
@@ -44,6 +46,7 @@ namespace SKAV.Api
             {
                 app.UseHttpsRedirection();
             }
+            app.UseRateLimiter();
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
