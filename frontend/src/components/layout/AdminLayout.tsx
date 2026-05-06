@@ -9,6 +9,7 @@ const adminItems = [
   { label: 'Medlemmar', path: '/admin/members' },
   { label: 'Spelningar', path: '/admin/gigs' },
   { label: 'Låtar', path: '/admin/songs' },
+  { label: 'Användare', path: '/admin/users' },
 ];
 
 export function AdminLayout() {
