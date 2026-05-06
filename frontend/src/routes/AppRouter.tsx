@@ -9,6 +9,7 @@ import { AdminAlbumPage } from '../pages/Admin/AdminAlbumPage';
 import { AdminSongsPage } from '../pages/Admin/AdminSongsPage';
 import { AdminMembersPage } from '../pages/Admin/AdminMembersPage';
 import { ProtectedRoute } from './ProtectedRoute';
+import { AdminUsersPage } from '../pages/Admin/AdminUsersPage';
 
 export function AppRouter() {
   return (
@@ -36,6 +37,7 @@ export function AppRouter() {
           <Route path="/admin/members" element={<AdminMembersPage />} />
           <Route path="/admin/gigs" element={<AdminGigsPage />} />
           <Route path="/admin/songs" element={<AdminSongsPage />} />
+          <Route path="/admin/users" element={<AdminUsersPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

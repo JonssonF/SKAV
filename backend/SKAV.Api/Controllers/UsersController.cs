@@ -12,13 +12,13 @@ namespace SKAV.Api.Controllers
     public class UserController(IUserService userService) : ControllerBase
     {
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Editor")]
         [SwaggerOperation("Hämta alla användare")]
         public async Task<IEnumerable<UserResponseDto>> GetAll(CancellationToken ct)
             => await userService.GetAllAsync(ct);
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Editor")]
         [SwaggerOperation("Skapa en ny användare")]
         public async Task<CreateUserResponseDto> Create(
             CreateUserRequestDto request, CancellationToken ct)
@@ -32,7 +32,7 @@ namespace SKAV.Api.Controllers
             => await userService.DeleteAsync(id, ct);
 
         [HttpPut("{id}/role")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Editor")]
         [SwaggerOperation("Uppdatera en användares roll")]
         public async Task<UpdateUserRoleResponseDto> UpdateRole(
             int id, UpdateUserRoleRequestDto request, CancellationToken ct)
