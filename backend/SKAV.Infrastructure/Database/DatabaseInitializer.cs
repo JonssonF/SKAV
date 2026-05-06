@@ -1,16 +1,6 @@
-﻿using BCrypt.Net;
-using Dapper;
+﻿using Dapper;
 using Microsoft.Extensions.Configuration;
-using SKAV.Domain.Entities;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace SKAV.Infrastructure.Database
 {

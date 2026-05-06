@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using SKAV.Application.DTOs.BookingRequest;
 using SKAV.Application.Services.Interface;
 using Swashbuckle.AspNetCore.Annotations;
@@ -24,6 +25,7 @@ namespace SKAV.Api.Controllers
 
         [HttpPost]
         [AllowAnonymous]
+        [EnableRateLimiting("BookingLimit")]
         [SwaggerOperation("Skicka en bokningsförfrågan")]
         public async Task<CreateBookingRequestResponseDto> Create(CreateBookingRequestDto request, CancellationToken ct)
             => await service.CreateAsync(request, ct);
