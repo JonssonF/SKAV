@@ -1,7 +1,7 @@
 import { Container, Title, Button, Group, Loader, Alert } from '@mantine/core';
 import { useAdminUsers } from '../../features/users/hooks/useAdminUsers';
 import { useAuth } from '../../providers/AuthProvider';
-import { UsersTable } from '../../../features/users/components/UsersTable';
+import { UsersTable } from '../../features/users/components/UsersTable';
 import { UserCreateModal } from '../../features/users/components/UserCreateModal';
 
 export function AdminUsersPage() {
