@@ -33,14 +33,15 @@ export function AdminUsersPage() {
         <Button onClick={admin.openCreate}>Ny användare</Button>
       </Group>
 
-      <UsersTable
+        <UsersTable
         users={admin.users}
         currentUserId={user?.userId}
+        currentUserRoles={user?.roles}
         onUpdateRole={admin.handleUpdateRole}
         onDelete={admin.handleDelete}
         deleteLoading={admin.deleteLoading}
         roleLoading={admin.roleLoading}
-      />
+        />
 
       <UserCreateModal {...admin.createModal} />
     </Container>

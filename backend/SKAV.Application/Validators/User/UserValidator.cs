@@ -11,7 +11,7 @@ namespace SKAV.Application.Validators.User
 
         private static readonly Dictionary<Roles, Roles[]> s_allowedRoleTransitions = new()
         {
-            [Roles.Admin] = [Roles.Editor, Roles.Member],
+            [Roles.Admin] = [Roles.Editor, Roles.Member, Roles.Admin],
             [Roles.Editor] = [Roles.Member],
             [Roles.Member] = [],
         };

@@ -24,7 +24,7 @@ namespace SKAV.Infrastructure.Services
 
             foreach (var role in Enum.GetValues<Roles>())
             {
-                if (user.Roles.HasFlag(role))
+                if (role != Roles.None && user.Roles.HasFlag(role))
                 {
                     claims.Add(new Claim(ClaimTypes.Role, role.ToString()));
                 }

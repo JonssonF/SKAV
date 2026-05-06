@@ -5,17 +5,12 @@ import { getRoleLabel } from '../../../types/user.types';
 interface UsersTableProps {
   users: UserResponse[];
   currentUserId?: number;
+  currentUserRoles?: string[];
   onUpdateRole: (user: UserResponse, data: UpdateUserRoleRequest) => void;
   onDelete: (user: UserResponse) => void;
   deleteLoading?: boolean;
   roleLoading?: boolean;
 }
-
-const roleOptions = [
-  { value: '4', label: 'Member' },
-  { value: '2', label: 'Editor' },
-  { value: '1', label: 'Admin' },
-];
 
 function getRoleBadgeColor(role: number): string {
   switch (role) {
@@ -26,9 +21,45 @@ function getRoleBadgeColor(role: number): string {
   }
 }
 
+function getRoleOptions(currentUserRoles: string[], targetUserRole: number, isSelf: boolean) {
+  const isAdmin = currentUserRoles.includes('Admin');
+  const isEditor = currentUserRoles.includes('Editor');
+
+  // Member kan inte ändra roller
+  if (!isAdmin && !isEditor) return [];
+
+  // Ingen ändrar sin egen roll (utom Editor som demoterar sig)
+  if (isSelf && isEditor) {
+    return [
+      { value: '2', label: 'Editor' },
+      { value: '4', label: 'Member' },
+    ];
+  }
+
+  // Admin kan inte ändra sig själv
+  if (isSelf) return [];
+
+  // Editor kan bara ändra Members
+  if (isEditor && !isAdmin) {
+    if (targetUserRole !== 4) return [];
+    return [
+      { value: '2', label: 'Editor' },
+      { value: '4', label: 'Member' },
+    ];
+  }
+
+  // Admin kan sätta alla roller
+  return [
+    { value: '1', label: 'Admin' },
+    { value: '2', label: 'Editor' },
+    { value: '4', label: 'Member' },
+  ];
+}
+
 export function UsersTable({
   users,
   currentUserId,
+  currentUserRoles,
   onUpdateRole,
   onDelete,
   deleteLoading,
@@ -50,14 +81,17 @@ export function UsersTable({
       </Table.Thead>
       <Table.Tbody>
         {users.map((user) => {
-          const isCurrentUser = user.id === currentUserId;
+            const isSelf = user.id === currentUserId;
+            const roleOptions = getRoleOptions(currentUserRoles ?? [], user.roles, isSelf);
+            const canChangeRole = roleOptions.length > 0;
+            const canDelete = !isSelf && (currentUserRoles?.includes('Admin') ?? false);
 
           return (
             <Table.Tr key={user.id}>
               <Table.Td>
                 <Group gap="sm">
                   <Text size="sm">{user.email}</Text>
-                  {isCurrentUser && (
+                  {isSelf && (
                     <Badge variant="light" size="xs">Du</Badge>
                   )}
                 </Group>
@@ -68,30 +102,35 @@ export function UsersTable({
                 </Badge>
               </Table.Td>
               <Table.Td>
-                <Select
-                  size="xs"
-                  data={roleOptions}
-                  value={String(user.roles)}
-                  onChange={(val) => {
-                    if (val) {
-                      onUpdateRole(user, { roles: Number(val) });
-                    }
-                  }}
-                  disabled={isCurrentUser || roleLoading}
-                  w={120}
-                />
+                {canChangeRole ? (
+                  <Select
+                    size="xs"
+                    data={roleOptions}
+                    value={String(user.roles)}
+                    onChange={(val) => {
+                      if (val) {
+                        onUpdateRole(user, { roles: Number(val) });
+                      }
+                    }}
+                    disabled={roleLoading}
+                    w={120}
+                  />
+                ) : (
+                  <Text size="xs" c="dimmed">–</Text>
+                )}
               </Table.Td>
               <Table.Td>
-                <Button
-                  variant="light"
-                  color="red"
-                  size="xs"
-                  onClick={() => onDelete(user)}
-                  loading={deleteLoading}
-                  disabled={isCurrentUser}
-                >
-                  Ta bort
-                </Button>
+                {canDelete ? (
+                  <Button
+                    variant="light"
+                    color="red"
+                    size="xs"
+                    onClick={() => onDelete(user)}
+                    loading={deleteLoading}
+                  >
+                    Ta bort
+                  </Button>
+                ) : null}
               </Table.Td>
             </Table.Tr>
           );
