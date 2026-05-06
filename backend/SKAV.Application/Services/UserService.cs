@@ -3,22 +3,27 @@ using SKAV.Application.Interfaces;
 using SKAV.Application.Interfaces.Repositories;
 using SKAV.Application.Interfaces.UoW;
 using SKAV.Application.Services.Interface;
+using SKAV.Application.Validators.User;
 using SKAV.Domain.Consts;
 using SKAV.Domain.Entities;
+using SKAV.Domain.Enumeration;
 using SKAV.Domain.Exceptions;
+using System.ComponentModel.DataAnnotations;
 
 namespace SKAV.Application.Services
 {
     public class UserService(
         IUserRepository repo,
         IUnitOfWork uow,
-        ICurrentUserService currentUser) : IUserService
+        ICurrentUserService currentUser,
+        IUserValidator validator) : IUserService
     {
         public async Task<CreateUserResponseDto> CreateAsync(CreateUserRequestDto request, CancellationToken ct)
         {
             var exists = await repo.EmailExistsAsync(request.Email, ct);
             if (exists)
                 throw new BusinessRuleException("E-postadressen används redan.", BusinessRules.EmailAlreadyExists);
+            await validator.ValidateCreateAsync(request, ct);
 
             var user = new User
             {
@@ -54,6 +59,9 @@ namespace SKAV.Application.Services
         {
             var user = await repo.GetByIdAsync(id, ct)
                 ?? throw new NotFoundException(BusinessRules.UserNotFound);
+
+            var isSelf = user.Id == currentUser.UserId;
+            validator.ValidateUpdateRole(request, currentUser.Roles, user.Roles, isSelf);
 
             user.Roles = request.Roles;
 
