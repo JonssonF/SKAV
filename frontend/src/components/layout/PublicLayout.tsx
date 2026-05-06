@@ -22,6 +22,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
 
   const isAdmin = user?.roles.includes('Admin') ?? false;
   const isEditor = user?.roles.includes('Editor') ?? false;
+  const isMember = user?.roles.includes('Member') ?? false;
 
   const scrollTo = (href: string) => {
     const id = href.replace('#', '');
@@ -76,7 +77,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
                 {colorScheme === 'dark' ? '☀️' : '🌙'}
               </ActionIcon>
 
-              {isAuthenticated && (isAdmin || isEditor) && (
+              {isAuthenticated && (isAdmin || isEditor || isMember) && (
                 <Button
                   variant="light"
                   size="sm"

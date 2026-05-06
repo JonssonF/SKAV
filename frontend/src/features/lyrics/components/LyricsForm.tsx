@@ -12,11 +12,13 @@ interface LyricsFormProps {
 export function LyricsForm({initialData, onSubmit, loading }: LyricsFormProps) {
   const [body, setBody] = useState('');
 
-  useEffect(() => {
-    if (initialData) {
-      setBody(initialData.body);
-    }
-  }, [initialData]);
+useEffect(() => {
+  if (initialData) {
+    setBody(initialData.body);
+  } else {
+    setBody('');
+  }
+}, [initialData]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
