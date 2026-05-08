@@ -200,6 +200,8 @@ namespace SKAV.Infrastructure.Database
                     EventType TEXT,
                     Message TEXT NOT NULL,
                     IsRead INTEGER NOT NULL DEFAULT 0,
+                    AnsweredAt TEXT,
+                    AnsweredBy INTEGER,
                     CreatedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     CreatedBy INTEGER,
                     UpdatedAt TEXT,

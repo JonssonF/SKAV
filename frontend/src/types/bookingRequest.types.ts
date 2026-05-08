@@ -7,6 +7,9 @@ export interface BookingRequestResponse {
   eventType?: string;
   message: string;
   isRead: boolean;
+  answeredAt?: string;
+  answeredBy?: number;
+  answeredByEmail?: string;
   createdAt: string;
 }
 
