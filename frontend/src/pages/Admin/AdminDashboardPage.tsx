@@ -181,20 +181,29 @@ export function AdminDashboardPage() {
                   </Table>
 
                   <Text size="sm" mb="md">{booking.message}</Text>
-
-                  {!booking.isRead && (
-                    <Group justify="flex-end">
-                      <Badge
-                        variant="light"
-                        color="green"
-                        size="lg"
-                        style={{ cursor: 'pointer' }}
-                        onClick={() => markAsRead.mutate(booking.id)}
-                      >
-                        Markera som läst
-                      </Badge>
-                    </Group>
-                  )}
+                    {booking.isRead ? (
+                      <Text size="xs" c="dimmed" ta="right">
+                        Besvarad av {booking.answeredByEmail ?? 'okänd'}{' '}
+                        {booking.answeredAt && new Date(booking.answeredAt).toLocaleDateString('sv-SE', {
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </Text>
+                    ) : (
+                      <Group justify="flex-end">
+                        <Badge
+                          variant="light"
+                          color="green"
+                          size="lg"
+                          style={{ cursor: 'pointer' }}
+                          onClick={() => markAsRead.mutate(booking.id)}
+                        >
+                          Markera som besvarad
+                        </Badge>
+                      </Group>
+                    )}
                 </div>
               </Collapse>
             </Card>

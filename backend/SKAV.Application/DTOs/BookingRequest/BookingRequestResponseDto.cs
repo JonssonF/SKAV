@@ -11,5 +11,8 @@
         public required string Message { get; init; }
         public bool IsRead { get; init; }
         public DateTime CreatedAt { get; init; }
+        public DateTimeOffset? AnsweredAt { get; init; }
+        public int? AnsweredBy { get; init; }
+        public string? AnsweredByEmail { get; init; }
     }
 }

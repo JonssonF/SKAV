@@ -12,5 +12,7 @@ namespace SKAV.Domain.Entities
         public string? EventType { get; set; }
         public required string Message { get; set; }
         public bool IsRead { get; set; }
+        public DateTimeOffset? AnsweredAt { get; set; }
+        public int? AnsweredBy { get; set; }
     }
 }
