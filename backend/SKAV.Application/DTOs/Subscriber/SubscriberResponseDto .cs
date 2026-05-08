@@ -2,6 +2,6 @@
 {
     public class SubscriberResponseDto
     {
-        public string? Email { get; init; } = null!;
+        public string Email { get; init; } = null!;
     }
 }

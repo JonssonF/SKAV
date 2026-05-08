@@ -7,5 +7,7 @@ namespace SKAV.Application.DTOs.User
         public int Id { get; set; }
         public string Email { get; set; } = null!;
         public Roles Roles { get; set; }
+        public int? MemberId { get; set; }
+        public string? MemberName { get; set; }
     }
 }

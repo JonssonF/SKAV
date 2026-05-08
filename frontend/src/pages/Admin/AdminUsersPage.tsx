@@ -4,7 +4,7 @@ import { useAuth } from '../../providers/AuthProvider';
 import { UsersTable } from '../../features/users/components/UsersTable';
 import { UserCreateModal } from '../../features/users/components/UserCreateModal';
 import { ChangePasswordModal } from '../../features/users/components/ChangePasswordModal';
-
+import { LinkMemberModal } from '../../features/users/components/LinkMemberModal';
 
 export function AdminUsersPage() {
   const admin = useAdminUsers();
@@ -35,19 +35,22 @@ export function AdminUsersPage() {
         <Button onClick={admin.openCreate}>Ny användare</Button>
       </Group>
 
-        <UsersTable
+      <UsersTable
         users={admin.users}
         currentUserId={user?.userId}
         currentUserRoles={user?.roles}
         onUpdateRole={admin.handleUpdateRole}
         onDelete={admin.handleDelete}
         onChangePassword={admin.openChangePassword}
+        onLinkMember={admin.openLinkMember}
+        onUnlinkMember={admin.handleUnlinkMember}
         deleteLoading={admin.deleteLoading}
         roleLoading={admin.roleLoading}
-        />
+      />
 
       <UserCreateModal {...admin.createModal} />
       <ChangePasswordModal {...admin.passwordModal} />
+      <LinkMemberModal {...admin.linkModal} />
     </Container>
   );
 }

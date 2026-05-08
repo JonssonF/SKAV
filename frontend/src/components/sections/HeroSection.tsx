@@ -1,10 +1,13 @@
 import { useLocalStorage } from '@mantine/hooks';
+import { useMediaQuery } from '@mantine/hooks';
 
 export function HeroSection() {
   const [colorScheme] = useLocalStorage<'light' | 'dark'>({
     key: 'color-scheme',
     defaultValue: 'dark',
   });
+
+  const isMobile = useMediaQuery('(max-width: 48em)');
 
   const heroImage = colorScheme === 'dark'
     ? '/images/sections/hero-dark.png'
@@ -17,7 +20,7 @@ export function HeroSection() {
   return (
     <div
       style={{
-        minHeight: '80vh',
+        minHeight: isMobile ? '40vh' : '80vh',
         backgroundImage: `url(${heroImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',

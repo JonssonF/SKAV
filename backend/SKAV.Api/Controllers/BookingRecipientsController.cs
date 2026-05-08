@@ -8,7 +8,7 @@ namespace SKAV.Api.Controllers
 {
     [Route("api/booking-recipients")]
     [ApiController]
-    [Authorize(Roles = "Admin,Editor")]
+    [Authorize]
     public class BookingRecipientsController(IBookingRecipientService service) : ControllerBase
     {
         [HttpGet]

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SKAV.Application.DTOs.Member;
 using SKAV.Application.DTOs.User;
 using SKAV.Application.Services.Interface;
 using Swashbuckle.AspNetCore.Annotations;
@@ -43,5 +44,19 @@ namespace SKAV.Api.Controllers
         public async Task<ChangePasswordResponseDto> ChangePassword(
             ChangePasswordRequestDto request, CancellationToken ct)
             => await userService.ChangePasswordAsync(request, ct);
+
+        [HttpPut("{id}/link-member")]
+        [Authorize(Roles = "Admin,Editor")]
+        [SwaggerOperation("Koppla en användare till en bandmedlem")]
+        public async Task<LinkMemberResponseDto> LinkMember(
+            int id, LinkMemberRequestDto request, CancellationToken ct)
+            => await userService.LinkMemberAsync(id, request, ct);
+
+        [HttpPut("{id}/unlink-member")]
+        [Authorize(Roles = "Admin")]
+        [SwaggerOperation("Bryt kopplingen mellan användare och bandmedlem")]
+        public async Task<UnlinkMemberResponseDto> UnlinkMember(
+            int id, CancellationToken ct)
+            => await userService.UnlinkMemberAsync(id, ct);
     }
 }

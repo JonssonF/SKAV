@@ -49,6 +49,11 @@
         // Newsletter
         public const string NoSubscribers = "NoSubscribers";
 
+        // User-Member linking
+        public const string MemberAlreadyLinked = "MemberAlreadyLinked";
+        public const string UserAlreadyLinked = "UserAlreadyLinked";
+        public const string UserNotLinked = "UserNotLinked";
+
         // Validation
         public const string ValidationFailed = "ValidationFailed";
     }
