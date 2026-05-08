@@ -8,6 +8,7 @@ interface UsersTableProps {
   currentUserRoles?: string[];
   onUpdateRole: (user: UserResponse, data: UpdateUserRoleRequest) => void;
   onDelete: (user: UserResponse) => void;
+  onChangePassword: () => void;
   deleteLoading?: boolean;
   roleLoading?: boolean;
 }
@@ -25,10 +26,8 @@ function getRoleOptions(currentUserRoles: string[], targetUserRole: number, isSe
   const isAdmin = currentUserRoles.includes('Admin');
   const isEditor = currentUserRoles.includes('Editor');
 
-  // Member kan inte ändra roller
   if (!isAdmin && !isEditor) return [];
 
-  // Ingen ändrar sin egen roll (utom Editor som demoterar sig)
   if (isSelf && isEditor) {
     return [
       { value: '2', label: 'Editor' },
@@ -36,10 +35,8 @@ function getRoleOptions(currentUserRoles: string[], targetUserRole: number, isSe
     ];
   }
 
-  // Admin kan inte ändra sig själv
   if (isSelf) return [];
 
-  // Editor kan bara ändra Members
   if (isEditor && !isAdmin) {
     if (targetUserRole !== 4) return [];
     return [
@@ -48,7 +45,6 @@ function getRoleOptions(currentUserRoles: string[], targetUserRole: number, isSe
     ];
   }
 
-  // Admin kan sätta alla roller
   return [
     { value: '1', label: 'Admin' },
     { value: '2', label: 'Editor' },
@@ -62,6 +58,7 @@ export function UsersTable({
   currentUserRoles,
   onUpdateRole,
   onDelete,
+  onChangePassword,
   deleteLoading,
   roleLoading,
 }: UsersTableProps) {
@@ -81,10 +78,10 @@ export function UsersTable({
       </Table.Thead>
       <Table.Tbody>
         {users.map((user) => {
-            const isSelf = user.id === currentUserId;
-            const roleOptions = getRoleOptions(currentUserRoles ?? [], user.roles, isSelf);
-            const canChangeRole = roleOptions.length > 0;
-            const canDelete = !isSelf && (currentUserRoles?.includes('Admin') ?? false);
+          const isSelf = user.id === currentUserId;
+          const roleOptions = getRoleOptions(currentUserRoles ?? [], user.roles, isSelf);
+          const canChangeRole = roleOptions.length > 0;
+          const canDelete = !isSelf && (currentUserRoles?.includes('Admin') ?? false);
 
           return (
             <Table.Tr key={user.id}>
@@ -120,17 +117,28 @@ export function UsersTable({
                 )}
               </Table.Td>
               <Table.Td>
-                {canDelete ? (
-                  <Button
-                    variant="light"
-                    color="red"
-                    size="xs"
-                    onClick={() => onDelete(user)}
-                    loading={deleteLoading}
-                  >
-                    Ta bort
-                  </Button>
-                ) : null}
+                <Group gap="xs">
+                  {isSelf && (
+                    <Button
+                      variant="light"
+                      size="xs"
+                      onClick={onChangePassword}
+                    >
+                      Byt lösenord
+                    </Button>
+                  )}
+                  {canDelete && (
+                    <Button
+                      variant="light"
+                      color="red"
+                      size="xs"
+                      onClick={() => onDelete(user)}
+                      loading={deleteLoading}
+                    >
+                      Ta bort
+                    </Button>
+                  )}
+                </Group>
               </Table.Td>
             </Table.Tr>
           );

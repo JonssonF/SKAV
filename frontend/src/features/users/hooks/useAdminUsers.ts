@@ -1,15 +1,54 @@
 import { useState } from 'react';
 import { notifications } from '@mantine/notifications';
-import { useUsers, useCreateUser, useDeleteUser, useUpdateUserRole } from './useUsers';
+import { useUsers, useCreateUser, useDeleteUser, useUpdateUserRole, useChangePassword } from './useUsers';
 import { getApiErrors, getApiMessage } from '../../../utils/getApiErrors';
-import type { UserResponse, CreateUserRequest, UpdateUserRoleRequest } from '../../../types/user.types';
+import type { UserResponse, CreateUserRequest, UpdateUserRoleRequest, ChangePasswordRequest } from '../../../types/user.types';
+
 
 export function useAdminUsers() {
   const { data: users, isLoading, error } = useUsers();
   const createUser = useCreateUser();
   const deleteUser = useDeleteUser();
   const updateRole = useUpdateUserRole();
+  const changePassword = useChangePassword();
 
+  // Change password modal state
+  const [passwordOpen, setPasswordOpen] = useState(false);
+  const [passwordErrors, setPasswordErrors] = useState<Record<string, string> | null>(null);
+
+  // --- Change Password ---
+  const openChangePassword = () => {
+    setPasswordErrors(null);
+    setPasswordOpen(true);
+  };
+
+  const closeChangePassword = () => {
+    setPasswordOpen(false);
+    setPasswordErrors(null);
+  };
+
+  const handleChangePassword = (data: ChangePasswordRequest) => {
+    setPasswordErrors(null);
+    changePassword.mutate(data, {
+      onSuccess: () => {
+        closeChangePassword();
+        notifications.show({
+          title: 'Lösenord bytt',
+          message: 'Ditt lösenord har ändrats.',
+          color: 'green',
+        });
+      },
+      onError: (err) => {
+        const fieldErrors = getApiErrors(err);
+        if (fieldErrors) {
+          setPasswordErrors(fieldErrors);
+        } else {
+          notifications.show({ title: 'Något gick fel', message: getApiMessage(err), color: 'red' });
+        }
+      },
+    });
+  };
+  
   // Create modal state
   const [createOpen, setCreateOpen] = useState(false);
   const [createErrors, setCreateErrors] = useState<Record<string, string> | null>(null);
@@ -101,5 +140,15 @@ export function useAdminUsers() {
     handleDelete,
     deleteLoading: deleteUser.isPending,
     roleLoading: updateRole.isPending,
+
+    passwordModal: {
+    opened: passwordOpen,
+    onClose: closeChangePassword,
+    onSubmit: handleChangePassword,
+    loading: changePassword.isPending,
+    errors: passwordErrors,
+  },
+
+  openChangePassword,
   };
-}
+};
