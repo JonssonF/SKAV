@@ -2,6 +2,8 @@ export interface UserResponse {
   id: number;
   email: string;
   roles: number;
+  memberId?: number;
+  memberName?: string;
 }
 
 export interface CreateUserRequest {
@@ -23,6 +25,10 @@ export interface ChangePasswordRequest {
   currentPassword: string;
   newPassword: string;
   confirmNewPassword: string;
+}
+
+export interface LinkMemberRequest {
+  memberId: number;
 }
 
 export const RoleLabels: Record<number, string> = {

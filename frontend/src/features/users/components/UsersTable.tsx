@@ -9,6 +9,8 @@ interface UsersTableProps {
   onUpdateRole: (user: UserResponse, data: UpdateUserRoleRequest) => void;
   onDelete: (user: UserResponse) => void;
   onChangePassword: () => void;
+  onLinkMember: (user: UserResponse) => void;
+  onUnlinkMember: (user: UserResponse) => void;
   deleteLoading?: boolean;
   roleLoading?: boolean;
 }
@@ -59,9 +61,13 @@ export function UsersTable({
   onUpdateRole,
   onDelete,
   onChangePassword,
+  onLinkMember,
+  onUnlinkMember,
   deleteLoading,
   roleLoading,
 }: UsersTableProps) {
+  const isAdmin = currentUserRoles?.includes('Admin') ?? false;
+
   if (users.length === 0) {
     return <Text c="dimmed">Inga användare hittades.</Text>;
   }
@@ -72,6 +78,7 @@ export function UsersTable({
         <Table.Tr>
           <Table.Th>E-post</Table.Th>
           <Table.Th>Roll</Table.Th>
+          <Table.Th>Bandmedlem</Table.Th>
           <Table.Th>Ändra roll</Table.Th>
           <Table.Th />
         </Table.Tr>
@@ -81,7 +88,7 @@ export function UsersTable({
           const isSelf = user.id === currentUserId;
           const roleOptions = getRoleOptions(currentUserRoles ?? [], user.roles, isSelf);
           const canChangeRole = roleOptions.length > 0;
-          const canDelete = !isSelf && (currentUserRoles?.includes('Admin') ?? false);
+          const canDelete = !isSelf && isAdmin;
 
           return (
             <Table.Tr key={user.id}>
@@ -97,6 +104,33 @@ export function UsersTable({
                 <Badge color={getRoleBadgeColor(user.roles)} variant="light">
                   {getRoleLabel(user.roles)}
                 </Badge>
+              </Table.Td>
+              <Table.Td>
+                {user.memberName ? (
+                  <Group gap="xs">
+                    <Text size="sm">{user.memberName}</Text>
+                    {isAdmin && (
+                      <Button
+                        variant="subtle"
+                        color="red"
+                        size="xs"
+                        onClick={() => onUnlinkMember(user)}
+                      >
+                        Bryt
+                      </Button>
+                    )}
+                  </Group>
+                ) : (
+                  isAdmin && (
+                    <Button
+                      variant="subtle"
+                      size="xs"
+                      onClick={() => onLinkMember(user)}
+                    >
+                      Koppla till medlem
+                    </Button>
+                  )
+                )}
               </Table.Td>
               <Table.Td>
                 {canChangeRole ? (

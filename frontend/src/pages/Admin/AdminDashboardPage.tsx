@@ -21,6 +21,7 @@ import { useBookingRequests, useMarkBookingRead } from '../../features/booking/h
 import { useBookingRecipients, useCreateBookingRecipient, useDeleteBookingRecipient } from '../../features/booking/hooks/useBookingRecipients';
 import { getApiMessage } from '../../utils/getApiErrors';
 import { IconTrash } from '@tabler/icons-react';
+import { useSubscribers } from '../../features/subscribers/hooks/useSubscribers';
 
 export function AdminDashboardPage() {
   const { user } = useAuth();
@@ -35,6 +36,9 @@ export function AdminDashboardPage() {
   const [newEmail, setNewEmail] = useState('');
 
   const unreadCount = bookings?.filter((b) => !b.isRead).length ?? 0;
+
+  const { data: subscribers } = useSubscribers();
+  const activeSubscribers = subscribers?.length ?? 0;
 
   const toggleExpanded = (id: number) => {
     setExpandedId(expandedId === id ? null : id);
@@ -85,7 +89,21 @@ export function AdminDashboardPage() {
     <Container py="xl">
       <Title order={1} mb="xs">Dashboard</Title>
       <Text c="dimmed" mb="lg">Inloggad som {user?.email}</Text>
-
+      {/* ── Statistik ──────────────────────────────────── */}
+      <Group mb="xl" gap="md">
+        <Card shadow="sm" padding="lg" radius="md" withBorder style={{ flex: 1 }}>
+          <Text size="sm" c="dimmed">Prenumeranter</Text>
+          <Title order={2}>{activeSubscribers}</Title>
+        </Card>
+        <Card shadow="sm" padding="lg" radius="md" withBorder style={{ flex: 1 }}>
+          <Text size="sm" c="dimmed">Bokningsförfrågningar</Text>
+          <Title order={2}>{bookings?.length ?? 0}</Title>
+        </Card>
+        <Card shadow="sm" padding="lg" radius="md" withBorder style={{ flex: 1 }}>
+          <Text size="sm" c="dimmed">Obesvarade</Text>
+          <Title order={2} c={unreadCount > 0 ? 'red' : undefined}>{unreadCount}</Title>
+        </Card>
+      </Group>
       {/* ── Bokningsförfrågningar ────────────────────────── */}
       <Title order={2} mb="md">
         <Group gap="sm">
