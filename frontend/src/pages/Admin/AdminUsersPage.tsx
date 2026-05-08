@@ -3,6 +3,8 @@ import { useAdminUsers } from '../../features/users/hooks/useAdminUsers';
 import { useAuth } from '../../providers/AuthProvider';
 import { UsersTable } from '../../features/users/components/UsersTable';
 import { UserCreateModal } from '../../features/users/components/UserCreateModal';
+import { ChangePasswordModal } from '../../features/users/components/ChangePasswordModal';
+
 
 export function AdminUsersPage() {
   const admin = useAdminUsers();
@@ -39,11 +41,13 @@ export function AdminUsersPage() {
         currentUserRoles={user?.roles}
         onUpdateRole={admin.handleUpdateRole}
         onDelete={admin.handleDelete}
+        onChangePassword={admin.openChangePassword}
         deleteLoading={admin.deleteLoading}
         roleLoading={admin.roleLoading}
         />
 
       <UserCreateModal {...admin.createModal} />
+      <ChangePasswordModal {...admin.passwordModal} />
     </Container>
   );
 }
