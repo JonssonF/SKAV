@@ -1,4 +1,5 @@
-﻿using SKAV.Application.DTOs.User;
+﻿using SKAV.Application.DTOs.Member;
+using SKAV.Application.DTOs.User;
 using SKAV.Application.Interfaces;
 using SKAV.Application.Interfaces.Repositories;
 using SKAV.Application.Interfaces.UoW;
@@ -6,9 +7,7 @@ using SKAV.Application.Services.Interface;
 using SKAV.Application.Validators.User;
 using SKAV.Domain.Consts;
 using SKAV.Domain.Entities;
-using SKAV.Domain.Enumeration;
 using SKAV.Domain.Exceptions;
-using System.ComponentModel.DataAnnotations;
 
 namespace SKAV.Application.Services
 {
@@ -16,6 +15,7 @@ namespace SKAV.Application.Services
         IUserRepository repo,
         IUnitOfWork uow,
         ICurrentUserService currentUser,
+        IMemberRepository memberRepo,
         IUserValidator validator) : IUserService
     {
         public async Task<CreateUserResponseDto> CreateAsync(CreateUserRequestDto request, CancellationToken ct)
@@ -95,12 +95,72 @@ namespace SKAV.Application.Services
         public async Task<IEnumerable<UserResponseDto>> GetAllAsync(CancellationToken ct)
         {
             var users = await repo.GetAllAsync(ct);
+            var members = await memberRepo.GetAllAsync(ct);
+            var memberLookup = members.ToDictionary(m => m.Id, m => m.Name);
+
             return users.Select(u => new UserResponseDto
             {
                 Id = u.Id,
                 Email = u.Email,
-                Roles = u.Roles
+                Roles = u.Roles,
+                MemberId = u.MemberId,
+                MemberName = u.MemberId.HasValue && memberLookup.ContainsKey(u.MemberId.Value)
+                    ? memberLookup[u.MemberId.Value]
+                    : null,
             });
+        }
+
+        public async Task<LinkMemberResponseDto> LinkMemberAsync(int userId, LinkMemberRequestDto request, CancellationToken ct)
+        {
+            var user = await repo.GetByIdAsync(userId, ct)
+                ?? throw new NotFoundException(BusinessRules.UserNotFound);
+
+            if (user.MemberId.HasValue)
+                throw new BusinessRuleException(
+                    "Användaren är redan kopplad till en medlem.",
+                    BusinessRules.UserAlreadyLinked);
+
+            var member = await memberRepo.GetByIdAsync(request.MemberId, ct)
+                ?? throw new NotFoundException(BusinessRules.MemberNotFound);
+
+            if (member.UserId.HasValue)
+                throw new BusinessRuleException(
+                    "Medlemmen är redan kopplad till en användare.",
+                    BusinessRules.MemberAlreadyLinked);
+
+            user.MemberId = member.Id;
+            member.UserId = user.Id;
+
+            using var scope = uow.BeginTransactionScope();
+            await repo.UpdateAsync(user, ct);
+            await memberRepo.UpdateAsync(member, ct);
+            await scope.CommitTransactionScopeAsync(ct);
+
+            return new LinkMemberResponseDto();
+        }
+
+        public async Task<UnlinkMemberResponseDto> UnlinkMemberAsync(int userId, CancellationToken ct)
+        {
+            var user = await repo.GetByIdAsync(userId, ct)
+                ?? throw new NotFoundException(BusinessRules.UserNotFound);
+
+            if (!user.MemberId.HasValue)
+                throw new BusinessRuleException(
+                    "Användaren är inte kopplad till någon medlem.",
+                    BusinessRules.UserNotLinked);
+
+            var member = await memberRepo.GetByIdAsync(user.MemberId.Value, ct)
+                ?? throw new NotFoundException(BusinessRules.MemberNotFound);
+
+            user.MemberId = null;
+            member.UserId = null;
+
+            using var scope = uow.BeginTransactionScope();
+            await repo.UpdateAsync(user, ct);
+            await memberRepo.UpdateAsync(member, ct);
+            await scope.CommitTransactionScopeAsync(ct);
+
+            return new UnlinkMemberResponseDto();
         }
     }
 }

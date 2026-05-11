@@ -78,6 +78,9 @@ export function LoginPage() {
               <Button type="submit" fullWidth loading={loading}>
                 Logga in
               </Button>
+              <Button variant="subtle" color="lightgray" onClick={() => navigate('/')}>
+                Tillbaka till SKAV
+              </Button>
             </Stack>
           </form>
         </Stack>

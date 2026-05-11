@@ -4,6 +4,7 @@ import type {
   CreateUserRequest,
   UpdateUserRoleRequest,
   ChangePasswordRequest,
+  LinkMemberRequest,
 } from '../../../types/user.types';
 
 export function useUsers() {
@@ -50,5 +51,30 @@ export function useUpdateUserRole() {
 export function useChangePassword() {
   return useMutation({
     mutationFn: (data: ChangePasswordRequest) => usersApi.changePassword(data),
+  });
+}
+
+export function useLinkMember() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: LinkMemberRequest }) =>
+      usersApi.linkMember(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      queryClient.invalidateQueries({ queryKey: ['members'] });
+    },
+  });
+}
+
+export function useUnlinkMember() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => usersApi.unlinkMember(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      queryClient.invalidateQueries({ queryKey: ['members'] });
+    },
   });
 }

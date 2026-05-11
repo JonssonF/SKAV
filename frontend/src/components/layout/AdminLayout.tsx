@@ -5,11 +5,12 @@ import { useLocalStorage } from '@mantine/hooks';
 
 const adminItems = [
   { label: 'Dashboard', path: '/admin' },
-  { label: 'Album', path: '/admin/albums' },
+  { label: 'Användare', path: '/admin/users' },
   { label: 'Medlemmar', path: '/admin/members' },
   { label: 'Spelningar', path: '/admin/gigs' },
+  { label: 'Album', path: '/admin/albums' },
   { label: 'Låtar', path: '/admin/songs' },
-  { label: 'Användare', path: '/admin/users' },
+  { label: 'Nyhetsbrev', path: '/admin/newsletter' },
 ];
 
 export function AdminLayout() {

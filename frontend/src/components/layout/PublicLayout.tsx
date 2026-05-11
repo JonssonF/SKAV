@@ -1,20 +1,24 @@
-import { Group, Button, Container, ActionIcon } from '@mantine/core';
+import { useState } from 'react';
+import { Group, Button, Container, ActionIcon, Drawer, Stack } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../providers/AuthProvider';
 import { useLocalStorage } from '@mantine/hooks';
+import { IconMenu2 } from '@tabler/icons-react';
 
 const navItems = [
   { label: 'Hem', href: '#hem' },
   { label: 'Om', href: '#om' },
-  { label: 'Bandet', href: '#bandet' },
-  { label: 'Spelningar', href: '#spelningar' },
-  { label: 'Musik', href: '#musik' },
+  { label: 'Nyhetsbrev', href: '#nyhetsbrev' },
   { label: 'Boka', href: '#boka' },
+  { label: 'Spelningar', href: '#spelningar' },
+  { label: 'Bandet', href: '#bandet' },
+  { label: 'Musik', href: '#musik' },
 ];
 
 export function PublicLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [colorScheme, setColorScheme] = useLocalStorage<'light' | 'dark'>({
     key: 'color-scheme',
     defaultValue: 'dark',
@@ -53,10 +57,11 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
               style={{ fontSize: '1.4rem', fontWeight: 700, cursor: 'pointer' }}
               onClick={() => scrollTo('#hem')}
             >
-              SKAV - Byns bästa band
+              SKAV
             </span>
 
-            <Group gap="xs">
+            {/* Desktop nav */}
+            <Group gap="xs" visibleFrom="sm">
               {navItems.map((item) => (
                 <Button
                   key={item.href}
@@ -77,19 +82,76 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
                 {colorScheme === 'dark' ? '☀️' : '🌙'}
               </ActionIcon>
 
-              {isAuthenticated && (isAdmin || isEditor || isMember) && (
-                <Button
-                  variant="light"
-                  size="sm"
-                  onClick={() => navigate('/admin')}
-                >
+              {isAuthenticated && (isAdmin || isEditor) && (
+                <Button variant="light" size="sm" onClick={() => navigate('/admin')}>
                   Admin
                 </Button>
               )}
             </Group>
+
+            {/* Mobil hamburger */}
+            <ActionIcon
+              variant="subtle"
+              color="gray"
+              size="lg"
+              hiddenFrom="sm"
+              onClick={() => setDrawerOpen(true)}
+            >
+              <IconMenu2 size={24} />
+            </ActionIcon>
           </Group>
         </Container>
       </header>
+
+      {/* Mobil drawer */}
+      <Drawer
+        opened={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        title="SKAV"
+        size="xs"
+        position="right"
+      >
+        <Stack gap="xs">
+          {navItems.map((item) => (
+            <Button
+              key={item.href}
+              variant="subtle"
+              color="gray"
+              fullWidth
+              justify="flex-start"
+              onClick={() => scrollTo(item.href)}
+            >
+              {item.label}
+            </Button>
+          ))}
+
+          <Button
+            variant="subtle"
+            color="gray"
+            fullWidth
+            justify="flex-start"
+            onClick={() => {
+              setColorScheme(colorScheme === 'dark' ? 'light' : 'dark');
+              setDrawerOpen(false);
+            }}
+          >
+            {colorScheme === 'dark' ? '☀️ Ljust läge' : '🌙 Mörkt läge'}
+          </Button>
+
+          {isAuthenticated && (isAdmin || isEditor || isMember) && (
+            <Button
+              variant="light"
+              fullWidth
+              onClick={() => {
+                navigate('/admin');
+                setDrawerOpen(false);
+              }}
+            >
+              Admin
+            </Button>
+          )}
+        </Stack>
+      </Drawer>
 
       <main style={{ paddingTop: 60 }}>
         {children}

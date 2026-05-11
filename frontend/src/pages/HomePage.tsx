@@ -5,6 +5,7 @@ import { MusicSection } from '../features/songs/components/MusicSection';
 import { FooterSection } from '../components/sections/FooterSection';
 import { AboutSection } from '../features/about/components/AboutSection';
 import { BookingSection } from '../features/booking/components/BookingSection';
+import { SubscribeSection } from '../features/subscribers/components/SubscribeSection';
 
 export function HomePage() {
   return (
@@ -17,9 +18,12 @@ export function HomePage() {
         <AboutSection />
       </section>
 
+      <section id="nyhetsbrev">
+        <SubscribeSection />
+      </section>
 
-      <section id="bandet">
-        <MembersSection />
+      <section id="boka">
+        <BookingSection />
       </section>
 
       <section id="spelningar">
@@ -32,6 +36,10 @@ export function HomePage() {
 
       <section id="musik">
          <MusicSection />
+      </section>
+      
+      <section id="boka">
+        <BookingSection />
       </section>
 
       <FooterSection />

@@ -43,7 +43,7 @@ namespace SKAV.Application.Services
 
             return new SubscriberResponseDto
             {
-                Email = subscriber.Email
+                Email = subscriber.Email,
             };
         }
 

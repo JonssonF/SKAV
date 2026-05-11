@@ -5,6 +5,7 @@ import type {
   CreateUserResponse,
   UpdateUserRoleRequest,
   ChangePasswordRequest,
+  LinkMemberRequest,
 } from '../types/user.types';
 
 export const usersApi = {
@@ -29,4 +30,12 @@ export const usersApi = {
   changePassword: async (data: ChangePasswordRequest): Promise<void> => {
     await apiClient.put('/users/me/password', data);
   },
+
+   linkMember: async (id: number, data: LinkMemberRequest): Promise<void> => {
+    await apiClient.put(`/users/${id}/link-member`, data);
+  },
+
+  unlinkMember: async (id: number): Promise<void> => {
+    await apiClient.put(`/users/${id}/unlink-member`);
+  }, 
 };
