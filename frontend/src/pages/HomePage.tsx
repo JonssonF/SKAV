@@ -26,12 +26,12 @@ export function HomePage() {
         <GigsSection />
       </section>
 
+      <section id="bandet">
+        <MembersSection />
+      </section>
+
       <section id="musik">
          <MusicSection />
-      </section>
-      
-      <section id="boka">
-        <BookingSection />
       </section>
 
       <FooterSection />
