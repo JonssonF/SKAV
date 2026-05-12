@@ -239,8 +239,6 @@ namespace SKAV.Infrastructure.Database
                     Price DECIMAL(10,2) NOT NULL,
                     ImageUrl TEXT,
                     Category TEXT,
-                    StockQuantity INTEGER NOT NULL DEFAULT 0,
-                    Version INTEGER NOT NULL DEFAULT 1,
                     CreatedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     CreatedBy INTEGER,
                     UpdatedAt TEXT,
@@ -276,6 +274,7 @@ namespace SKAV.Infrastructure.Database
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
                     ProductOrderId INTEGER NOT NULL,
                     ProductId INTEGER NOT NULL,
+                    ProductVariantId INTEGER NOT NULL,
                     Quantity INTEGER NOT NULL,
                     CreatedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     CreatedBy INTEGER,
@@ -284,7 +283,8 @@ namespace SKAV.Infrastructure.Database
                     DeletedAt TEXT,
                     DeletedBy INTEGER,
                     FOREIGN KEY(ProductOrderId) REFERENCES ProductOrders(Id),
-                    FOREIGN KEY(ProductId) REFERENCES Products(Id)
+                    FOREIGN KEY(ProductId) REFERENCES Products(Id),
+                    FOREIGN KEY(ProductVariantId) REFERENCES ProductVariants(Id)
                 );
                 """;
                 await connection.ExecuteAsync(sqlProductOrderItems);
@@ -304,6 +304,43 @@ namespace SKAV.Infrastructure.Database
                 );
                 """;
                 await connection.ExecuteAsync(sqlProductOrderNotificationsRecipients);
+
+            const string sqlProductAttrubuteDefinitions = """
+                CREATE TABLE IF NOT EXISTS ProductAttributeDefinitions(
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    ProductId INTEGER NOT NULL,
+                    Name TEXT NOT NULL,
+                    Values TEXT NOT NULL,
+                    DisplayOrder INTEGER NOT NULL DEFAULT 0,
+                    CreatedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    CreatedBy INTEGER,
+                    UpdatedAt TEXT,
+                    UpdatedBy INTEGER,
+                    DeletedAt TEXT,
+                    DeletedBy INTEGER,
+                    FOREIGN KEY(ProductId) REFERENCES Products(Id)
+                );
+                """;
+                await connection.ExecuteAsync(sqlProductAttrubuteDefinitions);
+
+            const string sqlProductVariants = """
+                CREATE TABLE IF NOT EXISTS ProductVariants(
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    ProductId INTEGER NOT NULL,
+                    Attributes TEXT NOT NULL,
+                    PriceOverride DECIMAL(10,2),
+                    StockQuantity INTEGER NOT NULL DEFAULT 0,
+                    Version INTEGER NOT NULL DEFAULT 1,
+                    CreatedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    CreatedBy INTEGER,
+                    UpdatedAt TEXT,
+                    UpdatedBy INTEGER,
+                    DeletedAt TEXT,
+                    DeletedBy INTEGER,
+                    FOREIGN KEY(ProductId) REFERENCES Products(Id)
+                );
+                """;
+                await connection.ExecuteAsync(sqlProductVariants);
 
             await SeedAdminAsync(connection);
         }
