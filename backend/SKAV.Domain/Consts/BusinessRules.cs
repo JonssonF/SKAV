@@ -35,6 +35,16 @@
         public const string InstrumentAlreadyExists = "InstrumentAlreadyExists";
         public const string MemberInstrumentNotFound = "MemberInstrumentNotFound";
 
+        // Products
+        public const string ProductNotFound = "ProductNotFound";
+        public const string ProductOutOfStock = "ProductOutOfStock";
+        public const string ProductConcurrencyError = "ProductConcurrencyError";
+
+        // Product Orders
+        public const string ProductOrderNotFound = "ProductOrderNotFound";
+        public const string ProductOrderRecipientNotFound = "ProductOrderRecipientNotFound";
+        public const string ProductOrderRecipientAlreadyExists = "ProductOrderRecipientAlreadyExists";
+
         // Subscribers
         public const string SubscriberNotFound = "SubscriberNotFound";
 
