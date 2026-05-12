@@ -14,6 +14,7 @@ namespace SKAV.Application.Services
         IProductOrderRepository orderRepo,
         IProductOrderItemRepository itemRepo,
         IProductRepository productRepo,
+        IProductVariantRepository variantRepo,
         IUserRepository userRepo,
         IUnitOfWork uow,
         ICurrentUserService currentUser) : IProductOrderService
@@ -22,9 +23,11 @@ namespace SKAV.Application.Services
         {
             var orders = await orderRepo.GetAllAsync(ct);
             var products = await productRepo.GetAllAsync(ct);
+            var variants = await variantRepo.GetAllAsync(ct);
             var users = await userRepo.GetAllAsync(ct);
 
             var productLookup = products.ToDictionary(p => p.Id);
+            var variantLookup = variants.ToDictionary(v => v.Id);
             var userLookup = users.ToDictionary(u => u.Id, u => u.Email);
 
             var result = new List<ProductOrderResponseDto>();
@@ -32,7 +35,7 @@ namespace SKAV.Application.Services
             foreach (var order in orders.OrderByDescending(o => o.CreatedAt))
             {
                 var items = await itemRepo.GetByOrderIdAsync(order.Id, ct);
-                result.Add(MapToDto(order, items, productLookup, userLookup));
+                result.Add(MapToDto(order, items, productLookup, variantLookup, userLookup));
             }
 
             return result;
@@ -45,31 +48,35 @@ namespace SKAV.Application.Services
 
             var items = await itemRepo.GetByOrderIdAsync(order.Id, ct);
             var products = await productRepo.GetAllAsync(ct);
+            var variants = await variantRepo.GetAllAsync(ct);
             var users = await userRepo.GetAllAsync(ct);
 
             var productLookup = products.ToDictionary(p => p.Id);
+            var variantLookup = variants.ToDictionary(v => v.Id);
             var userLookup = users.ToDictionary(u => u.Id, u => u.Email);
 
-            return MapToDto(order, items, productLookup, userLookup);
+            return MapToDto(order, items, productLookup, variantLookup, userLookup);
         }
 
         public async Task<CreateProductOrderResponseDto> CreateAsync(CreateProductOrderRequestDto request, CancellationToken ct)
         {
-            // Validera att alla produkter finns och har lager
-            var productsToUpdate = new List<Product>();
+            var variantsToUpdate = new List<ProductVariant>();
 
             foreach (var item in request.Items)
             {
-                var product = await productRepo.GetByIdAsync(item.ProductId, ct)
-                    ?? throw new NotFoundException(BusinessRules.ProductNotFound);
+                var variant = await variantRepo.GetByIdAsync(item.ProductVariantId, ct)
+                    ?? throw new NotFoundException(BusinessRules.ProductVariantNotFound);
 
-                if (product.StockQuantity < item.Quantity)
+                if (variant.StockQuantity < item.Quantity)
+                {
+                    var product = await productRepo.GetByIdAsync(variant.ProductId, ct);
                     throw new BusinessRuleException(
-                        $"{product.Title} har bara {product.StockQuantity} i lager.",
+                        $"{product?.Title ?? "Produkt"} har bara {variant.StockQuantity} i lager.",
                         BusinessRules.ProductOutOfStock);
+                }
 
-                product.StockQuantity -= item.Quantity;
-                productsToUpdate.Add(product);
+                variant.StockQuantity -= item.Quantity;
+                variantsToUpdate.Add(variant);
             }
 
             var order = new ProductOrder
@@ -85,16 +92,16 @@ namespace SKAV.Application.Services
 
             using var scope = uow.BeginTransactionScope();
 
-            // Skapa ordern
             var orderId = await orderRepo.CreateAsync(order, ct);
 
-            // Skapa order items
             foreach (var item in request.Items)
             {
+                var variant = variantsToUpdate.First(v => v.Id == item.ProductVariantId);
                 var orderItem = new ProductOrderItem
                 {
                     ProductOrderId = orderId,
-                    ProductId = item.ProductId,
+                    ProductId = variant.ProductId,
+                    ProductVariantId = item.ProductVariantId,
                     Quantity = item.Quantity,
                 };
 
@@ -102,14 +109,13 @@ namespace SKAV.Application.Services
                 await itemRepo.CreateAsync(orderItem, ct);
             }
 
-            // Minska lagersaldo med version check
-            foreach (var product in productsToUpdate)
+            foreach (var variant in variantsToUpdate)
             {
-                AuditHelper.SetUpdated(product, null);
-                var affected = await productRepo.UpdateWithVersionCheckAsync(product, ct);
+                AuditHelper.SetUpdated(variant, null);
+                var affected = await variantRepo.UpdateWithVersionCheckAsync(variant, ct);
                 if (affected == 0)
                     throw new BusinessRuleException(
-                        $"Kunde inte uppdatera lagersaldo för {product.Title}. Försök igen.",
+                        "Lagersaldo har ändrats. Försök igen.",
                         BusinessRules.ProductConcurrencyError);
             }
 
@@ -138,6 +144,7 @@ namespace SKAV.Application.Services
             ProductOrder order,
             IEnumerable<ProductOrderItem> items,
             Dictionary<int, Product> productLookup,
+            Dictionary<int, ProductVariant> variantLookup,
             Dictionary<int, string> userLookup) => new()
             {
                 Id = order.Id,
@@ -161,6 +168,10 @@ namespace SKAV.Application.Services
                     ProductPrice = productLookup.ContainsKey(i.ProductId)
                         ? productLookup[i.ProductId].Price
                         : 0,
+                    ProductVariantId = i.ProductVariantId,
+                    VariantAttributes = variantLookup.ContainsKey(i.ProductVariantId)
+                        ? variantLookup[i.ProductVariantId].Attributes
+                        : "{}",
                     Quantity = i.Quantity,
                 }).ToList(),
             };

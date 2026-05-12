@@ -12,20 +12,35 @@ namespace SKAV.Application.Services
 {
     public class ProductService(
         IProductRepository repo,
+        IProductVariantRepository variantRepo,
+        IProductAttributeDefinitionRepository attrRepo,
         IUnitOfWork uow,
         ICurrentUserService currentUser) : IProductService
     {
         public async Task<IEnumerable<ProductResponseDto>> GetAllAsync(CancellationToken ct)
         {
             var products = await repo.GetAllAsync(ct);
-            return products.Select(MapToDto);
+            var result = new List<ProductResponseDto>();
+
+            foreach (var product in products)
+            {
+                var variants = await variantRepo.GetByProductIdAsync(product.Id, ct);
+                var attributes = await attrRepo.GetByProductIdAsync(product.Id, ct);
+                result.Add(MapToDto(product, variants, attributes));
+            }
+
+            return result;
         }
 
         public async Task<ProductResponseDto> GetByIdAsync(int id, CancellationToken ct)
         {
             var product = await repo.GetByIdAsync(id, ct)
                 ?? throw new NotFoundException(BusinessRules.ProductNotFound);
-            return MapToDto(product);
+
+            var variants = await variantRepo.GetByProductIdAsync(product.Id, ct);
+            var attributes = await attrRepo.GetByProductIdAsync(product.Id, ct);
+
+            return MapToDto(product, variants, attributes);
         }
 
         public async Task<CreateProductResponseDto> CreateAsync(CreateProductRequestDto request, CancellationToken ct)
@@ -37,8 +52,6 @@ namespace SKAV.Application.Services
                 Price = request.Price,
                 ImageUrl = request.ImageUrl,
                 Category = request.Category,
-                StockQuantity = request.StockQuantity,
-                Version = 1,
             };
 
             AuditHelper.SetCreated(product, currentUser.UserId);
@@ -60,16 +73,11 @@ namespace SKAV.Application.Services
             existing.Price = request.Price;
             existing.ImageUrl = request.ImageUrl;
             existing.Category = request.Category;
-            existing.StockQuantity = request.StockQuantity;
 
             AuditHelper.SetUpdated(existing, currentUser.UserId);
 
             using var scope = uow.BeginTransactionScope();
-            var affected = await repo.UpdateWithVersionCheckAsync(existing, ct);
-            if (affected == 0)
-                throw new BusinessRuleException(
-                    "Produkten har ändrats av någon annan. Ladda om och försök igen.",
-                    BusinessRules.ProductConcurrencyError);
+            await repo.UpdateAsync(existing, ct);
             await scope.CommitTransactionScopeAsync(ct);
 
             return new UpdateProductResponseDto();
@@ -89,15 +97,31 @@ namespace SKAV.Application.Services
             return new DeleteProductResponseDto();
         }
 
-        private static ProductResponseDto MapToDto(Product p) => new()
-        {
-            Id = p.Id,
-            Title = p.Title,
-            Description = p.Description,
-            Price = p.Price,
-            ImageUrl = p.ImageUrl,
-            Category = p.Category,
-            StockQuantity = p.StockQuantity,
-        };
+        private static ProductResponseDto MapToDto(
+            Product p,
+            IEnumerable<ProductVariant> variants,
+            IEnumerable<ProductAttributeDefinition> attributes) => new()
+            {
+                Id = p.Id,
+                Title = p.Title,
+                Description = p.Description,
+                Price = p.Price,
+                ImageUrl = p.ImageUrl,
+                Category = p.Category,
+                AttributeDefinitions = attributes.OrderBy(a => a.DisplayOrder).Select(a => new ProductAttributeDefinitionDto
+                {
+                    Id = a.Id,
+                    Name = a.Name,
+                    Values = a.Values,
+                    DisplayOrder = a.DisplayOrder,
+                }).ToList(),
+                Variants = variants.Select(v => new ProductVariantDto
+                {
+                    Id = v.Id,
+                    Attributes = v.Attributes,
+                    PriceOverride = v.PriceOverride,
+                    StockQuantity = v.StockQuantity,
+                }).ToList(),
+            };
     }
 }

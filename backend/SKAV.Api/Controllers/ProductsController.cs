@@ -18,7 +18,7 @@ namespace SKAV.Api.Controllers
 
         [HttpGet("{id}")]
         [AllowAnonymous]
-        [SwaggerOperation("Hämta en produkt")]
+        [SwaggerOperation("Hämta en produkt med attribut och varianter")]
         public async Task<ProductResponseDto> GetById(int id, CancellationToken ct)
             => await service.GetByIdAsync(id, ct);
 
