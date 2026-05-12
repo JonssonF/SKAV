@@ -8,6 +8,7 @@
         public decimal Price { get; init; }
         public string? ImageUrl { get; init; }
         public string? Category { get; init; }
-        public int StockQuantity { get; init; }
+        public List<ProductAttributeDefinitionDto> AttributeDefinitions { get; init; } = [];
+        public List<ProductVariantDto> Variants { get; init; } = [];
     }
 }

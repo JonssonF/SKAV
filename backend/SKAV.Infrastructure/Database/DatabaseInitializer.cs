@@ -1,6 +1,9 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
+using SKAV.Domain.Entities;
 using System.Data;
+using System.Numerics;
+using System.Xml.Linq;
 
 namespace SKAV.Infrastructure.Database
 {
@@ -227,6 +230,80 @@ namespace SKAV.Infrastructure.Database
                 );
             """;
             await connection.ExecuteAsync(sqlBookingNotificationRecipients);
+
+            const string sqlProducts = """
+                CREATE TABLE IF NOT EXISTS Products(
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Title TEXT NOT NULL,
+                    Description TEXT NOT NULL,
+                    Price DECIMAL(10,2) NOT NULL,
+                    ImageUrl TEXT,
+                    Category TEXT,
+                    StockQuantity INTEGER NOT NULL DEFAULT 0,
+                    Version INTEGER NOT NULL DEFAULT 1,
+                    CreatedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    CreatedBy INTEGER,
+                    UpdatedAt TEXT,
+                    UpdatedBy INTEGER,
+                    DeletedAt TEXT,
+                    DeletedBy INTEGER
+                );
+                """;
+            await connection.ExecuteAsync(sqlProducts);
+
+            const string sqlProductOrders = """
+                CREATE TABLE IF NOT EXISTS ProductOrders(
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Name TEXT NOT NULL,
+                    Email TEXT NOT NULL,
+                    Phone TEXT,
+                    Message TEXT,
+                    IsHandled INTEGER NOT NULL DEFAULT 0,
+                    HandledAt TEXT,
+                    HandledBy INTEGER,
+                    CreatedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    CreatedBy INTEGER,
+                    UpdatedAt TEXT,
+                    UpdatedBy INTEGER,
+                    DeletedAt TEXT,
+                    DeletedBy INTEGER
+                );
+                """;
+                await connection.ExecuteAsync(sqlProductOrders);
+            
+            const string sqlProductOrderItems = """
+                CREATE TABLE IF NOT EXISTS ProductOrderItems(
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    ProductOrderId INTEGER NOT NULL,
+                    ProductId INTEGER NOT NULL,
+                    Quantity INTEGER NOT NULL,
+                    CreatedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    CreatedBy INTEGER,
+                    UpdatedAt TEXT,
+                    UpdatedBy INTEGER,
+                    DeletedAt TEXT,
+                    DeletedBy INTEGER,
+                    FOREIGN KEY(ProductOrderId) REFERENCES ProductOrders(Id),
+                    FOREIGN KEY(ProductId) REFERENCES Products(Id)
+                );
+                """;
+                await connection.ExecuteAsync(sqlProductOrderItems);
+
+            const string sqlProductOrderNotificationsRecipients = """
+                CREATE TABLE IF NOT EXISTS ProductOrderNotificationRecipients(
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Email TEXT NOT NULL,
+                    MemberId INTEGER,
+                    CreatedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    CreatedBy INTEGER,
+                    UpdatedAt TEXT,
+                    UpdatedBy INTEGER,
+                    DeletedAt TEXT,
+                    DeletedBy INTEGER,
+                    FOREIGN KEY(MemberId) REFERENCES Members(Id)
+                );
+                """;
+                await connection.ExecuteAsync(sqlProductOrderNotificationsRecipients);
 
             await SeedAdminAsync(connection);
         }

@@ -5,7 +5,7 @@ namespace SKAV.Application.DTOs.ProductOrder
     public class CreateProductOrderItemDto
     {
         [Required]
-        public int ProductId { get; set; }
+        public int ProductVariantId { get; set; }
 
         [Required]
         [Range(1, 100, ErrorMessage = "Antal måste vara mellan {1} och {2}")]

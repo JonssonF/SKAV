@@ -25,9 +25,5 @@ namespace SKAV.Application.DTOs.Product
         [MaxLength(100, ErrorMessage = "Max {1} tecken")]
         [DefaultValue("Kläder")]
         public string? Category { get; set; }
-
-        [Range(0, 99999, ErrorMessage = "Antal måste vara mellan {1} och {2}")]
-        [DefaultValue(10)]
-        public int StockQuantity { get; set; }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace SKAV.Application.DTOs.Product
 {
@@ -21,8 +20,5 @@ namespace SKAV.Application.DTOs.Product
 
         [MaxLength(100, ErrorMessage = "Max {1} tecken")]
         public string? Category { get; set; }
-
-        [Range(0, 99999, ErrorMessage = "Antal måste vara mellan {1} och {2}")]
-        public int StockQuantity { get; set; }
     }
 }

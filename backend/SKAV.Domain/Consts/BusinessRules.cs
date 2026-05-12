@@ -39,6 +39,8 @@
         public const string ProductNotFound = "ProductNotFound";
         public const string ProductOutOfStock = "ProductOutOfStock";
         public const string ProductConcurrencyError = "ProductConcurrencyError";
+        public const string ProductVariantNotFound = "ProductVariantNotFound";
+        public const string ProductAttributeDefinitionNotFound = "ProductAttributeDefinitionNotFound";
 
         // Product Orders
         public const string ProductOrderNotFound = "ProductOrderNotFound";
