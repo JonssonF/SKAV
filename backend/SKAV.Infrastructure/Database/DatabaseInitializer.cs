@@ -1,9 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
-using SKAV.Domain.Entities;
 using System.Data;
-using System.Numerics;
-using System.Xml.Linq;
 
 namespace SKAV.Infrastructure.Database
 {
@@ -267,61 +264,7 @@ namespace SKAV.Infrastructure.Database
                     DeletedBy INTEGER
                 );
                 """;
-                await connection.ExecuteAsync(sqlProductOrders);
-            
-            const string sqlProductOrderItems = """
-                CREATE TABLE IF NOT EXISTS ProductOrderItems(
-                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    ProductOrderId INTEGER NOT NULL,
-                    ProductId INTEGER NOT NULL,
-                    ProductVariantId INTEGER NOT NULL,
-                    Quantity INTEGER NOT NULL,
-                    CreatedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                    CreatedBy INTEGER,
-                    UpdatedAt TEXT,
-                    UpdatedBy INTEGER,
-                    DeletedAt TEXT,
-                    DeletedBy INTEGER,
-                    FOREIGN KEY(ProductOrderId) REFERENCES ProductOrders(Id),
-                    FOREIGN KEY(ProductId) REFERENCES Products(Id),
-                    FOREIGN KEY(ProductVariantId) REFERENCES ProductVariants(Id)
-                );
-                """;
-                await connection.ExecuteAsync(sqlProductOrderItems);
-
-            const string sqlProductOrderNotificationsRecipients = """
-                CREATE TABLE IF NOT EXISTS ProductOrderNotificationRecipients(
-                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    Email TEXT NOT NULL,
-                    MemberId INTEGER,
-                    CreatedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                    CreatedBy INTEGER,
-                    UpdatedAt TEXT,
-                    UpdatedBy INTEGER,
-                    DeletedAt TEXT,
-                    DeletedBy INTEGER,
-                    FOREIGN KEY(MemberId) REFERENCES Members(Id)
-                );
-                """;
-                await connection.ExecuteAsync(sqlProductOrderNotificationsRecipients);
-
-            const string sqlProductAttrubuteDefinitions = """
-                CREATE TABLE IF NOT EXISTS ProductAttributeDefinitions(
-                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    ProductId INTEGER NOT NULL,
-                    Name TEXT NOT NULL,
-                    Values TEXT NOT NULL,
-                    DisplayOrder INTEGER NOT NULL DEFAULT 0,
-                    CreatedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                    CreatedBy INTEGER,
-                    UpdatedAt TEXT,
-                    UpdatedBy INTEGER,
-                    DeletedAt TEXT,
-                    DeletedBy INTEGER,
-                    FOREIGN KEY(ProductId) REFERENCES Products(Id)
-                );
-                """;
-                await connection.ExecuteAsync(sqlProductAttrubuteDefinitions);
+            await connection.ExecuteAsync(sqlProductOrders);
 
             const string sqlProductVariants = """
                 CREATE TABLE IF NOT EXISTS ProductVariants(
@@ -340,7 +283,61 @@ namespace SKAV.Infrastructure.Database
                     FOREIGN KEY(ProductId) REFERENCES Products(Id)
                 );
                 """;
-                await connection.ExecuteAsync(sqlProductVariants);
+            await connection.ExecuteAsync(sqlProductVariants);
+
+            const string sqlProductOrderItems = """
+                CREATE TABLE IF NOT EXISTS ProductOrderItems(
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    ProductOrderId INTEGER NOT NULL,
+                    ProductId INTEGER NOT NULL,
+                    ProductVariantId INTEGER NOT NULL,
+                    Quantity INTEGER NOT NULL,
+                    CreatedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    CreatedBy INTEGER,
+                    UpdatedAt TEXT,
+                    UpdatedBy INTEGER,
+                    DeletedAt TEXT,
+                    DeletedBy INTEGER,
+                    FOREIGN KEY(ProductOrderId) REFERENCES ProductOrders(Id),
+                    FOREIGN KEY(ProductId) REFERENCES Products(Id),
+                    FOREIGN KEY(ProductVariantId) REFERENCES ProductVariants(Id)
+                );
+                """;
+            await connection.ExecuteAsync(sqlProductOrderItems);
+
+            const string sqlProductOrderNotificationsRecipients = """
+                CREATE TABLE IF NOT EXISTS ProductOrderNotificationRecipients(
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Email TEXT NOT NULL,
+                    MemberId INTEGER,
+                    CreatedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    CreatedBy INTEGER,
+                    UpdatedAt TEXT,
+                    UpdatedBy INTEGER,
+                    DeletedAt TEXT,
+                    DeletedBy INTEGER,
+                    FOREIGN KEY(MemberId) REFERENCES Members(Id)
+                );
+                """;
+            await connection.ExecuteAsync(sqlProductOrderNotificationsRecipients);
+
+            const string sqlProductAttributeDefinitions = """
+                CREATE TABLE IF NOT EXISTS ProductAttributeDefinitions(
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    ProductId INTEGER NOT NULL,
+                    Name TEXT NOT NULL,
+                    AttributeValues TEXT NOT NULL,
+                    DisplayOrder INTEGER NOT NULL DEFAULT 0,
+                    CreatedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    CreatedBy INTEGER,
+                    UpdatedAt TEXT,
+                    UpdatedBy INTEGER,
+                    DeletedAt TEXT,
+                    DeletedBy INTEGER,
+                    FOREIGN KEY(ProductId) REFERENCES Products(Id)
+                );
+                """;
+            await connection.ExecuteAsync(sqlProductAttributeDefinitions);
 
             await SeedAdminAsync(connection);
         }

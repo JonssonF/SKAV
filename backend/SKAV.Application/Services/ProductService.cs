@@ -112,7 +112,7 @@ namespace SKAV.Application.Services
                 {
                     Id = a.Id,
                     Name = a.Name,
-                    Values = a.Values,
+                    AttributeValues = a.AttributeValues,
                     DisplayOrder = a.DisplayOrder,
                 }).ToList(),
                 Variants = variants.Select(v => new ProductVariantDto

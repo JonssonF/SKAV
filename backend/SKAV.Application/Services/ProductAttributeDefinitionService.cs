@@ -25,7 +25,7 @@ namespace SKAV.Application.Services
             {
                 ProductId = request.ProductId,
                 Name = request.Name,
-                Values = request.Values,
+                AttributeValues = request.AttributeValues,
                 DisplayOrder = request.DisplayOrder,
             };
 

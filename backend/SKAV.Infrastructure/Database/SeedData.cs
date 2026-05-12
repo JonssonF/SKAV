@@ -107,18 +107,18 @@ namespace SKAV.Infrastructure.Database
             var definitions = new List<ProductAttributeDefinition>
     {
         // T-shirt – storlek + färg
-        new() { ProductId = 1, Name = "Storlek", Values = "[\"S\",\"M\",\"L\",\"XL\",\"XXL\"]", DisplayOrder = 1 },
-        new() { ProductId = 1, Name = "Färg", Values = "[\"Svart\",\"Vit\"]", DisplayOrder = 2 },
+        new() { ProductId = 1, Name = "Storlek", AttributeValues = "[\"S\",\"M\",\"L\",\"XL\",\"XXL\"]", DisplayOrder = 1 },
+        new() { ProductId = 1, Name = "Färg", AttributeValues = "[\"Svart\",\"Vit\"]", DisplayOrder = 2 },
 
         // Hoodie – storlek + färg
-        new() { ProductId = 2, Name = "Storlek", Values = "[\"S\",\"M\",\"L\",\"XL\"]", DisplayOrder = 1 },
-        new() { ProductId = 2, Name = "Färg", Values = "[\"Svart\",\"Grå\"]", DisplayOrder = 2 },
+        new() { ProductId = 2, Name = "Storlek", AttributeValues = "[\"S\",\"M\",\"L\",\"XL\"]", DisplayOrder = 1 },
+        new() { ProductId = 2, Name = "Färg", AttributeValues = "[\"Svart\",\"Grå\"]", DisplayOrder = 2 },
 
         // Vinyl – färg
-        new() { ProductId = 3, Name = "Färg", Values = "[\"Svart\",\"Transparent\"]", DisplayOrder = 1 },
+        new() { ProductId = 3, Name = "Färg", AttributeValues = "[\"Svart\",\"Transparent\"]", DisplayOrder = 1 },
 
         // Keps – färg
-        new() { ProductId = 5, Name = "Färg", Values = "[\"Svart\",\"Grå\",\"Röd\"]", DisplayOrder = 1 },
+        new() { ProductId = 5, Name = "Färg", AttributeValues = "[\"Svart\",\"Grå\",\"Röd\"]", DisplayOrder = 1 },
     };
 
             using var scope = uow.BeginTransactionScope();

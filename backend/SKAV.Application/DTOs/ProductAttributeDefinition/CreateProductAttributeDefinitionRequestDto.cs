@@ -15,7 +15,7 @@ namespace SKAV.Application.DTOs.ProductAttributeDefinition
 
         [Required(ErrorMessage = "Värden är obligatoriska")]
         [DefaultValue("[\"S\",\"M\",\"L\",\"XL\"]")]
-        public required string Values { get; set; }
+        public required string AttributeValues { get; set; }
 
         [DefaultValue(0)]
         public int DisplayOrder { get; set; }

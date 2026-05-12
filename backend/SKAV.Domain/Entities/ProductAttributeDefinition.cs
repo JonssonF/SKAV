@@ -7,7 +7,7 @@ namespace SKAV.Domain.Entities
     {
         public int ProductId { get; set; }
         public required string Name { get; set; }
-        public required string Values { get; set; }
+        public required string AttributeValues { get; set; }
         public int DisplayOrder { get; set; }
     }
 }
