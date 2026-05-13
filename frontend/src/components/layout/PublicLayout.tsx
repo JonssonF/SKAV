@@ -15,6 +15,7 @@ const navItems = [
   { label: 'Musik', href: '#musik' },
 ];
 
+
 export function PublicLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
@@ -28,13 +29,20 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
   const isEditor = user?.roles.includes('Editor') ?? false;
   const isMember = user?.roles.includes('Member') ?? false;
 
-  const scrollTo = (href: string) => {
-    const id = href.replace('#', '');
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
+const scrollTo = (href: string) => {
+  setDrawerOpen(false);
+  const id = href.replace('#', '');
+
+  if (window.location.pathname !== '/') {
+    navigate('/' + href);
+    return;
+  }
+
+  const element = document.getElementById(id);
+  if (element) {
+    element.scrollIntoView({ behavior: 'smooth' });
+  }
+};
 
   return (
     <>
@@ -72,8 +80,15 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
                 >
                   {item.label}
                 </Button>
+                
               ))}
-
+              <Button
+                variant="light"
+                size="sm"
+                onClick={() => navigate('/shop')}
+              >
+                Shop
+              </Button>
               <ActionIcon
                 variant="subtle"
                 color="gray"
@@ -124,7 +139,16 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
               {item.label}
             </Button>
           ))}
-
+          <Button
+            variant="light"
+            fullWidth
+            onClick={() => {
+              navigate('/shop');
+              setDrawerOpen(false);
+            }}
+          >
+            Shop
+          </Button>
           <Button
             variant="subtle"
             color="gray"
@@ -153,7 +177,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
         </Stack>
       </Drawer>
 
-      <main style={{ paddingTop: 60 }}>
+      <main style={{ paddingTop: 60,  cursor: 'url(/images/misc/liten-gralle.png), auto' }}>
         {children}
       </main>
     </>
