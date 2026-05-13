@@ -53,7 +53,7 @@ namespace SKAV.Infrastructure.Database
             Title = "SKAV T-shirt",
             Description = "Klassisk t-shirt med SKAV-logga tryckt på bröstet. 100% bomull.",
             Price = 249,
-            ImageUrl = "/images/products/tshirt.jpg",
+            ImageUrl = "/images/products/t-shirt_shop.png",
             Category = "Kläder",
         },
         new()
@@ -61,7 +61,7 @@ namespace SKAV.Infrastructure.Database
             Title = "SKAV Hoodie",
             Description = "Mysig hoodie med SKAV-tryck på ryggen. Perfekt för kalla kvällar.",
             Price = 449,
-            ImageUrl = "/images/products/hoodie.jpg",
+            ImageUrl = "/images/products/hoodie_svart_shop.png",
             Category = "Kläder",
         },
         new()
@@ -69,7 +69,7 @@ namespace SKAV.Infrastructure.Database
             Title = "Från Derome med kärlek – Vinyl",
             Description = "Debutskivan på vinyl. Limiterad upplaga i svart och transparent.",
             Price = 199,
-            ImageUrl = "/images/products/vinyl.jpg",
+            ImageUrl = "/images/products/poster_shop.png",
             Category = "Musik",
         },
         new()
@@ -77,7 +77,7 @@ namespace SKAV.Infrastructure.Database
             Title = "SKAV Klistermärke",
             Description = "Tåligt klistermärke med SKAV-logga. Perfekt för gitarrfodralet.",
             Price = 29,
-            ImageUrl = "/images/products/sticker.jpg",
+            ImageUrl = "/images/products/stickers_shop.png",
             Category = "Övrigt",
         },
         new()
@@ -85,7 +85,7 @@ namespace SKAV.Infrastructure.Database
             Title = "SKAV Keps",
             Description = "Snapback-keps med broderad SKAV-logga.",
             Price = 199,
-            ImageUrl = "/images/products/cap.jpg",
+            ImageUrl = "/images/products/Keps_shop.png",
             Category = "Kläder",
         },
     };

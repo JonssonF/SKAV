@@ -11,6 +11,8 @@ import { AdminMembersPage } from '../pages/Admin/AdminMembersPage';
 import { ProtectedRoute } from './ProtectedRoute';
 import { AdminUsersPage } from '../pages/Admin/AdminUsersPage';
 import { AdminNewsletterPage } from '../pages/Admin/AdminNewsletterPage';
+import { ShopPage } from '../pages/ShopPage';
+import { AdminProductsPage } from '../pages/Admin/AdminProductsPage';
 
 export function AppRouter() {
   return (
@@ -23,6 +25,14 @@ export function AppRouter() {
           element={
             <PublicLayout>
               <HomePage />
+            </PublicLayout>
+          }
+        />
+        <Route
+          path="/shop"
+          element={
+            <PublicLayout>
+              <ShopPage />
             </PublicLayout>
           }
         />
@@ -40,6 +50,7 @@ export function AppRouter() {
           <Route path="/admin/songs" element={<AdminSongsPage />} />
           <Route path="/admin/users" element={<AdminUsersPage />} />
           <Route path="/admin/newsletter" element={<AdminNewsletterPage />} />
+          <Route path="/admin/products" element={<AdminProductsPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

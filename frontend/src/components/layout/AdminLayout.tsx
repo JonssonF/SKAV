@@ -11,6 +11,7 @@ const adminItems = [
   { label: 'Album', path: '/admin/albums' },
   { label: 'Låtar', path: '/admin/songs' },
   { label: 'Nyhetsbrev', path: '/admin/newsletter' },
+  { label: 'Produkter', path: '/admin/products' },
 ];
 
 export function AdminLayout() {

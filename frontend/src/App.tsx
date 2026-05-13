@@ -4,6 +4,7 @@ import { Notifications } from '@mantine/notifications';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './providers/AuthProvider';
 import { AppRouter } from './routes/AppRouter';
+import '@mantine/carousel/styles.css';
 
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
