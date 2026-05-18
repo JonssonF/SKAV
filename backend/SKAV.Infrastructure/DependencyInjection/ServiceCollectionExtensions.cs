@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Dapper;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SKAV.Application.Interfaces.Repositories;
 using SKAV.Application.Interfaces.UoW;
@@ -42,6 +43,8 @@ namespace SKAV.Infrastructure.DependencyInjection
             services.AddTransient<DatabaseInitializer>();
             services.AddScoped<SeedData>();
             services.AddScoped<IEmailService, ResendEmailService>();
+
+            SqlMapper.AddTypeHandler(new DateTimeOffsetHandler());
 
             // UnitOfWork registrations
             services.AddScoped<UnitOfWork>();
