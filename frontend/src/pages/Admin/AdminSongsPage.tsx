@@ -35,7 +35,6 @@ export function AdminSongsPage() {
 
       <SongsTable
         songs={admin.songs}
-        albums={admin.albums}
         onEdit={admin.openEdit}
         onDelete={admin.handleDelete}
         onLyrics={admin.openLyrics}

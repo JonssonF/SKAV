@@ -5,7 +5,6 @@ import { HomePage } from '../pages/HomePage';
 import { LoginPage } from '../pages/LoginPage';
 import { AdminDashboardPage } from '../pages/Admin/AdminDashboardPage';
 import { AdminGigsPage } from '../pages/Admin/AdminGigsPage';
-import { AdminAlbumPage } from '../pages/Admin/AdminAlbumPage';
 import { AdminSongsPage } from '../pages/Admin/AdminSongsPage';
 import { AdminMembersPage } from '../pages/Admin/AdminMembersPage';
 import { ProtectedRoute } from './ProtectedRoute';
@@ -44,7 +43,6 @@ export function AppRouter() {
           }
         >
           <Route path="/admin" element={<AdminDashboardPage />} />
-          <Route path="/admin/albums" element={<AdminAlbumPage />} />
           <Route path="/admin/members" element={<AdminMembersPage />} />
           <Route path="/admin/gigs" element={<AdminGigsPage />} />
           <Route path="/admin/songs" element={<AdminSongsPage />} />

@@ -8,7 +8,6 @@ const adminItems = [
   { label: 'Användare', path: '/admin/users' },
   { label: 'Medlemmar', path: '/admin/members' },
   { label: 'Spelningar', path: '/admin/gigs' },
-  { label: 'Album', path: '/admin/albums' },
   { label: 'Låtar', path: '/admin/songs' },
   { label: 'Nyhetsbrev', path: '/admin/newsletter' },
   { label: 'Produkter', path: '/admin/products' },
