@@ -42,15 +42,20 @@ namespace SKAV.Application.Services
             await albumValidator.ValidateAlbumExistsAsync(request.AlbumId, ct);
             await songValidator.ValidateCreateAsync(request, ct);
 
+
             var song = new Song
             {
                 AlbumId = request.AlbumId,
                 Title = request.Title,
                 DurationSeconds = request.DurationSeconds,
                 SpotifyUrl = request.SpotifyUrl,
-                Writer = request.Writer,
+                MusicWriter = request.MusicWriter,
+                LyricsWriter = request.LyricsWriter,
                 TrackNumber = request.TrackNumber,
+                YoutubeUrl = request.YoutubeUrl,
+                Year = request.Year,
             };
+            
 
             AuditHelper.SetCreated(song, currentUser.UserId);
 
@@ -69,14 +74,15 @@ namespace SKAV.Application.Services
             await albumValidator.ValidateAlbumExistsAsync(request.AlbumId, ct);
             await songValidator.ValidateUpdateAsync(id, request, ct);
 
-
-
             existing.AlbumId = request.AlbumId;
             existing.Title = request.Title;
             existing.DurationSeconds = request.DurationSeconds;
             existing.SpotifyUrl = request.SpotifyUrl;
-            existing.Writer = request.Writer;
+            existing.MusicWriter = request.MusicWriter;
+            existing.LyricsWriter = request.LyricsWriter;
             existing.TrackNumber = request.TrackNumber;
+            existing.YoutubeUrl = request.YoutubeUrl;
+            existing.Year = request.Year;
 
             AuditHelper.SetUpdated(existing, currentUser.UserId);
 
@@ -108,8 +114,11 @@ namespace SKAV.Application.Services
             Title = s.Title,
             DurationSeconds = s.DurationSeconds,
             SpotifyUrl = s.SpotifyUrl,
-            Writer = s.Writer,
+            MusicWriter = s.MusicWriter,
+            LyricsWriter = s.LyricsWriter,
             TrackNumber = s.TrackNumber,
+            YoutubeUrl = s.YoutubeUrl,
+            Year = s.Year,
         };
     }
 }

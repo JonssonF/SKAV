@@ -8,10 +8,10 @@
         public string? Phone { get; init; }
         public string? Message { get; init; }
         public bool IsHandled { get; init; }
-        public DateTime? HandledAt { get; init; }
+        public DateTimeOffset? HandledAt { get; init; }
         public int? HandledBy { get; init; }
         public string? HandledByEmail { get; init; }
-        public DateTime CreatedAt { get; init; }
+        public DateTimeOffset CreatedAt { get; init; }
         public List<ProductOrderItemDto> Items { get; init; } = [];
     }
 }

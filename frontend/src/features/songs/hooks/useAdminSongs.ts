@@ -4,6 +4,7 @@ import { useSongs, useCreateSong, useUpdateSong, useDeleteSong } from './useSong
 import { useCreateLyrics, useUpdateLyrics } from '../../lyrics/hooks/useLyrics';
 import { lyricsApi } from '../../../api/lyrics.api';
 import { getApiErrors, getApiMessage } from '../../../utils/getApiErrors';
+import { useAlbums } from '../../albums/hooks/useAlbums';
 import type { SongResponse, CreateSongRequest, UpdateSongRequest } from '../../../types/song.types';
 import type { LyricsResponse } from '../../../types/lyrics.types';
 
@@ -15,6 +16,7 @@ export function useAdminSongs() {
   const deleteSong = useDeleteSong();
   const createLyrics = useCreateLyrics();
   const updateLyrics = useUpdateLyrics();
+  const { data: albums } = useAlbums();
 
   // Create modal state
   const [createOpen, setCreateOpen] = useState(false);
@@ -178,6 +180,7 @@ export function useAdminSongs() {
 
   return {
     songs: songs ?? [],
+    albums: albums ?? [],
     isLoading,
     error,
 

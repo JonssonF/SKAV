@@ -436,21 +436,21 @@ namespace SKAV.Infrastructure.Database
             var songs = new List<Song>
             {
                 // Album 1 - Från Derome med kärlek
-                new() { AlbumId = 1, Title = "Byvägen hem", TrackNumber = 1, DurationSeconds = 215, Writer = "Klas" },
-                new() { AlbumId = 1, Title = "Regn i juli", TrackNumber = 2, DurationSeconds = 192, Writer = "Maja" },
-                new() { AlbumId = 1, Title = "Garagerock", TrackNumber = 3, DurationSeconds = 178, Writer = "Pelle" },
-                new() { AlbumId = 1, Title = "Sista ölen", TrackNumber = 4, DurationSeconds = 245, Writer = "Klas & Maja" },
-                new() { AlbumId = 1, Title = "Derome blues", TrackNumber = 5, DurationSeconds = 302, Writer = "Klas" },
+                new() { AlbumId = 1, Title = "Byvägen hem", TrackNumber = 1, DurationSeconds = 215, LyricsWriter = "Klas", MusicWriter = "Klas" },
+                new() { AlbumId = 1, Title = "Regn i juli", TrackNumber = 2, DurationSeconds = 192, LyricsWriter = "Maja", MusicWriter = "Klas" },
+                new() { AlbumId = 1, Title = "Garagerock", TrackNumber = 3, DurationSeconds = 178, LyricsWriter = "Pelle", MusicWriter = "Klas" },
+                new() { AlbumId = 1, Title = "Sista ölen", TrackNumber = 4, DurationSeconds = 245, LyricsWriter = "Klas & Maja", MusicWriter = "Klas" },
+                new() { AlbumId = 1, Title = "Derome blues", TrackNumber = 5, DurationSeconds = 302, LyricsWriter = "Klas", MusicWriter = "Klas" },
 
                 // Album 2 - Andra varvet
-                new() { AlbumId = 2, Title = "Full gas", TrackNumber = 1, DurationSeconds = 168, Writer = "Pelle" },
-                new() { AlbumId = 2, Title = "Nattskift", TrackNumber = 2, DurationSeconds = 234, Writer = "Klas" },
-                new() { AlbumId = 2, Title = "Motorvägen", TrackNumber = 3, DurationSeconds = 199, Writer = "Maja & Pelle" },
-                new() { AlbumId = 2, Title = "Svart kaffe", TrackNumber = 4, DurationSeconds = 221, Writer = "Jonas" },
+                new() { AlbumId = 2, Title = "Full gas", TrackNumber = 1, DurationSeconds = 168, LyricsWriter = "Pelle", MusicWriter = "Klas" },
+                new() { AlbumId = 2, Title = "Nattskift", TrackNumber = 2, DurationSeconds = 234, LyricsWriter = "Klas", MusicWriter = "Klas" },
+                new() { AlbumId = 2, Title = "Motorvägen", TrackNumber = 3, DurationSeconds = 199, LyricsWriter = "Maja & Pelle", MusicWriter = "Klas" },
+                new() { AlbumId = 2, Title = "Svart kaffe", TrackNumber = 4, DurationSeconds = 221, LyricsWriter = "Jonas", MusicWriter = "Klas" },
 
                 // Singlar (inget album)
-                new() { Title = "Sommar i stan", DurationSeconds = 203, Writer = "Klas" },
-                new() { Title = "Vintervila", DurationSeconds = 267, Writer = "Maja" },
+                new() { Title = "Sommar i stan", DurationSeconds = 203, LyricsWriter = "Klas", MusicWriter = "Klas" },
+                new() { Title = "Vintervila", DurationSeconds = 267, LyricsWriter = "Maja", MusicWriter = "Klas" },
             };
 
             using var scope = uow.BeginTransactionScope();

@@ -50,8 +50,14 @@ function SongRow({ song, index, lyrics }: { song: SongResponse; index: number; l
                 </Badge>
               )}
             </Group>
-            {song.writer && (
-              <Text size="xs" c="dimmed">{song.writer}</Text>
+            {(song.musicWriter || song.lyricsWriter || song.year) && (
+              <Text size="xs" c="dimmed">
+                {song.year && `${song.year}`}
+                {song.year && (song.musicWriter || song.lyricsWriter) && ' · '}
+                {song.musicWriter && `Musik: ${song.musicWriter}`}
+                {song.musicWriter && song.lyricsWriter && ' · '}
+                {song.lyricsWriter && `Text: ${song.lyricsWriter}`}
+              </Text>
             )}
           </div>
         </Group>
@@ -66,6 +72,18 @@ function SongRow({ song, index, lyrics }: { song: SongResponse; index: number; l
               onClick={(e: React.MouseEvent) => e.stopPropagation()}
             >
               Spotify
+            </Text>
+          )}
+          {song.youtubeUrl && (
+            <Text
+              size="xs"
+              component="a"
+              href={song.youtubeUrl}
+              target="_blank"
+              c="red"
+              onClick={(e: React.MouseEvent) => e.stopPropagation()}
+            >
+              YouTube
             </Text>
           )}
           <Text size="sm" c="dimmed">{formatDuration(song.durationSeconds)}</Text>
