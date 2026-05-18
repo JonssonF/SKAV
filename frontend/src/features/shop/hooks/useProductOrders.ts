@@ -25,3 +25,15 @@ export function useHandleProductOrder() {
     },
   });
 }
+
+export function useCancelProductOrder() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => productOrdersApi.cancel(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['productOrders'] });
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+    },
+  });
+}

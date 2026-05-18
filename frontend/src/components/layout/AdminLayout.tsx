@@ -1,7 +1,7 @@
-import { AppShell, NavLink, Title, Group, Button, ActionIcon } from '@mantine/core';
+import { AppShell, NavLink, Title, Group, Button, ActionIcon, Burger } from '@mantine/core';
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../../providers/AuthProvider';
-import { useLocalStorage } from '@mantine/hooks';
+import { useLocalStorage, useDisclosure } from '@mantine/hooks';
 
 const adminItems = [
   { label: 'Dashboard', path: '/admin' },
@@ -17,6 +17,7 @@ export function AdminLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const [opened, { toggle, close }] = useDisclosure();
   const [colorScheme, setColorScheme] = useLocalStorage<'light' | 'dark'>({
     key: 'color-scheme',
     defaultValue: 'dark',
@@ -27,21 +28,29 @@ export function AdminLayout() {
     navigate('/');
   };
 
+  const handleNavigate = (path: string) => {
+    navigate(path);
+    close();
+  };
+
   return (
     <AppShell
       header={{ height: 60 }}
-      navbar={{ width: 200, breakpoint: 'sm' }}
+      navbar={{ width: 200, breakpoint: 'sm', collapsed: { mobile: !opened } }}
       padding="md"
     >
       <AppShell.Header>
         <Group h="100%" px="md" justify="space-between">
-          <Title
-            order={3}
-            style={{ cursor: 'pointer' }}
-            onClick={() => navigate('/')}
-          >
-            SKAV
-          </Title>
+          <Group gap="sm">
+            <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
+            <Title
+              order={3}
+              style={{ cursor: 'pointer' }}
+              onClick={() => handleNavigate('/')}
+            >
+              SKAV
+            </Title>
+          </Group>
           <Group gap="sm">
             <ActionIcon
               variant="subtle"
@@ -50,7 +59,7 @@ export function AdminLayout() {
             >
               {colorScheme === 'dark' ? '☀️' : '🌙'}
             </ActionIcon>
-            <Button variant="subtle" size="xs" color="gray" onClick={() => navigate('/')}>
+            <Button variant="subtle" size="xs" color="gray" onClick={() => handleNavigate('/')} visibleFrom="sm">
               Till hemsidan
             </Button>
             <Button variant="subtle" size="xs" color="gray" onClick={handleLogout}>
@@ -66,7 +75,7 @@ export function AdminLayout() {
             key={item.path}
             label={item.label}
             active={location.pathname === item.path}
-            onClick={() => navigate(item.path)}
+            onClick={() => handleNavigate(item.path)}
           />
         ))}
       </AppShell.Navbar>

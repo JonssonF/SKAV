@@ -8,5 +8,6 @@ namespace SKAV.Application.Services.Interface
         Task<ProductOrderResponseDto> GetByIdAsync(int id, CancellationToken ct);
         Task<CreateProductOrderResponseDto> CreateAsync(CreateProductOrderRequestDto request, CancellationToken ct);
         Task<HandleProductOrderResponseDto> HandleAsync(int id, CancellationToken ct);
+        Task<CancelProductOrderResponseDto> CancelAsync(int id, CancellationToken ct);
     }
 }

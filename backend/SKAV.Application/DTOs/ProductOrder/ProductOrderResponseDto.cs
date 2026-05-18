@@ -11,6 +11,11 @@
         public DateTimeOffset? HandledAt { get; init; }
         public int? HandledBy { get; init; }
         public string? HandledByEmail { get; init; }
+        public bool IsCancelled { get; init; }
+        public DateTimeOffset? CancelledAt { get; init; }
+        public int? CancelledBy { get; init; }
+        public string? CancelledByEmail { get; init; }
+        public DateTimeOffset? CreatedAt { get; init; }
         public DateTimeOffset CreatedAt { get; init; }
         public List<ProductOrderItemDto> Items { get; init; } = [];
     }

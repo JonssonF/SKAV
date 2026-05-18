@@ -140,6 +140,52 @@ namespace SKAV.Application.Services
             return new HandleProductOrderResponseDto();
         }
 
+        public async Task<CancelProductOrderResponseDto> CancelAsync(int id, CancellationToken ct)
+        {
+            var order = await orderRepo.GetByIdAsync(id, ct)
+                ?? throw new NotFoundException(BusinessRules.ProductOrderNotFound);
+
+            if (order.IsCancelled)
+                throw new BusinessRuleException(
+                    "Beställningen är redan avbruten.",
+                    BusinessRules.ProductOrderAlreadyCancelled);
+
+            if (order.IsHandled)
+                throw new BusinessRuleException(
+                    "Beställningen är redan hanterad och kan inte avbrytas.",
+                    BusinessRules.ProductOrderAlreadyHandled);
+
+            // Hämta order items och lägg tillbaka lager
+            var items = await itemRepo.GetByOrderIdAsync(order.Id, ct);
+
+            order.IsCancelled = true;
+            order.CancelledAt = DateTime.UtcNow;
+            order.CancelledBy = currentUser.UserId;
+
+            using var scope = uow.BeginTransactionScope();
+
+            await orderRepo.UpdateAsync(order, ct);
+
+            foreach (var item in items)
+            {
+                var variant = await variantRepo.GetByIdAsync(item.ProductVariantId, ct);
+                if (variant != null)
+                {
+                    variant.StockQuantity += item.Quantity;
+                    AuditHelper.SetUpdated(variant, currentUser.UserId);
+                    var affected = await variantRepo.UpdateWithVersionCheckAsync(variant, ct);
+                    if (affected == 0)
+                        throw new BusinessRuleException(
+                            "Kunde inte uppdatera lagersaldo. Försök igen.",
+                            BusinessRules.ProductConcurrencyError);
+                }
+            }
+
+            await scope.CommitTransactionScopeAsync(ct);
+
+            return new CancelProductOrderResponseDto();
+        }
+
         private static ProductOrderResponseDto MapToDto(
             ProductOrder order,
             IEnumerable<ProductOrderItem> items,
@@ -158,20 +204,26 @@ namespace SKAV.Application.Services
                 HandledByEmail = order.HandledBy.HasValue && userLookup.ContainsKey(order.HandledBy.Value)
                 ? userLookup[order.HandledBy.Value]
                 : null,
+                IsCancelled = order.IsCancelled,
+                CancelledAt = order.CancelledAt,
+                CancelledBy = order.CancelledBy,
+                CancelledByEmail = order.CancelledBy.HasValue && userLookup.ContainsKey(order.CancelledBy.Value)
+                ? userLookup[order.CancelledBy.Value]
+                : null,
                 CreatedAt = order.CreatedAt,
                 Items = items.Select(i => new ProductOrderItemDto
                 {
                     ProductId = i.ProductId,
                     ProductTitle = productLookup.ContainsKey(i.ProductId)
-                        ? productLookup[i.ProductId].Title
-                        : "Okänd produkt",
+                ? productLookup[i.ProductId].Title
+                : "Okänd produkt",
                     ProductPrice = productLookup.ContainsKey(i.ProductId)
-                        ? productLookup[i.ProductId].Price
-                        : 0,
+                ? productLookup[i.ProductId].Price
+                : 0,
                     ProductVariantId = i.ProductVariantId,
                     VariantAttributes = variantLookup.ContainsKey(i.ProductVariantId)
-                        ? variantLookup[i.ProductVariantId].Attributes
-                        : "{}",
+                ? variantLookup[i.ProductVariantId].Attributes
+                : "{}",
                     Quantity = i.Quantity,
                 }).ToList(),
             };

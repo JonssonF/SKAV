@@ -41,6 +41,22 @@ namespace SKAV.Infrastructure.Database
             await SeedProductOrderRecipientsAsync(ct);
         }
 
+        private async Task SeedUsersAsync(CancellationToken ct)
+        {
+            var existing = await memberRepo.GetAllAsync(ct);
+            if (existing.Any()) return;
+            var admin = new Member
+            {
+                Name = "Admin",
+                Quote = "Jag har full koll på allt!",
+                DisplayOrder = 0,
+            };
+            AuditHelper.SetCreated(admin, null);
+            using var scope = uow.BeginTransactionScope();
+            await memberRepo.CreateAsync(admin, ct);
+            await scope.CommitTransactionScopeAsync(ct);
+        }
+
         private async Task SeedProductsAsync(CancellationToken ct)
         {
             var existing = await productRepo.GetAllAsync(ct);

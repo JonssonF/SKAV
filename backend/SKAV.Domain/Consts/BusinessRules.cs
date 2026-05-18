@@ -36,6 +36,8 @@
         public const string MemberInstrumentNotFound = "MemberInstrumentNotFound";
 
         // Products
+        public const string ProductOrderAlreadyHandled = "ProductOrderAlreadyHandled";
+        public const string ProductOrderAlreadyCancelled = "ProductOrderAlreadyCancelled";
         public const string ProductNotFound = "ProductNotFound";
         public const string ProductOutOfStock = "ProductOutOfStock";
         public const string ProductConcurrencyError = "ProductConcurrencyError";

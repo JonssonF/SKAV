@@ -25,6 +25,8 @@ import { useProductOrderRecipients, useCreateProductOrderRecipient, useDeletePro
 import { useSubscribers } from '../../features/subscribers/hooks/useSubscribers';
 import { getApiMessage } from '../../utils/getApiErrors';
 import { IconTrash } from '@tabler/icons-react';
+import { useSubscribers } from '../../features/subscribers/hooks/useSubscribers';
+import { useProductOrders, useHandleProductOrder, useCancelProductOrder } from '../../features/shop/hooks/useProductOrders';
 
 export function AdminDashboardPage() {
   const { user } = useAuth();
@@ -32,6 +34,10 @@ export function AdminDashboardPage() {
   // Bokningar
   const { data: bookings, isLoading: bookingsLoading, error: bookingsError } = useBookingRequests();
   const markAsRead = useMarkBookingRead();
+  const cancelOrder = useCancelProductOrder();
+  const { data: recipients, isLoading: recipientsLoading } = useBookingRecipients();
+  const createRecipient = useCreateBookingRecipient();
+  const deleteRecipient = useDeleteBookingRecipient();
   const { data: bookingRecipients, isLoading: bookingRecipientsLoading } = useBookingRecipients();
   const createBookingRecipient = useCreateBookingRecipient();
   const deleteBookingRecipient = useDeleteBookingRecipient();

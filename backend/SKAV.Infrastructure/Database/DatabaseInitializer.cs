@@ -259,6 +259,9 @@ namespace SKAV.Infrastructure.Database
                     IsHandled INTEGER NOT NULL DEFAULT 0,
                     HandledAt TEXT,
                     HandledBy INTEGER,
+                    IsCancelled INTEGER NOT NULL DEFAULT 0,
+                    CancelledAt TEXT,
+                    CancelledBy INTEGER,
                     CreatedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     CreatedBy INTEGER,
                     UpdatedAt TEXT,
@@ -349,25 +352,34 @@ namespace SKAV.Infrastructure.Database
             var adminPassword = configuration["Seed:AdminPassword"]
                 ?? throw new InvalidOperationException("Admin seed password not configured.");
 
-            var exists = await connection.ExecuteScalarAsync<int>(
-                "SELECT COUNT(1) FROM Users WHERE Email = @Email",
-                new { Email = "admin@skav.se" });
+            var users = new[]
+            {
+        new { Email = "admin@skav.se", Roles = 1 },   // Admin
+        new { Email = "editor@skav.se", Roles = 2 },   // Editor
+        new { Email = "member@skav.se", Roles = 4 },   // Member
+    };
 
-            if (exists > 0)
-                return;
+            foreach (var user in users)
+            {
+                var exists = await connection.ExecuteScalarAsync<int>(
+                    "SELECT COUNT(1) FROM Users WHERE Email = @Email",
+                    new { user.Email });
 
-            var hash = BCrypt.Net.BCrypt.HashPassword(adminPassword);
+                if (exists > 0) continue;
 
-            await connection.ExecuteAsync(@"
-                INSERT OR IGNORE INTO Users (Email, PasswordHash, Roles, CreatedAt)
-                VALUES (@Email, @PasswordHash, @Roles, @CreatedAt)",
-                new
-                {
-                    Email = "admin@skav.se",
-                    PasswordHash = hash,
-                    Roles = 1,
-                    CreatedAt = DateTime.UtcNow.ToString("O")
-                });
+                var hash = BCrypt.Net.BCrypt.HashPassword(adminPassword);
+
+                await connection.ExecuteAsync(@"
+            INSERT OR IGNORE INTO Users (Email, PasswordHash, Roles, CreatedAt)
+            VALUES (@Email, @PasswordHash, @Roles, @CreatedAt)",
+                    new
+                    {
+                        user.Email,
+                        PasswordHash = hash,
+                        user.Roles,
+                        CreatedAt = DateTime.UtcNow.ToString("O")
+                    });
+            }
         }
     }
 }
