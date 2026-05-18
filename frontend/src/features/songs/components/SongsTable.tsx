@@ -1,6 +1,5 @@
-import { Table, Group, Button, Text, Badge } from '@mantine/core';
+import { Table, Group, Button, Text } from '@mantine/core';
 import type { SongResponse } from '../../../types/song.types';
-import type { AlbumResponse } from '../../../types/album.types';
 
 function formatDuration(seconds?: number): string {
   if (!seconds) return '-';
@@ -11,19 +10,13 @@ function formatDuration(seconds?: number): string {
 
 interface SongsTableProps {
   songs: SongResponse[];
-  albums: AlbumResponse[];
   onEdit: (song: SongResponse) => void;
   onDelete: (song: SongResponse) => void;
   onLyrics: (song: SongResponse) => void;
   deleteLoading?: boolean;
 }
 
-export function SongsTable({ songs, albums, onEdit, onDelete, onLyrics, deleteLoading }: SongsTableProps) {
-  const getAlbumTitle = (albumId?: number) => {
-    if (!albumId) return null;
-    return albums.find((a) => a.id === albumId)?.title ?? null;
-  };
-
+export function SongsTable({ songs, onEdit, onDelete, onLyrics, deleteLoading }: SongsTableProps) {
   if (songs.length === 0) {
     return <Text c="dimmed">Inga låtar än. Skapa den första!</Text>;
   }
@@ -33,8 +26,7 @@ export function SongsTable({ songs, albums, onEdit, onDelete, onLyrics, deleteLo
       <Table.Thead>
         <Table.Tr>
           <Table.Th>Titel</Table.Th>
-          <Table.Th>Album</Table.Th>
-          <Table.Th>Spår</Table.Th>
+          <Table.Th>Låtskrivare</Table.Th>
           <Table.Th>Längd</Table.Th>
           <Table.Th />
         </Table.Tr>
@@ -42,14 +34,15 @@ export function SongsTable({ songs, albums, onEdit, onDelete, onLyrics, deleteLo
       <Table.Tbody>
         {songs.map((song) => (
           <Table.Tr key={song.id}>
-            <Table.Td>{song.title}</Table.Td>
             <Table.Td>
-              {getAlbumTitle(song.albumId) ?? (
-                <Badge variant="light" color="gray" size="sm">Singel</Badge>
-              )}
+              <Text size="sm" fw={500}>{song.title}</Text>
             </Table.Td>
-            <Table.Td>{song.trackNumber ?? '-'}</Table.Td>
-            <Table.Td>{formatDuration(song.durationSeconds)}</Table.Td>
+            <Table.Td>
+              <Text size="sm" c="dimmed">{song.writer ?? '–'}</Text>
+            </Table.Td>
+            <Table.Td>
+              <Text size="sm" c="dimmed">{formatDuration(song.durationSeconds)}</Text>
+            </Table.Td>
             <Table.Td>
               <Group gap="xs">
                 <Button variant="light" color="violet" size="xs" onClick={() => onLyrics(song)}>
