@@ -6,6 +6,9 @@
         public required string Name { get; init; }
         public required string Email { get; init; }
         public string? Phone { get; init; }
+        public string? Address { get; init; }
+        public string? City { get; init; }
+        public string? PostalCode { get; init; }
         public string? Message { get; init; }
         public bool IsHandled { get; init; }
         public DateTimeOffset? HandledAt { get; init; }
@@ -16,7 +19,6 @@
         public int? CancelledBy { get; init; }
         public string? CancelledByEmail { get; init; }
         public DateTimeOffset? CreatedAt { get; init; }
-        public DateTimeOffset CreatedAt { get; init; }
         public List<ProductOrderItemDto> Items { get; init; } = [];
     }
 }

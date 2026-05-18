@@ -20,13 +20,11 @@ import { notifications } from '@mantine/notifications';
 import { useAuth } from '../../providers/AuthProvider';
 import { useBookingRequests, useMarkBookingRead } from '../../features/booking/hooks/useBookingRequests';
 import { useBookingRecipients, useCreateBookingRecipient, useDeleteBookingRecipient } from '../../features/booking/hooks/useBookingRecipients';
-import { useProductOrders, useHandleProductOrder } from '../../features/shop/hooks/useProductOrders';
+import { useProductOrders, useHandleProductOrder, useCancelProductOrder } from '../../features/shop/hooks/useProductOrders';
 import { useProductOrderRecipients, useCreateProductOrderRecipient, useDeleteProductOrderRecipient } from '../../features/shop/hooks/useProductOrderRecipients';
 import { useSubscribers } from '../../features/subscribers/hooks/useSubscribers';
 import { getApiMessage } from '../../utils/getApiErrors';
 import { IconTrash } from '@tabler/icons-react';
-import { useSubscribers } from '../../features/subscribers/hooks/useSubscribers';
-import { useProductOrders, useHandleProductOrder, useCancelProductOrder } from '../../features/shop/hooks/useProductOrders';
 
 export function AdminDashboardPage() {
   const { user } = useAuth();
@@ -34,10 +32,6 @@ export function AdminDashboardPage() {
   // Bokningar
   const { data: bookings, isLoading: bookingsLoading, error: bookingsError } = useBookingRequests();
   const markAsRead = useMarkBookingRead();
-  const cancelOrder = useCancelProductOrder();
-  const { data: recipients, isLoading: recipientsLoading } = useBookingRecipients();
-  const createRecipient = useCreateBookingRecipient();
-  const deleteRecipient = useDeleteBookingRecipient();
   const { data: bookingRecipients, isLoading: bookingRecipientsLoading } = useBookingRecipients();
   const createBookingRecipient = useCreateBookingRecipient();
   const deleteBookingRecipient = useDeleteBookingRecipient();
@@ -45,6 +39,7 @@ export function AdminDashboardPage() {
   // Köpförfrågningar
   const { data: orders, isLoading: ordersLoading, error: ordersError } = useProductOrders();
   const handleOrder = useHandleProductOrder();
+  const cancelOrder = useCancelProductOrder();
   const { data: orderRecipients, isLoading: orderRecipientsLoading } = useProductOrderRecipients();
   const createOrderRecipient = useCreateProductOrderRecipient();
   const deleteOrderRecipient = useDeleteProductOrderRecipient();
@@ -368,8 +363,12 @@ export function AdminDashboardPage() {
                 radius="md"
                 withBorder
                 style={{
-                  opacity: order.isHandled ? 0.7 : 1,
-                  borderLeft: order.isHandled ? undefined : '3px solid var(--mantine-color-orange-filled)',
+                  opacity: order.isHandled || order.isCancelled ? 0.7 : 1,
+                  borderLeft: order.isCancelled
+                    ? '3px solid var(--mantine-color-red-filled)'
+                    : order.isHandled
+                      ? undefined
+                      : '3px solid var(--mantine-color-orange-filled)',
                   cursor: 'pointer',
                 }}
                 onClick={() => setExpandedOrderId(expandedOrderId === order.id ? null : order.id)}
@@ -381,7 +380,10 @@ export function AdminDashboardPage() {
                       {order.items.length} {order.items.length === 1 ? 'produkt' : 'produkter'}
                     </Badge>
                     <Badge variant="light" size="sm">{totalPrice} kr</Badge>
-                    {!order.isHandled && (
+                    {order.isCancelled && (
+                      <Badge color="red" size="sm">Avbruten</Badge>
+                    )}
+                    {!order.isHandled && !order.isCancelled && (
                       <Badge color="orange" size="sm">Ny</Badge>
                     )}
                   </Group>
@@ -397,20 +399,30 @@ export function AdminDashboardPage() {
 
                 <Collapse expanded={expandedOrderId === order.id}>
                   <div style={{ paddingTop: 12 }} onClick={(e) => e.stopPropagation()}>
-                    <Table withRowBorders={false} mb="sm">
-                      <Table.Tbody>
-                        <Table.Tr>
-                          <Table.Td w={100}><Text size="sm" c="dimmed">E-post</Text></Table.Td>
-                          <Table.Td><Text size="sm">{order.email}</Text></Table.Td>
-                        </Table.Tr>
-                        {order.phone && (
-                          <Table.Tr>
-                            <Table.Td><Text size="sm" c="dimmed">Telefon</Text></Table.Td>
-                            <Table.Td><Text size="sm">{order.phone}</Text></Table.Td>
-                          </Table.Tr>
-                        )}
-                      </Table.Tbody>
-                    </Table>
+                <Table withRowBorders={false} mb="sm">
+                  <Table.Tbody>
+                    <Table.Tr>
+                      <Table.Td w={100}><Text size="sm" c="dimmed">E-post</Text></Table.Td>
+                      <Table.Td><Text size="sm">{order.email}</Text></Table.Td>
+                    </Table.Tr>
+                    {order.phone && (
+                      <Table.Tr>
+                        <Table.Td><Text size="sm" c="dimmed">Telefon</Text></Table.Td>
+                        <Table.Td><Text size="sm">{order.phone}</Text></Table.Td>
+                      </Table.Tr>
+                    )}
+                    {(order.address || order.city || order.postalCode) && (
+                      <Table.Tr>
+                        <Table.Td><Text size="sm" c="dimmed">Adress</Text></Table.Td>
+                        <Table.Td>
+                          <Text size="sm">
+                            {[order.address, `${order.postalCode ?? ''} ${order.city ?? ''}`.trim()].filter(Boolean).join(', ')}
+                          </Text>
+                        </Table.Td>
+                      </Table.Tr>
+                    )}
+                  </Table.Tbody>
+                </Table>
 
                     {/* Produktlista */}
                     <Table mb="sm">
@@ -444,8 +456,17 @@ export function AdminDashboardPage() {
                     {order.message && (
                       <Text size="sm" mb="md">{order.message}</Text>
                     )}
-
-                    {order.isHandled ? (
+                    {order.isCancelled ? (
+                      <Text size="xs" c="red" ta="right">
+                        Avbruten av {order.cancelledByEmail ?? 'okänd'}{' '}
+                        {order.cancelledAt && new Date(order.cancelledAt).toLocaleDateString('sv-SE', {
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </Text>
+                    ) : order.isHandled ? (
                       <Text size="xs" c="dimmed" ta="right">
                         Hanterad av {order.handledByEmail ?? 'okänd'}{' '}
                         {order.handledAt && new Date(order.handledAt).toLocaleDateString('sv-SE', {
@@ -456,7 +477,20 @@ export function AdminDashboardPage() {
                         })}
                       </Text>
                     ) : (
-                      <Group justify="flex-end">
+                      <Group justify="flex-end" gap="sm">
+                        <Badge
+                          variant="light"
+                          color="red"
+                          size="lg"
+                          style={{ cursor: 'pointer' }}
+                          onClick={() => {
+                            if (window.confirm('Vill du avbryta denna beställning? Lagersaldo återställs.')) {
+                              cancelOrder.mutate(order.id);
+                            }
+                          }}
+                        >
+                          Avbryt beställning
+                        </Badge>
                         <Badge
                           variant="light"
                           color="green"

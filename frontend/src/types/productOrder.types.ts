@@ -12,6 +12,9 @@ export interface ProductOrderResponse {
   name: string;
   email: string;
   phone?: string;
+  address?: string;
+  city?: string;
+  postalCode?: string;
   message?: string;
   isHandled: boolean;
   handledAt?: string;
@@ -29,6 +32,9 @@ export interface CreateProductOrderRequest {
   name: string;
   email: string;
   phone?: string;
+  address?: string;
+  city?: string;
+  postalCode?: string;
   message?: string;
   items: CreateProductOrderItemRequest[];
 }

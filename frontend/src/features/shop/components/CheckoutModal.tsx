@@ -17,7 +17,15 @@ interface CheckoutModalProps {
   onClose: () => void;
   items: CartItem[];
   totalPrice: number;
-  onSubmit: (data: { name: string; email: string; phone?: string; message?: string }) => void;
+  onSubmit: (data: {
+    name: string;
+    email: string;
+    phone?: string;
+    message?: string;
+    address?: string;
+    city?: string;
+    postalCode?: string;
+  }) => void;
   loading?: boolean;
   errors?: Record<string, string> | null;
 }
@@ -35,6 +43,9 @@ export function CheckoutModal({
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [message, setMessage] = useState('');
+  const [address, setAddress] = useState('');
+  const [city, setCity] = useState('');
+  const [postalCode, setPostalCode] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,6 +54,9 @@ export function CheckoutModal({
       email,
       phone: phone || undefined,
       message: message || undefined,
+      address: address || undefined,
+      city: city || undefined,
+      postalCode: postalCode || undefined,
     });
   };
 
@@ -113,7 +127,31 @@ export function CheckoutModal({
               onChange={(e) => setPhone(e.currentTarget.value)}
               error={errors?.phone}
             />
+            <TextInput
+              label="Adress"
+              placeholder="Gatuadress (valfritt)"
+              value={address}
+              onChange={(e) => setAddress(e.currentTarget.value)}
+              error={errors?.address}
+            />
 
+            <Group grow>
+              <TextInput
+                label="Postnummer"
+                placeholder="12345"
+                value={postalCode}
+                onChange={(e) => setPostalCode(e.currentTarget.value)}
+                error={errors?.postalCode}
+              />
+
+              <TextInput
+                label="Ort"
+                placeholder="Derome"
+                value={city}
+                onChange={(e) => setCity(e.currentTarget.value)}
+                error={errors?.city}
+              />
+            </Group>
             <Textarea
               label="Meddelande"
               placeholder="Önskemål, leveransinfo etc. (valfritt)"

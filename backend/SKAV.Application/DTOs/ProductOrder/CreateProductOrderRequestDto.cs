@@ -17,6 +17,15 @@ namespace SKAV.Application.DTOs.ProductOrder
         [MaxLength(20, ErrorMessage = "Max {1} tecken")]
         public string? Phone { get; set; }
 
+        [MaxLength(200, ErrorMessage = "Max {1} tecken")]
+        public string? Address { get; set; }
+
+        [MaxLength(100, ErrorMessage = "Max {1} tecken")]
+        public string? City { get; set; }
+
+        [MaxLength(10, ErrorMessage = "Max {1} tecken")]
+        public string? PostalCode { get; set; }
+
         [MaxLength(1000, ErrorMessage = "Max {1} tecken")]
         [DefaultValue("Storlek M tack!")]
         public string? Message { get; set; }

@@ -85,7 +85,11 @@ namespace SKAV.Application.Services
                 Email = request.Email,
                 Phone = request.Phone,
                 Message = request.Message,
+                Address = request.Address,
+                City = request.City,
+                PostalCode = request.PostalCode,
                 IsHandled = false,
+                IsCancelled = false,
             };
 
             AuditHelper.SetCreated(order, null);
@@ -197,6 +201,9 @@ namespace SKAV.Application.Services
                 Name = order.Name,
                 Email = order.Email,
                 Phone = order.Phone,
+                Address = order.Address,
+                City = order.City,
+                PostalCode = order.PostalCode,
                 Message = order.Message,
                 IsHandled = order.IsHandled,
                 HandledAt = order.HandledAt,
