@@ -10,7 +10,7 @@ namespace SKAV.Domain.Entities
         public string? Phone { get; set; }
         public string? Message { get; set; }
         public bool IsHandled { get; set; }
-        public DateTime? HandledAt { get; set; }
+        public DateTimeOffset? HandledAt { get; set; }
         public int? HandledBy { get; set; }
         public bool IsCancelled { get; set; }
         public DateTimeOffset? CancelledAt { get; set; }

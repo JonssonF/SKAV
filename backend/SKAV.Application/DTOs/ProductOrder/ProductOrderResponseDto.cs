@@ -16,6 +16,7 @@
         public int? CancelledBy { get; init; }
         public string? CancelledByEmail { get; init; }
         public DateTimeOffset? CreatedAt { get; init; }
+        public DateTimeOffset CreatedAt { get; init; }
         public List<ProductOrderItemDto> Items { get; init; } = [];
     }
 }

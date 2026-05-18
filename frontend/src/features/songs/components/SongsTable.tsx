@@ -34,7 +34,8 @@ export function SongsTable({ songs, albums, onEdit, onDelete, onLyrics, deleteLo
         <Table.Tr>
           <Table.Th>Titel</Table.Th>
           <Table.Th>Album</Table.Th>
-          <Table.Th>Spår</Table.Th>
+          <Table.Th>Musik av</Table.Th>
+          <Table.Th>Text av</Table.Th>
           <Table.Th>Längd</Table.Th>
           <Table.Th />
         </Table.Tr>
@@ -42,14 +43,23 @@ export function SongsTable({ songs, albums, onEdit, onDelete, onLyrics, deleteLo
       <Table.Tbody>
         {songs.map((song) => (
           <Table.Tr key={song.id}>
-            <Table.Td>{song.title}</Table.Td>
+            <Table.Td>
+              <Text size="sm" fw={500}>{song.title}</Text>
+            </Table.Td>
             <Table.Td>
               {getAlbumTitle(song.albumId) ?? (
                 <Badge variant="light" color="gray" size="sm">Singel</Badge>
               )}
             </Table.Td>
-            <Table.Td>{song.trackNumber ?? '-'}</Table.Td>
-            <Table.Td>{formatDuration(song.durationSeconds)}</Table.Td>
+            <Table.Td>
+              <Text size="sm" c="dimmed">{song.musicWriter ?? '–'}</Text>
+            </Table.Td>
+            <Table.Td>
+              <Text size="sm" c="dimmed">{song.lyricsWriter ?? '–'}</Text>
+            </Table.Td>
+            <Table.Td>
+              <Text size="sm" c="dimmed">{formatDuration(song.durationSeconds)}</Text>
+            </Table.Td>
             <Table.Td>
               <Group gap="xs">
                 <Button variant="light" color="violet" size="xs" onClick={() => onLyrics(song)}>

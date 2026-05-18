@@ -11,8 +11,10 @@ export function AboutSection() {
       <Title order={2} mb="lg" ta="center">Om Oss</Title>
       <Stack gap="md">
         <Text>
-          SKAV är ett punkband från Byn i Åre, bildat 2016. Vi spelar snabb och energisk punkrock med texter som ofta handlar om livet i en liten by, 
-          kärlek, och att våga vara sig själv. Vi har släppt två album och flera singlar, och vi älskar att spela live så ofta vi kan!
+        Ca 233km söder om Bengtsfors håller Byns bästa band till. SKAV är bandet som stavas som det låter,
+        och låter som det ska. När sex män med enorma egon och noll självdistans träffas händer magiska ting. 
+        Pappret på att vi är mentalt stabila är signerat och inramat på väggen. Vår musik är till stor del inspirerad av livet i byn, 
+        men också ganska mycket av sånt vi läst om på text-TV.
         </Text>
       </Stack>
     </Container>

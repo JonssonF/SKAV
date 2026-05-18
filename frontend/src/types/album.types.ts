@@ -26,4 +26,3 @@ export interface UpdateAlbumRequest {
   spotifyUrl?: string;
   description?: string;
 }
-

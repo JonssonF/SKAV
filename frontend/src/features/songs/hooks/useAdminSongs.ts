@@ -1,25 +1,22 @@
 import { useState } from 'react';
 import { notifications } from '@mantine/notifications';
 import { useSongs, useCreateSong, useUpdateSong, useDeleteSong } from './useSongs';
-import { useAlbums } from '../../albums/hooks/useAlbums';
 import { useCreateLyrics, useUpdateLyrics } from '../../lyrics/hooks/useLyrics';
 import { lyricsApi } from '../../../api/lyrics.api';
 import { getApiErrors, getApiMessage } from '../../../utils/getApiErrors';
-import type { SongResponse } from '../../../types/song.types';
-import type { CreateSongRequest, UpdateSongRequest } from '../../../types/song.types';
+import { useAlbums } from '../../albums/hooks/useAlbums';
+import type { SongResponse, CreateSongRequest, UpdateSongRequest } from '../../../types/song.types';
 import type { LyricsResponse } from '../../../types/lyrics.types';
 
 export function useAdminSongs() {
-  // Data
   const { data: songs, isLoading, error } = useSongs();
-  const { data: albums } = useAlbums();
 
-  // Mutations
   const createSong = useCreateSong();
   const updateSong = useUpdateSong();
   const deleteSong = useDeleteSong();
   const createLyrics = useCreateLyrics();
   const updateLyrics = useUpdateLyrics();
+  const { data: albums } = useAlbums();
 
   // Create modal state
   const [createOpen, setCreateOpen] = useState(false);
@@ -34,7 +31,7 @@ export function useAdminSongs() {
   const [existingLyrics, setExistingLyrics] = useState<LyricsResponse | null>(null);
   const [lyricsLoading, setLyricsLoading] = useState(false);
 
-  // --- Create handlers ---
+  // --- Create ---
   const openCreate = () => {
     setCreateErrors(null);
     setCreateOpen(true);
@@ -67,7 +64,7 @@ export function useAdminSongs() {
     });
   };
 
-  // --- Edit handlers ---
+  // --- Edit ---
   const openEdit = (song: SongResponse) => {
     setEditErrors(null);
     setEditSong(song);
@@ -104,7 +101,7 @@ export function useAdminSongs() {
     );
   };
 
-  // --- Delete handler ---
+  // --- Delete ---
   const handleDelete = (song: SongResponse) => {
     if (!window.confirm(`Vill du ta bort "${song.title}"?`)) return;
     deleteSong.mutate(song.id, {
@@ -121,7 +118,7 @@ export function useAdminSongs() {
     });
   };
 
-  // --- Lyrics handlers ---
+  // --- Lyrics ---
   const openLyrics = async (song: SongResponse) => {
     setLyricsSong(song);
     setExistingLyrics(null);
@@ -182,13 +179,11 @@ export function useAdminSongs() {
   };
 
   return {
-    // Data
     songs: songs ?? [],
     albums: albums ?? [],
     isLoading,
     error,
 
-    // Create modal
     createModal: {
       opened: createOpen,
       onClose: closeCreate,
@@ -197,7 +192,6 @@ export function useAdminSongs() {
       errors: createErrors,
     },
 
-    // Edit modal
     editModal: {
       song: editSong,
       onClose: closeEdit,
@@ -206,7 +200,6 @@ export function useAdminSongs() {
       errors: editErrors,
     },
 
-    // Lyrics modal
     lyricsModal: {
       song: lyricsSong,
       existingLyrics,
@@ -216,7 +209,6 @@ export function useAdminSongs() {
       saving: createLyrics.isPending || updateLyrics.isPending,
     },
 
-    // Actions
     openCreate,
     openEdit,
     handleDelete,

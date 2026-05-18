@@ -6,19 +6,19 @@ namespace SKAV.Application.Common.Helpers
     {
         public static void SetCreated(BaseEntity entity, int? userId)
         {
-            entity.CreatedAt = DateTime.UtcNow;
+            entity.CreatedAt = DateTimeOffset.UtcNow;
             entity.CreatedBy = userId;
         }
 
         public static void SetUpdated(BaseEntity entity, int? userId)
         {
-            entity.UpdatedAt = DateTime.UtcNow;
+            entity.UpdatedAt = DateTimeOffset.UtcNow;
             entity.UpdatedBy = userId;
         }
 
         public static void SetDeleted(BaseEntity entity, int? userId)
         {
-            entity.DeletedAt = DateTime.UtcNow;
+            entity.DeletedAt = DateTimeOffset.UtcNow;
             entity.DeletedBy = userId;
         }
     }

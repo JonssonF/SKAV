@@ -4,8 +4,11 @@ export interface SongResponse {
   title: string;
   durationSeconds?: number;
   spotifyUrl?: string;
-  writer?: string;
+  musicWriter?: string;
+  lyricsWriter?: string;
   trackNumber?: number;
+  youtubeUrl?: string;
+  year?: number;
 }
 
 export interface CreateSongRequest {
@@ -13,8 +16,11 @@ export interface CreateSongRequest {
   title: string;
   durationSeconds?: number;
   spotifyUrl?: string;
-  writer?: string;
+  musicWriter?: string;
+  lyricsWriter?: string;
   trackNumber?: number;
+  youtubeUrl?: string;
+  year?: number;
 }
 
 export interface CreateSongResponse {
@@ -26,6 +32,9 @@ export interface UpdateSongRequest {
   title: string;
   durationSeconds?: number;
   spotifyUrl?: string;
-  writer?: string;
+  musicWriter?: string;
+  lyricsWriter?: string;
   trackNumber?: number;
+  youtubeUrl?: string;
+  year?: number;
 }

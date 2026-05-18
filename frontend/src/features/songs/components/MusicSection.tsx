@@ -7,14 +7,11 @@ import {
   Group,
   Loader,
   Alert,
-  Accordion,
   Badge,
   Collapse,
 } from '@mantine/core';
-import { useAlbums } from '../../albums/hooks/useAlbums';
 import { useSongs } from '../../songs/hooks/useSongs';
 import { useLyrics } from '../../lyrics/hooks/useLyrics';
-import type { AlbumResponse } from '../../../types/album.types';
 import type { SongResponse } from '../../../types/song.types';
 import type { LyricsResponse } from '../../../types/lyrics.types';
 
@@ -42,7 +39,7 @@ function SongRow({ song, index, lyrics }: { song: SongResponse; index: number; l
       >
         <Group gap="md">
           <Text size="sm" c="dimmed" w={24} ta="right">
-            {song.trackNumber ?? index + 1}
+            {index + 1}
           </Text>
           <div>
             <Group gap="xs">
@@ -53,8 +50,14 @@ function SongRow({ song, index, lyrics }: { song: SongResponse; index: number; l
                 </Badge>
               )}
             </Group>
-            {song.writer && (
-              <Text size="xs" c="dimmed">{song.writer}</Text>
+            {(song.musicWriter || song.lyricsWriter || song.year) && (
+              <Text size="xs" c="dimmed">
+                {song.year && `${song.year}`}
+                {song.year && (song.musicWriter || song.lyricsWriter) && ' · '}
+                {song.musicWriter && `Musik: ${song.musicWriter}`}
+                {song.musicWriter && song.lyricsWriter && ' · '}
+                {song.lyricsWriter && `Text: ${song.lyricsWriter}`}
+              </Text>
             )}
           </div>
         </Group>
@@ -69,6 +72,18 @@ function SongRow({ song, index, lyrics }: { song: SongResponse; index: number; l
               onClick={(e: React.MouseEvent) => e.stopPropagation()}
             >
               Spotify
+            </Text>
+          )}
+          {song.youtubeUrl && (
+            <Text
+              size="xs"
+              component="a"
+              href={song.youtubeUrl}
+              target="_blank"
+              c="red"
+              onClick={(e: React.MouseEvent) => e.stopPropagation()}
+            >
+              YouTube
             </Text>
           )}
           <Text size="sm" c="dimmed">{formatDuration(song.durationSeconds)}</Text>
@@ -88,71 +103,9 @@ function SongRow({ song, index, lyrics }: { song: SongResponse; index: number; l
   );
 }
 
-function AlbumCard({ album, songs, allLyrics }: { album: AlbumResponse; songs: SongResponse[]; allLyrics: LyricsResponse[] }) {
-  const albumSongs = songs
-    .filter((s) => s.albumId === album.id)
-    .sort((a, b) => (a.trackNumber ?? 0) - (b.trackNumber ?? 0));
-
-  return (
-    <Accordion.Item value={`album-${album.id}`}>
-      <Accordion.Control>
-        <Group justify="space-between" pr="md">
-          <div>
-            <Text fw={500}>{album.title}</Text>
-            {album.releaseDate && (
-              <Text size="xs" c="dimmed">
-                {new Date(album.releaseDate).toLocaleDateString('sv-SE', {
-                  year: 'numeric',
-                  month: 'long',
-                })}
-              </Text>
-            )}
-          </div>
-          <Badge variant="light" color="gray" size="sm">
-            {albumSongs.length} låtar
-          </Badge>
-        </Group>
-      </Accordion.Control>
-      <Accordion.Panel>
-        {album.description && (
-          <Text size="sm" c="dimmed" mb="md">{album.description}</Text>
-        )}
-        {album.spotifyUrl && (
-          <Text
-            size="sm"
-            component="a"
-            href={album.spotifyUrl}
-            target="_blank"
-            c="blue"
-            mb="md"
-            display="inline-block"
-          >
-            Lyssna på Spotify →
-          </Text>
-        )}
-        {albumSongs.length === 0 ? (
-          <Text size="sm" c="dimmed">Inga låtar tillagda än.</Text>
-        ) : (
-          albumSongs.map((song, i) => (
-            <SongRow
-              key={song.id}
-              song={song}
-              index={i}
-              lyrics={allLyrics.find((l) => l.songId === song.id)}
-            />
-          ))
-        )}
-      </Accordion.Panel>
-    </Accordion.Item>
-  );
-}
-
 export function MusicSection() {
-  const { data: albums, isLoading: albumsLoading, error: albumsError } = useAlbums();
-  const { data: songs, isLoading: songsLoading, error: songsError } = useSongs();
+  const { data: songs, isLoading, error } = useSongs();
   const { data: allLyrics } = useLyrics();
-  const isLoading = albumsLoading || songsLoading;
-  const error = albumsError || songsError;
 
   if (isLoading) {
     return (
@@ -172,52 +125,28 @@ export function MusicSection() {
     );
   }
 
-  const singles = (songs ?? []).filter((s) => !s.albumId);
-  const albumList = (albums ?? []).sort((a, b) => {
-    if (!a.releaseDate) return 1;
-    if (!b.releaseDate) return -1;
-    return new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime();
-  });
+  if (!songs || songs.length === 0) {
+    return (
+      <Container size="lg" py="xl">
+        <Title order={2} mb="lg" ta="center">Musik</Title>
+        <Text c="dimmed" ta="center">Inga låtar tillagda än.</Text>
+      </Container>
+    );
+  }
 
   return (
     <Container size="lg" py="xl">
       <Title order={2} mb="lg" ta="center">Musik</Title>
-
-      {albumList.length === 0 && singles.length === 0 && (
-        <Text c="dimmed">Ingen musik tillagd än.</Text>
-      )}
-
-      {albumList.length > 0 && (
-        <>
-          <Title order={3} size="h3" mb="md">Album</Title>
-          <Accordion variant="separated" mb="xl">
-            {albumList.map((album) => (
-              <AlbumCard
-                key={album.id}
-                album={album}
-                songs={songs ?? []}
-                allLyrics={allLyrics ?? []}
-              />
-            ))}
-          </Accordion>
-        </>
-      )}
-
-      {singles.length > 0 && (
-        <>
-          <Title order={3} size="h3" mb="md">Singlar</Title>
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
-            {singles.map((song, i) => (
-              <SongRow
-                key={song.id}
-                song={song}
-                index={i}
-                lyrics={(allLyrics ?? []).find((l) => l.songId === song.id)}
-              />
-            ))}
-          </Card>
-        </>
-      )}
+      <Card shadow="sm" padding="lg" radius="md" withBorder>
+        {songs.map((song, i) => (
+          <SongRow
+            key={song.id}
+            song={song}
+            index={i}
+            lyrics={(allLyrics ?? []).find((l) => l.songId === song.id)}
+          />
+        ))}
+      </Card>
     </Container>
   );
 }

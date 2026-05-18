@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { albumsApi } from '../../../api/albums.api';
 import type { CreateAlbumRequest, UpdateAlbumRequest } from '../../../types/album.types';
-                        
+
 export function useAlbums() {
   return useQuery({
     queryKey: ['albums'],
@@ -13,7 +13,7 @@ export function useAlbum(id: number) {
   return useQuery({
     queryKey: ['albums', id],
     queryFn: () => albumsApi.getById(id),
-    enabled: id > 0, // Kör inte om id är 0 eller ogiltigt
+    enabled: id > 0,
   });
 }
 
@@ -23,7 +23,6 @@ export function useCreateAlbum() {
   return useMutation({
     mutationFn: (data: CreateAlbumRequest) => albumsApi.create(data),
     onSuccess: () => {
-      // Invalidera cachen — tvingar listan att hämtas om
       queryClient.invalidateQueries({ queryKey: ['albums'] });
     },
   });

@@ -25,8 +25,21 @@ namespace SKAV.Application.DTOs.Song
 
         [MaxLength(200, ErrorMessage = "Max {1} tecken")]
         [RegularExpression(ValidationRegularExpression.Name, ErrorMessage = "Ogiltiga tecken i låtskrivare")]
-        [DefaultValue("Freddie Mercury")]
-        public string? Writer { get; set; }
+        [DefaultValue("Freddie")]
+        public string? MusicWriter { get; set; }
+
+        [MaxLength(200, ErrorMessage = "Max {1} tecken")]
+        [RegularExpression(ValidationRegularExpression.Name, ErrorMessage = "Ogiltiga tecken i låtskrivare")]
+        [DefaultValue("Mercury")]
+        public string? LyricsWriter { get; set; }
+
+        [RegularExpression(ValidationRegularExpression.Url, ErrorMessage = "Ogiltig URL")]
+        [DefaultValue("https://youtube.com/watch?v=example")]
+        public string? YoutubeUrl { get; set; }
+
+        [Range(1900, 2100, ErrorMessage = "År måste vara mellan 1900 och 2100")]
+        [DefaultValue(2025)]
+        public int? Year { get; set; }
 
         [Range(1, 100, ErrorMessage = "Spårnummer måste vara mellan 1 och 100")]
         public int? TrackNumber { get; set; }

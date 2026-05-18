@@ -17,8 +17,11 @@ interface SongFormProps {
     title: string;
     durationSeconds?: number;
     spotifyUrl?: string;
-    writer?: string;
+    musicWriter?: string;
+    lyricsWriter?: string;
     trackNumber?: number;
+    youtubeUrl?: string;
+    year?: number;
   }) => void;
   loading?: boolean;
   errors?: Record<string, string> | null;
@@ -31,8 +34,11 @@ export function SongForm({ initialData, onSubmit, loading, errors }: SongFormPro
   const [title, setTitle] = useState('');
   const [durationSeconds, setDurationSeconds] = useState<number | string>('');
   const [spotifyUrl, setSpotifyUrl] = useState('');
-  const [writer, setWriter] = useState('');
+  const [musicWriter, setMusicWriter] = useState('');
+  const [lyricsWriter, setLyricsWriter] = useState('');
   const [trackNumber, setTrackNumber] = useState<number | string>('');
+  const [youtubeUrl, setYoutubeUrl] = useState('');
+  const [year, setYear] = useState<number | string>('');
 
   useEffect(() => {
     if (initialData) {
@@ -40,12 +46,14 @@ export function SongForm({ initialData, onSubmit, loading, errors }: SongFormPro
       setTitle(initialData.title);
       setDurationSeconds(initialData.durationSeconds ?? '');
       setSpotifyUrl(initialData.spotifyUrl ?? '');
-      setWriter(initialData.writer ?? '');
+      setMusicWriter(initialData.musicWriter ?? '');
+      setLyricsWriter(initialData.lyricsWriter ?? '');
       setTrackNumber(initialData.trackNumber ?? '');
+      setYoutubeUrl(initialData.youtubeUrl ?? '');
+      setYear(initialData.year ?? '');
     }
   }, [initialData]);
 
-  // Bygg album-options för Select-komponenten
   const albumOptions = (albums ?? []).map((a) => ({
     value: a.id.toString(),
     label: a.title,
@@ -59,8 +67,11 @@ export function SongForm({ initialData, onSubmit, loading, errors }: SongFormPro
       title,
       durationSeconds: durationSeconds !== '' ? Number(durationSeconds) : undefined,
       spotifyUrl: spotifyUrl || undefined,
-      writer: writer || undefined,
+      musicWriter: musicWriter || undefined,
+      lyricsWriter: lyricsWriter || undefined,
       trackNumber: trackNumber !== '' ? Number(trackNumber) : undefined,
+      youtubeUrl: youtubeUrl || undefined,
+      year: year !== '' ? Number(year) : undefined,
     });
   };
 
@@ -107,13 +118,23 @@ export function SongForm({ initialData, onSubmit, loading, errors }: SongFormPro
           />
         </Group>
 
-        <TextInput
-          label="Låtskrivare"
-          placeholder="Namn"
-          value={writer}
-          onChange={(e) => setWriter(e.currentTarget.value)}
-          error={errors?.writer}
-        />
+        <Group grow>
+          <TextInput
+            label="Musik av"
+            placeholder="Vem skrev musiken"
+            value={musicWriter}
+            onChange={(e) => setMusicWriter(e.currentTarget.value)}
+            error={errors?.musicWriter}
+          />
+
+          <TextInput
+            label="Text av"
+            placeholder="Vem skrev texten"
+            value={lyricsWriter}
+            onChange={(e) => setLyricsWriter(e.currentTarget.value)}
+            error={errors?.lyricsWriter}
+          />
+        </Group>
 
         <TextInput
           label="Spotify URL"
@@ -121,6 +142,24 @@ export function SongForm({ initialData, onSubmit, loading, errors }: SongFormPro
           value={spotifyUrl}
           onChange={(e) => setSpotifyUrl(e.currentTarget.value)}
           error={errors?.spotifyUrl}
+        />
+
+        <TextInput
+          label="YouTube URL"
+          placeholder="https://www.youtube.com/watch?v=..."
+          value={youtubeUrl}
+          onChange={(e) => setYoutubeUrl(e.currentTarget.value)}
+          error={errors?.youtubeUrl}
+        />
+
+        <NumberInput
+          label="År"
+          placeholder="T.ex. 2025"
+          value={year}
+          onChange={(value) => setYear(Number(value))}
+          error={errors?.year}
+          min={1900}
+          max={2100}
         />
 
         <Group justify="flex-end">
