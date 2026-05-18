@@ -24,4 +24,8 @@ export const productOrdersApi = {
   handle: async (id: number): Promise<void> => {
     await apiClient.put(`/product-orders/${id}/handle`);
   },
+
+  cancel: async (id: number): Promise<void> => {
+  await apiClient.put(`/product-orders/${id}/cancel`);
+  },
 };

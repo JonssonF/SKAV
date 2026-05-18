@@ -17,6 +17,10 @@ export interface ProductOrderResponse {
   handledAt?: string;
   handledBy?: number;
   handledByEmail?: string;
+  isCancelled: boolean;
+  cancelledAt?: string;
+  cancelledBy?: number;
+  cancelledByEmail?: string;
   createdAt: string;
   items: ProductOrderItemDto[];
 }

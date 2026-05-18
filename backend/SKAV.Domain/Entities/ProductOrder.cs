@@ -12,5 +12,11 @@ namespace SKAV.Domain.Entities
         public bool IsHandled { get; set; }
         public DateTime? HandledAt { get; set; }
         public int? HandledBy { get; set; }
+        public bool IsCancelled { get; set; }
+        public DateTimeOffset? CancelledAt { get; set; }
+        public int? CancelledBy { get; set; }
+        public string? Address { get; set; }
+        public string? City { get; set; }
+        public string? PostalCode { get; set; }
     }
 }

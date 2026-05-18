@@ -35,5 +35,11 @@ namespace SKAV.Api.Controllers
         [SwaggerOperation("Markera en beställning som hanterad")]
         public async Task<HandleProductOrderResponseDto> Handle(int id, CancellationToken ct)
             => await service.HandleAsync(id, ct);
+
+        [HttpPut("{id}/cancel")]
+        [Authorize(Roles = "Admin,Editor")]
+        [SwaggerOperation("Avbryt en beställning och återställ lagersaldo")]
+        public async Task<CancelProductOrderResponseDto> Cancel(int id, CancellationToken ct)
+    => await service.CancelAsync(id, ct);
     }
 }

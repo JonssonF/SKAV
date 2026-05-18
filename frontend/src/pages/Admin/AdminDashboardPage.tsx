@@ -22,12 +22,13 @@ import { useBookingRecipients, useCreateBookingRecipient, useDeleteBookingRecipi
 import { getApiMessage } from '../../utils/getApiErrors';
 import { IconTrash } from '@tabler/icons-react';
 import { useSubscribers } from '../../features/subscribers/hooks/useSubscribers';
+import { useProductOrders, useHandleProductOrder, useCancelProductOrder } from '../../features/shop/hooks/useProductOrders';
 
 export function AdminDashboardPage() {
   const { user } = useAuth();
   const { data: bookings, isLoading, error } = useBookingRequests();
   const markAsRead = useMarkBookingRead();
-
+  const cancelOrder = useCancelProductOrder();
   const { data: recipients, isLoading: recipientsLoading } = useBookingRecipients();
   const createRecipient = useCreateBookingRecipient();
   const deleteRecipient = useDeleteBookingRecipient();
