@@ -12,6 +12,7 @@ import {
   Select,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
+import { useQueryClient } from '@tanstack/react-query';
 import { IconShoppingCart } from '@tabler/icons-react';
 import { useProducts } from '../features/shop/hooks/useProducts';
 import { useCreateProductOrder } from '../features/shop/hooks/useProductOrders';
@@ -20,11 +21,13 @@ import { ProductCard } from '../features/shop/components/ProductCard';
 import { CartDrawer } from '../features/shop/components/CartDrawer';
 import { CheckoutModal } from '../features/shop/components/CheckoutModal';
 import { getApiErrors, getApiMessage } from '../utils/getApiErrors';
+import type { ProductResponse } from '../types/product.types';
 
 export function ShopPage() {
   const { data: products, isLoading, error } = useProducts();
   const createOrder = useCreateProductOrder();
   const cart = useCart();
+  const queryClient = useQueryClient();
 
   const [cartOpen, setCartOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
@@ -41,7 +44,42 @@ export function ShopPage() {
     ? (products ?? []).filter((p) => p.category === categoryFilter)
     : (products ?? []);
 
-  const handleCheckout = (data: { name: string; email: string; phone?: string; message?: string }) => {
+  // Validera lagersaldo och öppna checkout
+  const handleOpenCheckout = async () => {
+    // Hämta färskt lagersaldo
+    await queryClient.invalidateQueries({ queryKey: ['products'] });
+
+    const freshProducts = queryClient.getQueryData<ProductResponse[]>(['products']);
+    if (freshProducts) {
+      for (const cartItem of cart.items) {
+        const product = freshProducts.find((p) => p.id === cartItem.product.id);
+        const variant = product?.variants.find((v) => v.id === cartItem.variant.id);
+
+        if (!variant || variant.stockQuantity < cartItem.quantity) {
+          notifications.show({
+            title: 'Lagersaldo har ändrats',
+            message: `${cartItem.product.title} har bara ${variant?.stockQuantity ?? 0} kvar i lager.`,
+            color: 'yellow',
+            autoClose: false,
+          });
+          return;
+        }
+      }
+    }
+
+    setCheckoutOpen(true);
+  };
+
+  // Skicka beställning
+  const handleCheckout = (data: {
+    name: string;
+    email: string;
+    phone?: string;
+    message?: string;
+    address?: string;
+    city?: string;
+    postalCode?: string;
+  }) => {
     setCheckoutErrors(null);
 
     createOrder.mutate(
@@ -69,10 +107,12 @@ export function ShopPage() {
             setCheckoutErrors(fieldErrors);
           } else {
             notifications.show({
-              title: 'Något gick fel',
+              title: 'Beställningen kunde inte genomföras',
               message: getApiMessage(err),
               color: 'red',
+              autoClose: false,
             });
+            queryClient.invalidateQueries({ queryKey: ['products'] });
           }
         },
       }
@@ -156,7 +196,7 @@ export function ShopPage() {
         onRemoveItem={cart.removeItem}
         onCheckout={() => {
           setCartOpen(false);
-          setCheckoutOpen(true);
+          handleOpenCheckout();
         }}
       />
 
