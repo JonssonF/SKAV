@@ -10,8 +10,13 @@ export function useProductOrders() {
 }
 
 export function useCreateProductOrder() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: (data: CreateProductOrderRequest) => productOrdersApi.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+    },
   });
 }
 
