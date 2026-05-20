@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Container,
   Title,
@@ -27,9 +27,19 @@ function MemberCard({
   onSelect: () => void;
   onDeselect: () => void;
 }) {
+  useEffect(() => {
+    if (isSelected) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isSelected]);
+
   return (
     <>
-      {/* Kortet i gridet */}
       {!isSelected && (
         <motion.div
           layoutId={`member-${member.id}`}
@@ -75,7 +85,6 @@ function MemberCard({
         </motion.div>
       )}
 
-      {/* Expanderad overlay */}
       <AnimatePresence>
         {isSelected && (
           <>
@@ -89,7 +98,7 @@ function MemberCard({
                 position: 'fixed',
                 inset: 0,
                 backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                zIndex: 200,
+                zIndex: 9998,
               }}
             />
             <motion.div
@@ -101,10 +110,8 @@ function MemberCard({
                 left: '50%',
                 x: '-50%',
                 y: '-50%',
-                zIndex: 201,
+                zIndex: 9999,
                 width: 'min(90vw, 450px)',
-                maxHeight: '80vh',
-                overflow: 'auto',
               }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             >
