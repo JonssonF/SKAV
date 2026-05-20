@@ -9,6 +9,7 @@ const adminItems = [
   { label: 'Medlemmar', path: '/admin/members' },
   { label: 'Spelningar', path: '/admin/gigs' },
   { label: 'Låtar', path: '/admin/songs' },
+  { label: 'Låtförslag', path: '/admin/song-proposals' },
   { label: 'Nyhetsbrev', path: '/admin/newsletter' },
   { label: 'Produkter', path: '/admin/products' },
 ];

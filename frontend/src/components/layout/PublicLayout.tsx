@@ -12,6 +12,7 @@ const navItems = [
   { label: 'Boka', href: '#boka' },
   { label: 'Spelningar', href: '#spelningar' },
   { label: 'Bandet', href: '#bandet' },
+  { label: 'Rösta', href: '#rösta' },
   { label: 'Musik', href: '#musik' },
 ];
 

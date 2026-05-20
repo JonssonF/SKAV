@@ -9,6 +9,7 @@ import { SubscribeSection } from '../features/subscribers/components/SubscribeSe
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ShopCarousel } from '../features/shop/components/ShopCarousel';
+import { VotingSection } from '../features/songProposals/components/VotingSection';
 
 export function HomePage() {
   const location = useLocation();
@@ -51,6 +52,10 @@ export function HomePage() {
         <MembersSection />
       </section>
 
+      <section id="rösta">
+        <VotingSection />
+      </section>
+      
       <section id="musik">
          <MusicSection />
       </section>
