@@ -1,26 +1,174 @@
+import { useState } from 'react';
 import {
   Container,
   Title,
   Text,
-  Card,
   SimpleGrid,
   Avatar,
-  Stack,
   Loader,
   Alert,
   Group,
+  Paper,
+  Stack,
+  Badge,
 } from '@mantine/core';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useMembers } from '../hooks/useMembers';
+import type { MemberResponse } from '../../../types/member.types';
+
+function MemberCard({
+  member,
+  isSelected,
+  onSelect,
+  onDeselect,
+}: {
+  member: MemberResponse;
+  isSelected: boolean;
+  onSelect: () => void;
+  onDeselect: () => void;
+}) {
+  return (
+    <>
+      {/* Kortet i gridet */}
+      {!isSelected && (
+        <motion.div
+          layoutId={`member-${member.id}`}
+          onClick={onSelect}
+          style={{ cursor: 'pointer' }}
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.98 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+        >
+          <Paper
+            shadow="sm"
+            radius="md"
+            withBorder
+            p="lg"
+            style={{
+              minHeight: 220,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Avatar
+              src={member.imageUrl}
+              size={100}
+              radius="50%"
+              color="blue"
+            >
+              {member.name.charAt(0)}
+            </Avatar>
+            <Title order={4} mt="md" ta="center">{member.name}</Title>
+            {member.role && (
+              <Badge variant="light" color="violet" mt="xs">
+                {member.role}
+              </Badge>
+            )}
+            {member.quote && (
+              <Text size="sm" c="dimmed" fs="italic" mt="xs" ta="center">
+                "{member.quote}"
+              </Text>
+            )}
+          </Paper>
+        </motion.div>
+      )}
+
+      {/* Expanderad overlay */}
+      <AnimatePresence>
+        {isSelected && (
+          <>
+            <motion.div
+              key="backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={onDeselect}
+              style={{
+                position: 'fixed',
+                inset: 0,
+                backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                zIndex: 200,
+              }}
+            />
+            <motion.div
+              layoutId={`member-${member.id}`}
+              key="expanded"
+              style={{
+                position: 'fixed',
+                top: '50%',
+                left: '50%',
+                x: '-50%',
+                y: '-50%',
+                zIndex: 201,
+                width: 'min(90vw, 450px)',
+                maxHeight: '80vh',
+                overflow: 'auto',
+              }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            >
+              <Paper shadow="xl" radius="md" withBorder p="xl">
+                <Stack align="center" gap="md">
+                  <Avatar
+                    src={member.imageUrl}
+                    size={140}
+                    radius="50%"
+                    color="blue"
+                  >
+                    {member.name.charAt(0)}
+                  </Avatar>
+
+                  <div style={{ textAlign: 'center' }}>
+                    <Title order={3}>{member.name}</Title>
+                    {member.role && (
+                      <Badge variant="light" color="violet" size="lg" mt="xs">
+                        {member.role}
+                      </Badge>
+                    )}
+                  </div>
+
+                  {member.quote && (
+                    <Text size="md" c="dimmed" fs="italic" ta="center">
+                      "{member.quote}"
+                    </Text>
+                  )}
+
+                  {member.bio && (
+                    <Paper p="sm" radius="sm" bg="var(--mantine-color-default-hover)" w="100%">
+                      <Text size="sm" style={{ whiteSpace: 'pre-line' }}>
+                        {member.bio}
+                      </Text>
+                    </Paper>
+                  )}
+
+                  <Text
+                    size="xs"
+                    c="dimmed"
+                    ta="center"
+                    style={{ cursor: 'pointer' }}
+                    onClick={onDeselect}
+                  >
+                    Klicka här eller utanför för att stänga
+                  </Text>
+                </Stack>
+              </Paper>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
 
 export function MembersSection() {
   const { data: members, isLoading, error } = useMembers();
+  const [selectedId, setSelectedId] = useState<number | null>(null);
 
   if (isLoading) {
     return (
       <Container size="lg" py="xl">
-        <Group justify="center">
-          <Loader size="lg" />
-        </Group>
+        <Group justify="center"><Loader size="lg" /></Group>
       </Container>
     );
   }
@@ -38,8 +186,8 @@ export function MembersSection() {
   if (!members || members.length === 0) {
     return (
       <Container size="lg" py="xl">
-        <Title order={2} mb="lg">Bandet</Title>
-        <Text c="dimmed">Inga medlemmar tillagda än.</Text>
+        <Title order={2} mb="lg" ta="center">Bandet</Title>
+        <Text c="dimmed" ta="center">Inga medlemmar tillagda än.</Text>
       </Container>
     );
   }
@@ -49,26 +197,13 @@ export function MembersSection() {
       <Title order={2} mb="lg" ta="center">Bandet</Title>
       <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
         {members.map((member) => (
-          <Card key={member.id} shadow="sm" padding="lg" radius="md" withBorder>
-            <Stack align="center" gap="md">
-              <Avatar
-                src={member.imageUrl}
-                size={120}
-                radius="50%"
-                color="blue"
-              >
-                {member.name.charAt(0)}
-              </Avatar>
-              <div style={{ textAlign: 'center' }}>
-                <Title order={3}>{member.name}</Title>
-                {member.quote && (
-                  <Text c="dimmed" fs="italic" mt="xs">
-                    "{member.quote}"
-                  </Text>
-                )}
-              </div>
-            </Stack>
-          </Card>
+          <MemberCard
+            key={member.id}
+            member={member}
+            isSelected={selectedId === member.id}
+            onSelect={() => setSelectedId(member.id)}
+            onDeselect={() => setSelectedId(null)}
+          />
         ))}
       </SimpleGrid>
     </Container>

@@ -40,6 +40,8 @@ namespace SKAV.Application.Services
             var member = new Member
             {
                 Name = request.Name,
+                Role = request.Role,
+                Bio = request.Bio,
                 Quote = request.Quote,
                 ImageUrl = request.ImageUrl,
                 DisplayOrder = request.DisplayOrder,
@@ -69,6 +71,8 @@ namespace SKAV.Application.Services
 
 
             existing.Name = request.Name;
+            existing.Role = request.Role;
+            existing.Bio = request.Bio;
             existing.Quote = request.Quote;
             existing.ImageUrl = request.ImageUrl;
             existing.DisplayOrder = request.DisplayOrder;
@@ -101,6 +105,8 @@ namespace SKAV.Application.Services
         {
             Id = m.Id,
             Name = m.Name,
+            Role = m.Role,
+            Bio = m.Bio,
             Quote = m.Quote,
             ImageUrl = m.ImageUrl,
             DisplayOrder = m.DisplayOrder,

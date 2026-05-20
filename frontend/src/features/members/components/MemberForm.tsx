@@ -13,6 +13,8 @@ interface MemberFormProps {
   initialData?: MemberResponse;
   onSubmit: (data: {
     name: string;
+    role?: string;
+    bio?: string;
     quote?: string;
     imageUrl?: string;
     displayOrder: number;
@@ -23,6 +25,8 @@ interface MemberFormProps {
 
 export function MemberForm({ initialData, onSubmit, loading, errors }: MemberFormProps) {
   const [name, setName] = useState('');
+  const [role, setRole] = useState('');
+  const [bio, setBio] = useState('');
   const [quote, setQuote] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [displayOrder, setDisplayOrder] = useState<number | string>(0);
@@ -30,6 +34,8 @@ export function MemberForm({ initialData, onSubmit, loading, errors }: MemberFor
   useEffect(() => {
     if (initialData) {
       setName(initialData.name);
+      setRole(initialData.role ?? '');
+      setBio(initialData.bio ?? '');
       setQuote(initialData.quote ?? '');
       setImageUrl(initialData.imageUrl ?? '');
       setDisplayOrder(initialData.displayOrder);
@@ -41,6 +47,8 @@ export function MemberForm({ initialData, onSubmit, loading, errors }: MemberFor
 
     onSubmit({
       name,
+      role: role || undefined,
+      bio: bio || undefined,
       quote: quote || undefined,
       imageUrl: imageUrl || undefined,
       displayOrder: displayOrder !== '' ? Number(displayOrder) : 0,
@@ -59,13 +67,30 @@ export function MemberForm({ initialData, onSubmit, loading, errors }: MemberFor
           required
         />
 
+        <TextInput
+          label="Roll"
+          placeholder="T.ex. Basist, Gitarrist, Sångare"
+          value={role}
+          onChange={(e) => setRole(e.currentTarget.value)}
+          error={errors?.role}
+        />
+
         <Textarea
-          label="Citat / Bio"
-          placeholder="Valfritt citat eller kort beskrivning"
+          label="Bio"
+          placeholder="Berätta lite om dig själv..."
+          value={bio}
+          onChange={(e) => setBio(e.currentTarget.value)}
+          error={errors?.bio}
+          minRows={3}
+          autosize
+        />
+
+        <TextInput
+          label="Citat"
+          placeholder="Valfritt citat"
           value={quote}
           onChange={(e) => setQuote(e.currentTarget.value)}
           error={errors?.quote}
-          minRows={2}
         />
 
         <TextInput

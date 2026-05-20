@@ -13,6 +13,15 @@ namespace SKAV.Application.DTOs.Member
         [DefaultValue("Klas")]
         public required string Name { get; set; }
 
+        [MaxLength(100, ErrorMessage = "Max {1} tecken tillåtna")]
+        [DefaultValue("Gitarrist")]
+        public string? Role { get; set; }
+
+        [MaxLength(1000, ErrorMessage = "Max {1} tecken tillåtna")]
+        [RegularExpression(ValidationRegularExpression.FreeText, ErrorMessage = "Ogiltiga tecken i citat")]
+        [DefaultValue("Från byhålan Himle")]
+        public string? Bio { get; set; }
+
         [MaxLength(300, ErrorMessage = "Max {1} tecken tillåtna")]
         [RegularExpression(ValidationRegularExpression.FreeText, ErrorMessage = "Ogiltiga tecken i citat")]
         [DefaultValue("Inget citat")]

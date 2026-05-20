@@ -8,8 +8,6 @@ namespace SKAV.Infrastructure.Database
     public class SeedData(
         IMemberRepository memberRepo,
         IGigRepository gigRepo,
-        IInstrumentRepository instrumentRepo,
-        IMemberInstrumentRepository memberInstrumentRepo,
         IAlbumRepository albumRepo,
         ISongRepository songRepo,
         ILyricsRepository lyricsRepo,
@@ -25,9 +23,7 @@ namespace SKAV.Infrastructure.Database
     {
         public async Task SeedAsync(CancellationToken ct = default)
         {
-            await SeedInstrumentsAsync(ct);
             await SeedMembersAsync(ct);
-            await SeedMemberInstrumentsAsync(ct);
             await SeedGigsAsync(ct);
             await SeedAlbumsAsync(ct);
             await SeedSongsAsync(ct);
@@ -269,32 +265,7 @@ namespace SKAV.Infrastructure.Database
             }
             await scope.CommitTransactionScopeAsync(ct);
         }
-
-        private async Task SeedInstrumentsAsync(CancellationToken ct)
-        {
-            var existing = await instrumentRepo.GetAllAsync(ct);
-            if (existing.Any()) return;
-
-            var instruments = new List<Instrument>
-            {
-                new() { Name = "Sång", Description = "Vokalist" },
-                new() { Name = "Bas", Description = "Basgitarr" },
-                new() { Name = "Gitarr", Description = "Elgitarr" },
-                new() { Name = "Trummor", Description = "Trumset" },
-                new() { Name = "Keyboard", Description = "Synthesizer" },
-                new() { Name = "Akustisk gitarr", Description = "Akustisk gitarr" },
-                new() { Name = "Munspel", Description = "Bluesmunspel" },
-            };
-
-            using var scope = uow.BeginTransactionScope();
-            foreach (var instrument in instruments)
-            {
-                AuditHelper.SetCreated(instrument, null);
-                await instrumentRepo.CreateAsync(instrument, ct);
-            }
-            await scope.CommitTransactionScopeAsync(ct);
-        }
-
+        
         private async Task SeedMembersAsync(CancellationToken ct)
         {
             var existing = await memberRepo.GetAllAsync(ct);
@@ -314,32 +285,6 @@ namespace SKAV.Infrastructure.Database
             {
                 AuditHelper.SetCreated(member, null);
                 await memberRepo.CreateAsync(member, ct);
-            }
-            await scope.CommitTransactionScopeAsync(ct);
-        }
-
-        private async Task SeedMemberInstrumentsAsync(CancellationToken ct)
-        {
-            var existing = await memberInstrumentRepo.GetAllAsync(ct);
-            if (existing.Any()) return;
-
-            var memberInstruments = new List<MemberInstrument>
-            {
-                new() { MemberId = 1, InstrumentId = 1 },  // Klas - Sång
-                new() { MemberId = 1, InstrumentId = 7 },  // Klas - Munspel
-                new() { MemberId = 2, InstrumentId = 2 },  // Maja - Bas
-                new() { MemberId = 2, InstrumentId = 1 },  // Maja - Sång (kör)
-                new() { MemberId = 3, InstrumentId = 3 },  // Pelle - Gitarr
-                new() { MemberId = 3, InstrumentId = 6 },  // Pelle - Akustisk gitarr
-                new() { MemberId = 4, InstrumentId = 4 },  // Lena - Trummor
-                new() { MemberId = 5, InstrumentId = 5 },  // Jonas - Keyboard
-            };
-
-            using var scope = uow.BeginTransactionScope();
-            foreach (var memberInstrument in memberInstruments)
-            {
-                AuditHelper.SetCreated(memberInstrument, null);
-                await memberInstrumentRepo.CreateAsync(memberInstrument, ct);
             }
             await scope.CommitTransactionScopeAsync(ct);
         }
