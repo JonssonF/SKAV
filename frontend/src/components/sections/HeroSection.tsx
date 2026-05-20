@@ -17,13 +17,16 @@ export function HeroSection() {
     ? 'var(--mantine-color-dark-7)'
     : 'var(--mantine-color-white)';
 
+  const isDark = colorScheme === 'dark';
+
   return (
     <div
       style={{
         minHeight: isMobile ? '40vh' : '80vh',
         backgroundImage: `url(${heroImage})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
+        backgroundSize: isDark ? 'cover' : 'contain',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: isDark ? 'center' : 'center top',
         position: 'relative',
       }}
     >
@@ -31,11 +34,9 @@ export function HeroSection() {
         style={{
           position: 'absolute',
           inset: 0,
-          background: `linear-gradient(
-            to bottom,
-            transparent 30%,
-            ${bgColor} 100%
-          )`,
+          background: isDark
+            ? `linear-gradient(to bottom, transparent 30%, ${bgColor} 100%)`
+            : `linear-gradient(to bottom, transparent 60%, ${bgColor} 100%)`,
         }}
       />
     </div>

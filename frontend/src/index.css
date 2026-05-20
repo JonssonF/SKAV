@@ -1,0 +1,9 @@
+:root {
+  --decoration-display: block;
+}
+
+@media (max-width: 1200px) {
+  :root {
+    --decoration-display: none;
+  }
+}
