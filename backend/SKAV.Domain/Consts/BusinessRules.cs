@@ -29,12 +29,7 @@
         public const string MemberNotFound = "MemberNotFound";
         public const string MemberAlreadyExists = "MemberAlreadyExists";
         public const string MemberDisplayOrderExists = "MemberDisplayOrderExists";
-
-        // Instruments
-        public const string InstrumentNotFound = "InstrumentNotFound";
-        public const string InstrumentAlreadyExists = "InstrumentAlreadyExists";
-        public const string MemberInstrumentNotFound = "MemberInstrumentNotFound";
-
+        
         // Products
         public const string ProductOrderAlreadyHandled = "ProductOrderAlreadyHandled";
         public const string ProductOrderAlreadyCancelled = "ProductOrderAlreadyCancelled";
