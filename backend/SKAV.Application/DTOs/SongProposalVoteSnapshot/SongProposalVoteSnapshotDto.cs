@@ -3,6 +3,6 @@
     public class SongProposalVoteSnapshotDto
     {
         public int VoteCount { get; init; }
-        public DateTime SnapshotDate { get; init; }
+        public DateTimeOffset SnapshotDate { get; init; }
     }
 }
