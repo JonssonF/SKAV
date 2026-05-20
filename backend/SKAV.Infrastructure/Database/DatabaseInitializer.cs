@@ -348,6 +348,53 @@ namespace SKAV.Infrastructure.Database
                 """;
             await connection.ExecuteAsync(sqlProductAttributeDefinitions);
 
+            const string sqlSongProposals = """
+                CREATE TABLE IF NOT EXISTS SongProposals (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Title TEXT NOT NULL,
+                    Description TEXT NULL,
+                    LyricsBody TEXT NULL,
+                    IsActive INTEGER NOT NULL DEFAULT 0,
+                    IsWinner INTEGER NOT NULL DEFAULT 0,
+                    CreatedAt TEXT NOT NULL,
+                    CreatedBy INTEGER,
+                    UpdatedAt TEXT,
+                    UpdatedBy INTEGER,
+                    DeletedAt TEXT,
+                    DeletedBy INTEGER
+                );
+                """;
+            await connection.ExecuteAsync(sqlSongProposals);
+
+            const string sqlSongProposalVotes = """
+                CREATE TABLE IF NOT EXISTS SongProposalVotes (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    SongProposalId INTEGER NOT NULL,
+                    VoterIp TEXT NOT NULL,
+                    CreatedAt TEXT NOT NULL,
+                    FOREIGN KEY (SongProposalId) REFERENCES SongProposals(Id)
+                );
+                """;
+            await connection.ExecuteAsync(sqlSongProposalVotes);
+
+            const string indexSongProposalVoterIp = """
+                CREATE UNIQUE INDEX IF NOT EXISTS idx_song_proposal_voter_ip
+                ON SongProposalVotes (SongProposalId, VoterIp);
+                """;
+            await connection.ExecuteAsync(indexSongProposalVoterIp);
+
+            const string sqlSongProposalVoteSnapshots = """
+                CREATE TABLE IF NOT EXISTS SongProposalVoteSnapshots (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    SongProposalId INTEGER NOT NULL,
+                    VoteCount INTEGER NOT NULL,
+                    SnapshotDate TEXT NOT NULL,
+                    FOREIGN KEY (SongProposalId) REFERENCES SongProposals(Id)
+                );
+                """;
+            await connection.ExecuteAsync(sqlSongProposalVoteSnapshots);
+
+
             await SeedAdminAsync(connection);
         }
         private async Task SeedAdminAsync(IDbConnection connection)
@@ -357,10 +404,10 @@ namespace SKAV.Infrastructure.Database
 
             var users = new[]
             {
-        new { Email = "admin@skav.se", Roles = 1 },   // Admin
-        new { Email = "editor@skav.se", Roles = 2 },   // Editor
-        new { Email = "member@skav.se", Roles = 4 },   // Member
-    };
+                new { Email = "admin@skav.se", Roles = 1 },   // Admin
+                new { Email = "editor@skav.se", Roles = 2 },   // Editor
+                new { Email = "member@skav.se", Roles = 4 },   // Member
+            };
 
             foreach (var user in users)
             {
