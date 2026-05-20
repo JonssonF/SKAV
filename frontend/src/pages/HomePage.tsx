@@ -15,7 +15,6 @@ import { useLocalStorage } from '@mantine/hooks';
 
 const sectionStyle: React.CSSProperties = {
   position: 'relative',
-  zIndex: 1,
 };
 
 function DecorationImage({
@@ -47,7 +46,7 @@ function DecorationImage({
           [side]: 0,
           top: '-150px',
           width: 'min(1000px, 40vw)',
-          zIndex: 0,
+          zIndex: -1,
           display: 'var(--decoration-display)',
         }}
       />

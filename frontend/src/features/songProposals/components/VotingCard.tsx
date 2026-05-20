@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Text, Button, Badge, Stack, Group, Paper, Title } from '@mantine/core';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IconMusic, IconThumbUp } from '@tabler/icons-react';
@@ -27,9 +28,20 @@ export function VotingCard({
     onVote();
   };
 
+  // Lås scrollning när kortet är expanderat
+  useEffect(() => {
+    if (isSelected) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isSelected]);
+
   return (
     <>
-      {/* Kortet i gridet */}
       {!isSelected && (
         <motion.div
           layoutId={`proposal-${proposal.id}`}
@@ -72,7 +84,6 @@ export function VotingCard({
         </motion.div>
       )}
 
-      {/* Expanderad overlay */}
       <AnimatePresence>
         {isSelected && (
           <>
@@ -86,7 +97,7 @@ export function VotingCard({
                 position: 'fixed',
                 inset: 0,
                 backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                zIndex: 200,
+                zIndex: 9998,
               }}
             />
             <motion.div
@@ -98,10 +109,8 @@ export function VotingCard({
                 left: '50%',
                 x: '-50%',
                 y: '-50%',
-                zIndex: 201,
+                zIndex: 9999,
                 width: 'min(90vw, 500px)',
-                maxHeight: '80vh',
-                overflow: 'auto',
               }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             >
