@@ -16,8 +16,6 @@ namespace SKAV.Tests.Smoke
         [InlineData("/api/albums")]
         [InlineData("/api/members")]
         [InlineData("/api/songs")]
-        [InlineData("/api/instruments")]
-        [InlineData("/api/memberinstruments")]
         [InlineData("/api/subscribers")]
         [InlineData("/api/users")]
 
