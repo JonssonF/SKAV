@@ -1,5 +1,6 @@
 ﻿using SKAV.Application.Common.Helpers;
 using SKAV.Application.DTOs.Product;
+using SKAV.Application.DTOs.ProductImage;
 using SKAV.Application.Interfaces;
 using SKAV.Application.Interfaces.Repositories;
 using SKAV.Application.Interfaces.UoW;
@@ -14,6 +15,7 @@ namespace SKAV.Application.Services
         IProductRepository repo,
         IProductVariantRepository variantRepo,
         IProductAttributeDefinitionRepository attrRepo,
+        IProductImageRepository imageRepo,
         IUnitOfWork uow,
         ICurrentUserService currentUser) : IProductService
     {
@@ -26,7 +28,8 @@ namespace SKAV.Application.Services
             {
                 var variants = await variantRepo.GetByProductIdAsync(product.Id, ct);
                 var attributes = await attrRepo.GetByProductIdAsync(product.Id, ct);
-                result.Add(MapToDto(product, variants, attributes));
+                var images = await imageRepo.GetByProductIdAsync(product.Id, ct);
+                result.Add(MapToDto(product, variants, attributes, images));
             }
 
             return result;
@@ -39,8 +42,9 @@ namespace SKAV.Application.Services
 
             var variants = await variantRepo.GetByProductIdAsync(product.Id, ct);
             var attributes = await attrRepo.GetByProductIdAsync(product.Id, ct);
+            var images = await imageRepo.GetByProductIdAsync(product.Id, ct);
 
-            return MapToDto(product, variants, attributes);
+            return MapToDto(product, variants, attributes, images);
         }
 
         public async Task<CreateProductResponseDto> CreateAsync(CreateProductRequestDto request, CancellationToken ct)
@@ -50,8 +54,9 @@ namespace SKAV.Application.Services
                 Title = request.Title,
                 Description = request.Description,
                 Price = request.Price,
-                ImageUrl = request.ImageUrl,
                 Category = request.Category,
+                IsSignable = request.IsSignable,
+                SigningPrice = request.SigningPrice,
             };
 
             AuditHelper.SetCreated(product, currentUser.UserId);
@@ -71,8 +76,9 @@ namespace SKAV.Application.Services
             existing.Title = request.Title;
             existing.Description = request.Description;
             existing.Price = request.Price;
-            existing.ImageUrl = request.ImageUrl;
             existing.Category = request.Category;
+            existing.IsSignable = request.IsSignable;
+            existing.SigningPrice = request.SigningPrice;
 
             AuditHelper.SetUpdated(existing, currentUser.UserId);
 
@@ -100,14 +106,24 @@ namespace SKAV.Application.Services
         private static ProductResponseDto MapToDto(
             Product p,
             IEnumerable<ProductVariant> variants,
-            IEnumerable<ProductAttributeDefinition> attributes) => new()
+            IEnumerable<ProductAttributeDefinition> attributes,
+            IEnumerable<ProductImage> images) => new()
             {
                 Id = p.Id,
                 Title = p.Title,
                 Description = p.Description,
                 Price = p.Price,
-                ImageUrl = p.ImageUrl,
                 Category = p.Category,
+                IsSignable = p.IsSignable,
+                SigningPrice = p.SigningPrice,
+                Images = images.OrderBy(i => i.DisplayOrder).Select(i => new ProductImageDto
+                {
+                    Id = i.Id,
+                    ProductId = i.ProductId,
+                    ImageUrl = i.ImageUrl,
+                    IsPrimary = i.IsPrimary,
+                    DisplayOrder = i.DisplayOrder,
+                }).ToList(),
                 AttributeDefinitions = attributes.OrderBy(a => a.DisplayOrder).Select(a => new ProductAttributeDefinitionDto
                 {
                     Id = a.Id,

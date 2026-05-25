@@ -101,12 +101,21 @@ namespace SKAV.Application.Services
             foreach (var item in request.Items)
             {
                 var variant = variantsToUpdate.First(v => v.Id == item.ProductVariantId);
+                var product = await productRepo.GetByIdAsync(variant.ProductId, ct)
+                    ?? throw new NotFoundException(BusinessRules.ProductNotFound);
+
+                if (item.IsSigned && !product.IsSignable)
+                    throw new BusinessRuleException(
+                        $"{product.Title} kan inte signeras.",
+                        BusinessRules.ProductNotSignable);
+
                 var orderItem = new ProductOrderItem
                 {
                     ProductOrderId = orderId,
                     ProductId = variant.ProductId,
                     ProductVariantId = item.ProductVariantId,
                     Quantity = item.Quantity,
+                    IsSigned = item.IsSigned,
                 };
 
                 AuditHelper.SetCreated(orderItem, null);
@@ -222,16 +231,20 @@ namespace SKAV.Application.Services
                 {
                     ProductId = i.ProductId,
                     ProductTitle = productLookup.ContainsKey(i.ProductId)
-                ? productLookup[i.ProductId].Title
-                : "Okänd produkt",
+                        ? productLookup[i.ProductId].Title
+                        : "Okänd produkt",
                     ProductPrice = productLookup.ContainsKey(i.ProductId)
-                ? productLookup[i.ProductId].Price
-                : 0,
+                        ? productLookup[i.ProductId].Price
+                        : 0,
                     ProductVariantId = i.ProductVariantId,
                     VariantAttributes = variantLookup.ContainsKey(i.ProductVariantId)
-                ? variantLookup[i.ProductVariantId].Attributes
-                : "{}",
+                        ? variantLookup[i.ProductVariantId].Attributes
+                        : "{}",
                     Quantity = i.Quantity,
+                    IsSigned = i.IsSigned,
+                    SigningPrice = i.IsSigned && productLookup.ContainsKey(i.ProductId)
+                        ? productLookup[i.ProductId].SigningPrice
+                        : null,
                 }).ToList(),
             };
     }

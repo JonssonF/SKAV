@@ -200,8 +200,9 @@ namespace SKAV.Infrastructure.Database
                     Title TEXT NOT NULL,
                     Description TEXT NOT NULL,
                     Price DECIMAL(10,2) NOT NULL,
-                    ImageUrl TEXT,
                     Category TEXT,
+                    IsSignable INTEGER NOT NULL DEFAULT 0,
+                    SigningPrice DECIMAL(10,2),
                     CreatedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     CreatedBy INTEGER,
                     UpdatedAt TEXT,
@@ -211,6 +212,24 @@ namespace SKAV.Infrastructure.Database
                 );
                 """;
             await connection.ExecuteAsync(sqlProducts);
+
+            const string sqlProductImages = """
+                CREATE TABLE IF NOT EXISTS ProductImages(
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    ProductId INTEGER NOT NULL,
+                    ImageUrl TEXT NOT NULL,
+                    IsPrimary INTEGER NOT NULL DEFAULT 0,
+                    DisplayOrder INTEGER NOT NULL DEFAULT 0,
+                    CreatedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    CreatedBy INTEGER,
+                    UpdatedAt TEXT,
+                    UpdatedBy INTEGER,
+                    DeletedAt TEXT,
+                    DeletedBy INTEGER,
+                    FOREIGN KEY(ProductId) REFERENCES Products(Id)
+                );
+                """;
+            await connection.ExecuteAsync(sqlProductImages);
 
             const string sqlProductOrders = """
                 CREATE TABLE IF NOT EXISTS ProductOrders(
@@ -264,6 +283,7 @@ namespace SKAV.Infrastructure.Database
                     ProductId INTEGER NOT NULL,
                     ProductVariantId INTEGER NOT NULL,
                     Quantity INTEGER NOT NULL,
+                    IsSigned INTEGER NOT NULL DEFAULT 0,
                     CreatedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     CreatedBy INTEGER,
                     UpdatedAt TEXT,
@@ -356,7 +376,6 @@ namespace SKAV.Infrastructure.Database
                 );
                 """;
             await connection.ExecuteAsync(sqlSongProposalVoteSnapshots);
-
 
             await SeedAdminAsync(connection);
         }
