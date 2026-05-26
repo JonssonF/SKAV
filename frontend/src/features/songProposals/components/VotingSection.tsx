@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import {
   Container,
-  Title,
   Text,
   SimpleGrid,
   Loader,

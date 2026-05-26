@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import {
   Container,
-  Title,
   Card,
   Image,
   Text,
