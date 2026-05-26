@@ -8,9 +8,7 @@ namespace SKAV.Infrastructure.Database
     public class SeedData(
         IMemberRepository memberRepo,
         IGigRepository gigRepo,
-        IAlbumRepository albumRepo,
         ISongRepository songRepo,
-        ILyricsRepository lyricsRepo,
         IBookingRequestRepository bookingRequestRepo,
         IBookingRecipientRepository bookingRecipientRepo,
         IProductRepository productRepo,
@@ -26,9 +24,7 @@ namespace SKAV.Infrastructure.Database
         {
             await SeedMembersAsync(ct);
             await SeedGigsAsync(ct);
-            await SeedAlbumsAsync(ct);
             await SeedSongsAsync(ct);
-            await SeedLyricsAsync(ct);
             await SeedBookingRequestsAsync(ct);
             await SeedBookingRecipientsAsync(ct);
             await SeedProductsAsync(ct);
