@@ -6,6 +6,7 @@ import {
   Button,
   Stack,
   Group,
+  Switch,
 } from '@mantine/core';
 import type { ProductResponse } from '../../../types/product.types';
 
@@ -15,8 +16,9 @@ interface ProductFormProps {
     title: string;
     description: string;
     price: number;
-    imageUrl?: string;
     category?: string;
+    isSignable: boolean;
+    signingPrice?: number;
   }) => void;
   loading?: boolean;
   errors?: Record<string, string> | null;
@@ -26,16 +28,18 @@ export function ProductForm({ initialData, onSubmit, loading, errors }: ProductF
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState<number | string>(0);
-  const [imageUrl, setImageUrl] = useState('');
   const [category, setCategory] = useState('');
+  const [isSignable, setIsSignable] = useState(false);
+  const [signingPrice, setSigningPrice] = useState<number | string>('');
 
   useEffect(() => {
     if (initialData) {
       setTitle(initialData.title);
       setDescription(initialData.description);
       setPrice(initialData.price);
-      setImageUrl(initialData.imageUrl ?? '');
       setCategory(initialData.category ?? '');
+      setIsSignable(initialData.isSignable);
+      setSigningPrice(initialData.signingPrice ?? '');
     }
   }, [initialData]);
 
@@ -45,8 +49,9 @@ export function ProductForm({ initialData, onSubmit, loading, errors }: ProductF
       title,
       description,
       price: price !== '' ? Number(price) : 0,
-      imageUrl: imageUrl || undefined,
       category: category || undefined,
+      isSignable,
+      signingPrice: isSignable && signingPrice !== '' ? Number(signingPrice) : undefined,
     });
   };
 
@@ -83,20 +88,29 @@ export function ProductForm({ initialData, onSubmit, loading, errors }: ProductF
         />
 
         <TextInput
-          label="Bild-URL"
-          placeholder="https://..."
-          value={imageUrl}
-          onChange={(e) => setImageUrl(e.currentTarget.value)}
-          error={errors?.imageUrl}
-        />
-
-        <TextInput
           label="Kategori"
           placeholder="T.ex. Kläder, Musik, Övrigt"
           value={category}
           onChange={(e) => setCategory(e.currentTarget.value)}
           error={errors?.category}
         />
+
+        <Switch
+          label="Kan signeras"
+          checked={isSignable}
+          onChange={(e) => setIsSignable(e.currentTarget.checked)}
+        />
+
+        {isSignable && (
+          <NumberInput
+            label="Signeringspris (kr)"
+            description="Lämna tomt eller 0 för gratis signering"
+            placeholder="0"
+            value={signingPrice}
+            onChange={(val) => setSigningPrice(val !== undefined ? Number(val) : '')}
+            min={0}
+          />
+        )}
 
         <Group justify="flex-end">
           <Button type="submit" loading={loading}>

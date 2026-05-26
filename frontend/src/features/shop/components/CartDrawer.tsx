@@ -19,8 +19,8 @@ interface CartDrawerProps {
   items: CartItem[];
   totalItems: number;
   totalPrice: number;
-  onUpdateQuantity: (variantId: number, quantity: number) => void;
-  onRemoveItem: (variantId: number) => void;
+  onUpdateQuantity: (variantId: number, isSigned: boolean, quantity: number) => void;
+  onRemoveItem: (variantId: number, isSigned: boolean) => void;
   onCheckout: () => void;
 }
 
@@ -60,22 +60,29 @@ export function CartDrawer({
             const attrText = Object.entries(attrs)
               .map(([key, val]) => `${key}: ${val}`)
               .join(', ');
-            const price = item.variant.priceOverride ?? item.product.price;
+            const basePrice = item.variant.priceOverride ?? item.product.price;
+            const signingExtra = item.isSigned ? (item.product.signingPrice ?? 0) : 0;
+            const unitPrice = basePrice + signingExtra;
 
             return (
-              <div key={item.variant.id}>
+              <div key={`${item.variant.id}-${item.isSigned}`}>
                 <Group justify="space-between" align="flex-start">
                   <div style={{ flex: 1 }}>
                     <Text fw={600} size="sm">{item.product.title}</Text>
                     {attrText && (
                       <Text size="xs" c="dimmed">{attrText}</Text>
                     )}
-                    <Text size="sm" fw={500} mt={4}>{price} kr/st</Text>
+                    {item.isSigned && (
+                      <Badge size="xs" variant="light" color="violet" mt={2}>
+                        Signerad
+                      </Badge>
+                    )}
+                    <Text size="sm" fw={500} mt={4}>{unitPrice} kr/st</Text>
                   </div>
                   <ActionIcon
                     variant="subtle"
                     color="red"
-                    onClick={() => onRemoveItem(item.variant.id)}
+                    onClick={() => onRemoveItem(item.variant.id, item.isSigned)}
                   >
                     <IconTrash size={16} />
                   </ActionIcon>
@@ -85,7 +92,11 @@ export function CartDrawer({
                   <NumberInput
                     value={item.quantity}
                     onChange={(val) =>
-                      onUpdateQuantity(item.variant.id, typeof val === 'number' ? val : 1)
+                      onUpdateQuantity(
+                        item.variant.id,
+                        item.isSigned,
+                        typeof val === 'number' ? val : 1,
+                      )
                     }
                     min={1}
                     max={item.variant.stockQuantity}
@@ -93,7 +104,7 @@ export function CartDrawer({
                     w={80}
                   />
                   <Text size="sm" c="dimmed">
-                    = {price * item.quantity} kr
+                    = {unitPrice * item.quantity} kr
                   </Text>
                 </Group>
 

@@ -5,6 +5,8 @@ export interface ProductOrderItemDto {
   productVariantId: number;
   variantAttributes: string;
   quantity: number;
+  isSigned: boolean;
+  signingPrice?: number;
 }
 
 export interface ProductOrderResponse {
@@ -42,6 +44,7 @@ export interface CreateProductOrderRequest {
 export interface CreateProductOrderItemRequest {
   productVariantId: number;
   quantity: number;
+  isSigned: boolean;
 }
 
 export interface CreateProductOrderResponse {

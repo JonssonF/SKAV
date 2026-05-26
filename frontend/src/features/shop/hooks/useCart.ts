@@ -5,6 +5,7 @@ export interface CartItem {
   product: ProductResponse;
   variant: ProductVariant;
   quantity: number;
+  isSigned: boolean;
 }
 
 const CART_KEY = 'skav-cart';
@@ -21,39 +22,52 @@ function loadCart(): CartItem[] {
 export function useCart() {
   const [items, setItems] = useState<CartItem[]>(loadCart);
 
-  // Spara till localStorage vid varje ändring
   useEffect(() => {
     localStorage.setItem(CART_KEY, JSON.stringify(items));
   }, [items]);
 
-  const addItem = useCallback((product: ProductResponse, variant: ProductVariant, quantity: number = 1) => {
+  const addItem = useCallback((
+    product: ProductResponse,
+    variant: ProductVariant,
+    quantity: number = 1,
+    isSigned: boolean = false,
+  ) => {
     setItems((prev) => {
-      const existing = prev.find((item) => item.variant.id === variant.id);
+      // Samma variant + samma signeringsstatus = samma rad
+      const existing = prev.find(
+        (item) => item.variant.id === variant.id && item.isSigned === isSigned
+      );
       if (existing) {
         return prev.map((item) =>
-          item.variant.id === variant.id
+          item.variant.id === variant.id && item.isSigned === isSigned
             ? { ...item, quantity: item.quantity + quantity }
             : item
         );
       }
-      return [...prev, { product, variant, quantity }];
+      return [...prev, { product, variant, quantity, isSigned }];
     });
   }, []);
 
-  const updateQuantity = useCallback((variantId: number, quantity: number) => {
+  const updateQuantity = useCallback((variantId: number, isSigned: boolean, quantity: number) => {
     if (quantity <= 0) {
-      setItems((prev) => prev.filter((item) => item.variant.id !== variantId));
+      setItems((prev) => prev.filter(
+        (item) => !(item.variant.id === variantId && item.isSigned === isSigned)
+      ));
       return;
     }
     setItems((prev) =>
       prev.map((item) =>
-        item.variant.id === variantId ? { ...item, quantity } : item
+        item.variant.id === variantId && item.isSigned === isSigned
+          ? { ...item, quantity }
+          : item
       )
     );
   }, []);
 
-  const removeItem = useCallback((variantId: number) => {
-    setItems((prev) => prev.filter((item) => item.variant.id !== variantId));
+  const removeItem = useCallback((variantId: number, isSigned: boolean) => {
+    setItems((prev) => prev.filter(
+      (item) => !(item.variant.id === variantId && item.isSigned === isSigned)
+    ));
   }, []);
 
   const clearCart = useCallback(() => {
@@ -63,8 +77,9 @@ export function useCart() {
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
 
   const totalPrice = items.reduce((sum, item) => {
-    const price = item.variant.priceOverride ?? item.product.price;
-    return sum + price * item.quantity;
+    const basePrice = item.variant.priceOverride ?? item.product.price;
+    const signingExtra = item.isSigned ? (item.product.signingPrice ?? 0) : 0;
+    return sum + (basePrice + signingExtra) * item.quantity;
   }, 0);
 
   return {

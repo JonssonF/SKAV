@@ -13,6 +13,8 @@ appsettings.*.json
 *.db-shm
 *.db-wal
 
+wwwroot/uploads/
+
 # Frontend build output
 node_modules/
 dist/

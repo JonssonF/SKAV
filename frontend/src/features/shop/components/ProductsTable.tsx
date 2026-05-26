@@ -1,4 +1,5 @@
 import { Table, Group, Button, Text, Badge, Image } from '@mantine/core';
+import { getImageUrl } from '../../../utils/imageUrl';
 import type { ProductResponse } from '../../../types/product.types';
 
 interface ProductsTableProps {
@@ -34,13 +35,15 @@ export function ProductsTable({ products, onEdit, onManage, onDelete, deleteLoad
             <Table.Tr key={product.id}>
               <Table.Td>
                 <Group gap="sm">
-                  <Image
-                    src={product.imageUrl}
-                    w={40}
-                    h={40}
-                    radius="sm"
-                    fallbackSrc="https://placehold.co/40x40?text=?"
-                  />
+                <Image
+                  src={getImageUrl(
+                    (product.images.find((i) => i.isPrimary) ?? product.images[0])?.imageUrl
+                  )}
+                  w={40}
+                  h={40}
+                  radius="sm"
+                  fallbackSrc="https://placehold.co/40x40?text=?"
+                />
                   <Text size="sm" fw={500}>{product.title}</Text>
                 </Group>
               </Table.Td>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { notifications } from '@mantine/notifications';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   useProducts,
   useCreateProduct,
@@ -23,6 +24,7 @@ import type {
 
 export function useAdminProducts() {
   const { data: products, isLoading, error } = useProducts();
+  const queryClient = useQueryClient();
   const createProduct = useCreateProduct();
   const updateProduct = useUpdateProduct();
   const deleteProduct = useDeleteProduct();
@@ -248,6 +250,9 @@ export function useAdminProducts() {
       onCreateVariant: handleCreateVariant,
       onUpdateVariant: handleUpdateVariant,
       onDeleteVariant: handleDeleteVariant,
+      onImagesChanged: () => {
+        queryClient.invalidateQueries({ queryKey: ['products'] });
+      },
       attrLoading: createAttr.isPending,
       variantLoading: createVariant.isPending || updateVariant.isPending,
     },

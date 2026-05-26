@@ -40,7 +40,7 @@ namespace SKAV.Api
 
             app.UseMiddleware<ExceptionHandlingMiddleware>();
             app.UseCors("AllowFrontend");
-
+            app.UseStaticFiles();
             // Only use HTTPS redirection in production, as it can interfere with development and testing
             if (!app.Environment.IsDevelopment())
             {

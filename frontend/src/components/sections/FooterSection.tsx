@@ -3,6 +3,7 @@ import { Container, Group, Text, Stack } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
 import { motion } from 'framer-motion';
 import { UnsubscribeModal } from '../../features/subscribers/components/UnsubscribeModal';
+import { IMAGE_BASE_URL } from '../../utils/imageUrl';
 
 export function FooterSection() {
   const [colorScheme] = useLocalStorage<'light' | 'dark'>({
@@ -13,8 +14,8 @@ export function FooterSection() {
   const [unsubOpen, setUnsubOpen] = useState(false);
 
   const bottomImage = colorScheme === 'dark'
-    ? '/images/sections/bottom-dark.png'
-    : '/images/sections/bottom-light.jpg';
+    ? `${IMAGE_BASE_URL}/images/sections/bottom-dark.png`
+    : `${IMAGE_BASE_URL}/images/sections/bottom-light.jpg`;
 
   const bgColor = colorScheme === 'dark'
     ? 'var(--mantine-color-dark-7)'

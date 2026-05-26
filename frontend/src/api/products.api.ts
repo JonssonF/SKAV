@@ -9,6 +9,8 @@ import type {
   CreateProductVariantRequest,
   CreateProductVariantResponse,
   UpdateProductVariantRequest,
+  CreateProductImageRequest,
+  UpdateProductImageRequest,
 } from '../types/product.types';
 
 export const productsApi = {
@@ -57,5 +59,28 @@ export const productsApi = {
 
   deleteVariant: async (id: number): Promise<void> => {
     await apiClient.delete(`/product-variants/${id}`);
+  },
+
+  // Images
+  uploadImage: async (file: File, folder: string): Promise<{ url?: string; error?: string }> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await apiClient.post(`/upload/${folder}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  },
+
+  createImage: async (data: CreateProductImageRequest): Promise<{ id: number }> => {
+    const response = await apiClient.post<{ id: number }>('/product-images', data);
+    return response.data;
+  },
+
+  updateImage: async (id: number, data: UpdateProductImageRequest): Promise<void> => {
+    await apiClient.put(`/product-images/${id}`, data);
+  },
+
+  deleteImage: async (id: number): Promise<void> => {
+    await apiClient.delete(`/product-images/${id}`);
   },
 };
