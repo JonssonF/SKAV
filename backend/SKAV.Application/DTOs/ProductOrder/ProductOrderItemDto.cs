@@ -8,5 +8,7 @@
         public int ProductVariantId { get; init; }
         public string VariantAttributes { get; init; } = null!;
         public int Quantity { get; init; }
+        public bool IsSigned { get; init; }
+        public decimal? SigningPrice { get; init; }
     }
 }

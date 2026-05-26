@@ -29,7 +29,7 @@
         public const string MemberNotFound = "MemberNotFound";
         public const string MemberAlreadyExists = "MemberAlreadyExists";
         public const string MemberDisplayOrderExists = "MemberDisplayOrderExists";
-        
+
         // Products
         public const string ProductOrderAlreadyHandled = "ProductOrderAlreadyHandled";
         public const string ProductOrderAlreadyCancelled = "ProductOrderAlreadyCancelled";
@@ -38,6 +38,9 @@
         public const string ProductConcurrencyError = "ProductConcurrencyError";
         public const string ProductVariantNotFound = "ProductVariantNotFound";
         public const string ProductAttributeDefinitionNotFound = "ProductAttributeDefinitionNotFound";
+        public const string ProductImageNotFound = "ProductImageNotFound";
+        public const string ProductImagePrimaryRequired = "ProductImagePrimaryRequired";
+        public const string ProductNotSignable = "ProductNotSignable";
 
         // Product Orders
         public const string ProductOrderNotFound = "ProductOrderNotFound";

@@ -20,10 +20,14 @@ namespace SKAV.Application.DTOs.Product
         [DefaultValue(249)]
         public decimal Price { get; set; }
 
-        public string? ImageUrl { get; set; }
-
         [MaxLength(100, ErrorMessage = "Max {1} tecken")]
         [DefaultValue("Kläder")]
         public string? Category { get; set; }
+
+        [DefaultValue(false)]
+        public bool IsSignable { get; set; }
+
+        [Range(0, 99999, ErrorMessage = "Signeringspris måste vara mellan {1} och {2}")]
+        public decimal? SigningPrice { get; set; }
     }
 }
