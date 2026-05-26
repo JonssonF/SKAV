@@ -11,6 +11,7 @@ import {
   Anchor,
 } from '@mantine/core';
 import { useGigs } from '../hooks/useGigs';
+import { SectionTitle } from '../../../components/ui/SectionTitle';
 
 export function GigsSection() {
   const { data: gigs, isLoading, error } = useGigs();
@@ -38,7 +39,7 @@ export function GigsSection() {
   if (!gigs || gigs.length === 0) {
     return (
       <Container size="lg" py="xl">
-        <Title order={2} mb="lg">Spelningar</Title>
+        <SectionTitle text="Spelningar" />
         <Text c="dimmed">Inga spelningar inlagda än.</Text>
       </Container>
     );
@@ -46,7 +47,7 @@ export function GigsSection() {
 
   return (
     <Container size="lg" py="xl">
-      <Title order={2} mb="lg" ta="center">Spelningar</Title>
+      <SectionTitle text="Spelningar" />
       <Stack gap="md">
         {gigs.map((gig) => (
           <Card key={gig.id} shadow="sm" padding="lg" radius="md" withBorder>

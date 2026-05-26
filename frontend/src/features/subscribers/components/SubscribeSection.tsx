@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Container, Title, Text, TextInput, Button, Group, Alert } from '@mantine/core';
 import { useSubscribe } from '../hooks/useSubscribers';
 import { getApiMessage } from '../../../utils/getApiErrors';
+import { SectionTitle } from '../../../components/ui/SectionTitle';
 
 export function SubscribeSection() {
   const subscribe = useSubscribe();
@@ -26,7 +27,7 @@ export function SubscribeSection() {
 
   return (
     <Container size="sm" py="xl">
-      <Title order={2} mb="sm" ta="center">Nyhetsbrev</Title>
+      <SectionTitle text="Nyhetsbrev" />
       <Text ta="center" c="dimmed" mb="lg">
         Missa aldrig något ifrån SKAV! <br/>Få nyheter om spelningar och släpp direkt i din inkorg.
       </Text>

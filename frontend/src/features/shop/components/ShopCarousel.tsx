@@ -13,6 +13,7 @@ import {
 import { Carousel } from '@mantine/carousel';
 import { useProducts } from '../hooks/useProducts';
 import { getImageUrl } from '../../../utils/imageUrl';
+import { SectionTitle } from '../../../components/ui/SectionTitle';
 
 export function ShopCarousel() {
   const { data: products } = useProducts();
@@ -26,12 +27,16 @@ export function ShopCarousel() {
 
   return (
     <Container size="lg" py="xl">
-      <Group justify="space-between" mb="lg">
-        <Title order={2} ta="center">Merch</Title>
-        <Button variant="subtle" onClick={() => navigate('/shop')}>
+      <div style={{ position: 'relative' }}>
+        <SectionTitle text="Merch" mb="lg" />
+        <Button
+          variant="subtle"
+          onClick={() => navigate('/shop')}
+          style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)' }}
+        >
           Se alla →
         </Button>
-      </Group>
+      </div>
 
         <Carousel
           slideSize={{ base: '100%', sm: '50%', md: '33.333%' }}

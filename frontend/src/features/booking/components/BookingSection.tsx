@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Container, Title, Text, Card, Alert } from '@mantine/core';
+import { Container, Text, Card, Alert } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { BookingForm } from './BookingForm';
 import { useCreateBookingRequest } from '../hooks/useBookingRequests';
 import { getApiErrors, getApiMessage } from '../../../utils/getApiErrors';
+import { SectionTitle } from '../../../components/ui/SectionTitle';
 import type { CreateBookingRequest } from '../../../types/bookingRequest.types';
 
 export function BookingSection() {
@@ -39,7 +40,7 @@ export function BookingSection() {
 
   return (
     <Container size="sm" py="xl">
-      <Title order={2} mb="lg" ta="center">Boka oss</Title>
+      <SectionTitle text="Boka oss" />
       <Text ta="center" c="dimmed" mb="xl">
         Vill ni ha livemusik på ert event? Skicka en förfrågan så hör vi av oss!
       </Text>

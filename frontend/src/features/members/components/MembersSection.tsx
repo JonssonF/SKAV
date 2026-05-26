@@ -14,8 +14,9 @@ import {
 } from '@mantine/core';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMembers } from '../hooks/useMembers';
-import type { MemberResponse } from '../../../types/member.types';
+import { SectionTitle } from '../../../components/ui/SectionTitle';
 import { getImageUrl } from '../../../utils/imageUrl';
+import type { MemberResponse } from '../../../types/member.types';
 
 function MemberCard({
   member,
@@ -195,7 +196,7 @@ export function MembersSection() {
   if (!members || members.length === 0) {
     return (
       <Container size="lg" py="xl">
-        <Title order={2} mb="lg" ta="center">Bandet</Title>
+        <SectionTitle text="Bandet" />
         <Text c="dimmed" ta="center">Inga medlemmar tillagda än.</Text>
       </Container>
     );
@@ -203,7 +204,7 @@ export function MembersSection() {
 
   return (
     <Container size="lg" py="xl">
-      <Title order={2} mb="lg" ta="center">Bandet</Title>
+      <SectionTitle text="Bandet" />
       <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
         {members.map((member) => (
           <MemberCard

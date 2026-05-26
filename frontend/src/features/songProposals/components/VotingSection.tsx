@@ -12,6 +12,7 @@ import { notifications } from '@mantine/notifications';
 import { useSongProposals, useVoteSongProposal } from '../hooks/useSongProposals';
 import { getApiMessage } from '../../../utils/getApiErrors';
 import { VotingCard } from './VotingCard';
+import { SectionTitle } from '../../../components/ui/SectionTitle';
 
 export function VotingSection() {
   const { data: proposals, isLoading, error } = useSongProposals();
@@ -63,7 +64,7 @@ export function VotingSection() {
 
   return (
     <Container size="lg" py="xl">
-      <Title order={2} mb="xs" ta="center">Rösta på nästa låt</Title>
+      <SectionTitle text="Rösta på nästa låt" />
       <Text c="dimmed" ta="center" mb="lg">
         Klicka på ett kort för att läsa mer och rösta!
       </Text>

@@ -14,6 +14,7 @@ import { useSongs } from '../../songs/hooks/useSongs';
 import { useLyrics } from '../../lyrics/hooks/useLyrics';
 import type { SongResponse } from '../../../types/song.types';
 import type { LyricsResponse } from '../../../types/lyrics.types';
+import { SectionTitle } from '../../../components/ui/SectionTitle';
 
 function formatDuration(seconds?: number): string {
   if (!seconds) return '';
@@ -128,7 +129,7 @@ export function MusicSection() {
   if (!songs || songs.length === 0) {
     return (
       <Container size="lg" py="xl">
-        <Title order={2} mb="lg" ta="center">Musik</Title>
+      <SectionTitle text="Musik" />
         <Text c="dimmed" ta="center">Inga låtar tillagda än.</Text>
       </Container>
     );
@@ -136,7 +137,7 @@ export function MusicSection() {
 
   return (
     <Container size="lg" py="xl">
-      <Title order={2} mb="lg" ta="center">Musik</Title>
+      <SectionTitle text="Musik" />
       <Card shadow="sm" padding="lg" radius="md" withBorder>
         {songs.map((song, i) => (
           <SongRow

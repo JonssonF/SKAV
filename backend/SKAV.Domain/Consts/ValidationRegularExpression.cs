@@ -41,7 +41,7 @@
         /// Tillåter http och https URL:er.
         /// Passar för biljettlänkar och andra externa URL:er.
         /// </summary>
-        public const string Url = @"^https?://[^\s/$.?#].[^\s]*$";
+        public const string Url = @"^(https?://[^\s/$.?#].[^\s]*|/[^\s]*)$";
 
         /// <summary>
         /// Tillåter bokstäver, siffror, mellanslag och vanliga skiljetecken.

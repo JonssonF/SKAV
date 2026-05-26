@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../providers/AuthProvider';
 import { useLocalStorage } from '@mantine/hooks';
 import { IconMenu2 } from '@tabler/icons-react';
+import { IMAGE_BASE_URL } from '../../utils/imageUrl';
+
 
 const navItems = [
   { label: 'Hem', href: '#hem' },
@@ -178,7 +180,7 @@ const scrollTo = (href: string) => {
         </Stack>
       </Drawer>
 
-      <main style={{ paddingTop: 60,  cursor: 'url(/images/misc/liten-gralle.png), auto' }}>
+      <main style={{ paddingTop: 60, cursor: `url(${IMAGE_BASE_URL}/images/misc/liten-gralle.png), auto` }}>
         {children}
       </main>
     </>

@@ -380,3 +380,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/backend/SKAV.Api/wwwroot/images/albums
+/backend/SKAV.Api/wwwroot/images/members
+/backend/SKAV.Api/wwwroot/uploads
