@@ -6,7 +6,7 @@ services:
     ports:
       - "5249:8080"
     volumes:
-      - ./database:/app/database
+      - ./database:/app
       - ./backend/SKAV.Api/wwwroot/uploads:/app/wwwroot/uploads
 
   skav-frontend:
