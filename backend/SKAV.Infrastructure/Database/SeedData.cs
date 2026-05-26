@@ -381,13 +381,13 @@ namespace SKAV.Infrastructure.Database
             var songs = new List<Song>
             {
                 // Singlar (inget album)
-                new() { Title = "Gubben och katten", DurationSeconds = 256, LyricsWriter = "Peter Mercury Jonsson", MusicWriter = "Filip B-bender Lennartsson" },
-                new() { Title = "Tord", DurationSeconds = 197, LyricsWriter = "Peter Mercury Jonsson", MusicWriter = "SKAV" },
-                new() { Title = "Det brinner på sågen", DurationSeconds = 137, LyricsWriter = "Filip B-bender Lennartsson", MusicWriter = "SKAV" },
-                new() { Title = "Duttpenna", DurationSeconds = 193, LyricsWriter = "Peter Mercury Jonsson, Filip B-bender Lennartsson", MusicWriter = "SKAV" },
-                new() { Title = "Grållen", DurationSeconds = 198, LyricsWriter = "Filip B-bender Lennartsson", MusicWriter = "SKAV" },
-                new() { Title = "Rädd", DurationSeconds = 181, LyricsWriter = "Peter Mercury Jonsson", MusicWriter = "SKAV" },
-                new() { Title = "Amerikat", DurationSeconds = 268, LyricsWriter = "Filip B-bender Lennartsson", MusicWriter = "SKAV" },
+                new() { Title = "Gubben och katten", DurationSeconds = 256, Year = 2025, LyricsWriter = "Peter Mercury Jonsson", MusicWriter = "Filip B-bender Lennartsson", SpotifyUrl = "https://open.spotify.com/track/4Rz0Fccd0Bmbj7MKJfsHYC?si=33b114794e4b4e86", YoutubeUrl = "https://www.youtube.com/watch?v=TryIrZ2ztP0"  },
+                new() { Title = "Grållen", DurationSeconds = 198, Year = 2025, LyricsWriter = "Filip B-bender Lennartsson", MusicWriter = "SKAV", SpotifyUrl = "https://open.spotify.com/track/4mH1WEPzWN6XgvCo7Qrn8N?si=aa29a20246594341"  },
+                new() { Title = "Rädd", DurationSeconds = 181, Year = 2025, LyricsWriter = "Peter Mercury Jonsson", MusicWriter = "SKAV", SpotifyUrl = "https://open.spotify.com/track/3K2u9hwZDLu70izR34gYF2?si=cbc91e1e050f441c"  },
+                new() { Title = "Tord", DurationSeconds = 197, Year = 2025, LyricsWriter = "Peter Mercury Jonsson", MusicWriter = "SKAV", SpotifyUrl = "https://open.spotify.com/track/1bzNmUgPssLkZPDFMI7Feg?si=50dc48b8149e4119"  },
+                new() { Title = "Amerikat", DurationSeconds = 268, Year = 2026,LyricsWriter = "Filip B-bender Lennartsson", MusicWriter = "SKAV", SpotifyUrl = "https://open.spotify.com/track/2LTBA7hORRIf0V9IQSL1NU?si=122c0b97c54048ef" },
+                new() { Title = "Det brinner på sågen", DurationSeconds = 137, Year = 2026, LyricsWriter = "Filip B-bender Lennartsson", MusicWriter = "SKAV", SpotifyUrl = "https://open.spotify.com/track/4Quz2ID1L3xZtPUfCEPV1L?si=dcaef65519104f0f"  },
+                new() { Title = "Duttpenna", DurationSeconds = 193, Year = 2026, LyricsWriter = "Peter Mercury Jonsson, Filip B-bender Lennartsson", MusicWriter = "SKAV", SpotifyUrl = "https://open.spotify.com/track/1JrHqS1bbLCcxzSygyNPIR?si=fe5b37f871e24ed2"  },
             };
 
             using var scope = uow.BeginTransactionScope();
