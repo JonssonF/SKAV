@@ -56,8 +56,8 @@ export function AdminDashboardPage() {
   // Räknare
   const activeSubscribers = subscribers?.length ?? 0;
   const unreadBookings = bookings?.filter((b) => !b.isRead).length ?? 0;
-  const unhandledOrders = orders?.filter((o) => !o.isHandled).length ?? 0;
-
+  const unhandledOrders = orders?.filter((o) => !o.isHandled && !o.isCancelled).length ?? 0;
+  
   // ── Booking handlers ──────────────────────────────────
   const handleAddBookingRecipient = () => {
     if (!newBookingEmail.trim()) return;
