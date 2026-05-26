@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Container, Title, Text, TextInput, Button, Group, Alert } from '@mantine/core';
+import { Container, Text, TextInput, Button, Group, Alert } from '@mantine/core';
 import { useSubscribe } from '../hooks/useSubscribers';
 import { getApiMessage } from '../../../utils/getApiErrors';
 import { SectionTitle } from '../../../components/ui/SectionTitle';
