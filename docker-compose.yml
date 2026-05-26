@@ -1,0 +1,19 @@
+services:
+  skav-api:
+    container_name: skav-api
+    build:
+      context: ./backend
+    ports:
+      - "5249:8080"
+    volumes:
+      - ./database:/app/database
+      - ./backend/SKAV.Api/wwwroot/uploads:/app/wwwroot/uploads
+
+  skav-frontend:
+    container_name: skav-frontend
+    build:
+      context: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - skav-api
