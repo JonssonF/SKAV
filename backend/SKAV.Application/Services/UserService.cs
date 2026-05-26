@@ -1,4 +1,5 @@
-﻿using SKAV.Application.DTOs.Member;
+﻿using SKAV.Application.Common.Helpers;
+using SKAV.Application.DTOs.Member;
 using SKAV.Application.DTOs.User;
 using SKAV.Application.Interfaces;
 using SKAV.Application.Interfaces.Repositories;
@@ -48,6 +49,8 @@ namespace SKAV.Application.Services
             var user = await repo.GetByIdAsync(id, ct)
                 ?? throw new NotFoundException(BusinessRules.UserNotFound);
 
+            AuditHelper.SetDeleted(user, currentUser.UserId);
+
             using var scope = uow.BeginTransactionScope();
             await repo.DeleteAsync(id, user, ct);
             await scope.CommitTransactionScopeAsync(ct);
@@ -91,7 +94,7 @@ namespace SKAV.Application.Services
 
             return new ChangePasswordResponseDto();
         }
-        
+
         public async Task<IEnumerable<UserResponseDto>> GetAllAsync(CancellationToken ct)
         {
             var users = await repo.GetAllAsync(ct);
