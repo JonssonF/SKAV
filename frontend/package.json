@@ -13,6 +13,7 @@
     "@mantine/carousel": "^9.1.1",
     "@mantine/core": "^9.1.1",
     "@mantine/dates": "^9.1.1",
+    "@mantine/dropzone": "^9.1.1",
     "@mantine/hooks": "^9.1.1",
     "@mantine/notifications": "^9.1.1",
     "@tabler/icons-react": "^3.42.0",

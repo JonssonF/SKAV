@@ -15,6 +15,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMembers } from '../hooks/useMembers';
 import type { MemberResponse } from '../../../types/member.types';
+import { getImageUrl } from '../../../utils/imageUrl';
 
 function MemberCard({
   member,
@@ -62,14 +63,15 @@ function MemberCard({
               justifyContent: 'center',
             }}
           >
-            <Avatar
-              src={member.imageUrl}
-              size={100}
-              radius="50%"
-              color="blue"
-            >
-              {member.name.charAt(0)}
-            </Avatar>
+          <Avatar
+            src={member.imageUrl ? getImageUrl(member.imageUrl) : null}
+            size={100}
+            radius="50%"
+            color="blue"
+          >
+            {member.name.charAt(0)}
+          </Avatar>
+
             <Title order={4} mt="md" ta="center">{member.name}</Title>
             {member.role && (
               <Badge variant="light" color="violet" mt="xs">
@@ -117,14 +119,14 @@ function MemberCard({
             >
               <Paper shadow="xl" radius="md" withBorder p="xl">
                 <Stack align="center" gap="md">
-                  <Avatar
-                    src={member.imageUrl}
-                    size={140}
-                    radius="50%"
-                    color="blue"
-                  >
-                    {member.name.charAt(0)}
-                  </Avatar>
+                <Avatar
+                  src={member.imageUrl ? getImageUrl(member.imageUrl) : null}
+                  size={140}
+                  radius="50%"
+                  color="blue"
+                >
+                  {member.name.charAt(0)}
+                </Avatar>
 
                   <div style={{ textAlign: 'center' }}>
                     <Title order={3}>{member.name}</Title>

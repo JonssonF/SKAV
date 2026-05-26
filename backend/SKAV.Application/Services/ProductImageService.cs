@@ -32,14 +32,15 @@ namespace SKAV.Application.Services
                 DisplayOrder = request.DisplayOrder,
             };
 
+            AuditHelper.SetCreated(image, currentUser.UserId);
+
+            using var scope = uow.BeginTransactionScope();
+
             if (image.IsPrimary)
             {
                 await ClearPrimaryAsync(request.ProductId, null, ct);
             }
 
-            AuditHelper.SetCreated(image, currentUser.UserId);
-
-            using var scope = uow.BeginTransactionScope();
             var id = await repo.CreateAsync(image, ct);
             await scope.CommitTransactionScopeAsync(ct);
 
@@ -56,14 +57,15 @@ namespace SKAV.Application.Services
             existing.IsPrimary = request.IsPrimary;
             existing.DisplayOrder = request.DisplayOrder;
 
+            AuditHelper.SetUpdated(existing, currentUser.UserId);
+
+            using var scope = uow.BeginTransactionScope();
+
             if (existing.IsPrimary)
             {
                 await ClearPrimaryAsync(existing.ProductId, id, ct);
             }
 
-            AuditHelper.SetUpdated(existing, currentUser.UserId);
-
-            using var scope = uow.BeginTransactionScope();
             await repo.UpdateAsync(existing, ct);
             await scope.CommitTransactionScopeAsync(ct);
 
@@ -88,14 +90,12 @@ namespace SKAV.Application.Services
         {
             var images = await repo.GetByProductIdAsync(productId, ct);
 
-            using var scope = uow.BeginTransactionScope();
             foreach (var img in images.Where(i => i.IsPrimary && i.Id != excludeId))
             {
                 img.IsPrimary = false;
                 AuditHelper.SetUpdated(img, currentUser.UserId);
                 await repo.UpdateAsync(img, ct);
             }
-            await scope.CommitTransactionScopeAsync(ct);
         }
     }
 }

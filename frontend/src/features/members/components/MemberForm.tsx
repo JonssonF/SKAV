@@ -6,7 +6,16 @@ import {
   Button,
   Stack,
   Group,
+  Text,
+  Image,
+  ActionIcon,
+  Box,
 } from '@mantine/core';
+import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone';
+import { notifications } from '@mantine/notifications';
+import { IconUpload, IconPhoto, IconX, IconTrash } from '@tabler/icons-react';
+import { productsApi } from '../../../api/products.api';
+import { getImageUrl } from '../../../utils/imageUrl';
 import type { MemberResponse } from '../../../types/member.types';
 
 interface MemberFormProps {
@@ -30,6 +39,7 @@ export function MemberForm({ initialData, onSubmit, loading, errors }: MemberFor
   const [quote, setQuote] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [displayOrder, setDisplayOrder] = useState<number | string>(0);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (initialData) {
@@ -42,9 +52,40 @@ export function MemberForm({ initialData, onSubmit, loading, errors }: MemberFor
     }
   }, [initialData]);
 
+  const handleUpload = async (files: File[]) => {
+    const file = files[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const result = await productsApi.uploadImage(file, 'members');
+      if (result.error || !result.url) {
+        notifications.show({
+          title: 'Uppladdning misslyckades',
+          message: result.error ?? 'Okänt fel',
+          color: 'red',
+        });
+        return;
+      }
+      setImageUrl(result.url);
+      notifications.show({
+        title: 'Bild uppladdad',
+        message: 'Bilden har laddats upp.',
+        color: 'green',
+      });
+    } catch {
+      notifications.show({
+        title: 'Fel',
+        message: 'Kunde inte ladda upp bilden.',
+        color: 'red',
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
     onSubmit({
       name,
       role: role || undefined,
@@ -93,13 +134,61 @@ export function MemberForm({ initialData, onSubmit, loading, errors }: MemberFor
           error={errors?.quote}
         />
 
-        <TextInput
-          label="Bild-URL"
-          placeholder="https://..."
-          value={imageUrl}
-          onChange={(e) => setImageUrl(e.currentTarget.value)}
-          error={errors?.imageUrl}
-        />
+        <div>
+          <Text size="sm" fw={500} mb={4}>Medlemsbild</Text>
+
+          {imageUrl ? (
+            <Box pos="relative" w={160}>
+              <Image
+                src={getImageUrl(imageUrl)}
+                h={160}
+                w={160}
+                radius="sm"
+                alt="Medlemsbild"
+              />
+              <ActionIcon
+                pos="absolute"
+                top={4}
+                right={4}
+                size="sm"
+                variant="filled"
+                color="red"
+                onClick={() => setImageUrl('')}
+                title="Ta bort bild"
+              >
+                <IconTrash size={14} />
+              </ActionIcon>
+            </Box>
+          ) : (
+            <Dropzone
+              onDrop={handleUpload}
+              accept={IMAGE_MIME_TYPE}
+              maxSize={10 * 1024 * 1024}
+              maxFiles={1}
+              loading={uploading}
+            >
+              <Group justify="center" gap="xl" mih={100} style={{ pointerEvents: 'none' }}>
+                <Dropzone.Accept>
+                  <IconUpload size={40} stroke={1.5} />
+                </Dropzone.Accept>
+                <Dropzone.Reject>
+                  <IconX size={40} stroke={1.5} />
+                </Dropzone.Reject>
+                <Dropzone.Idle>
+                  <IconPhoto size={40} stroke={1.5} />
+                </Dropzone.Idle>
+                <div>
+                  <Text size="sm" inline>
+                    Dra en bild hit eller klicka för att välja
+                  </Text>
+                  <Text size="xs" c="dimmed" inline mt={4}>
+                    JPG, PNG, GIF, WebP – max 10 MB
+                  </Text>
+                </div>
+              </Group>
+            </Dropzone>
+          )}
+        </div>
 
         <NumberInput
           label="Visningsordning"

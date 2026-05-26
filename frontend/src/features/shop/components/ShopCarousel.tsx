@@ -12,12 +12,12 @@ import {
 } from '@mantine/core';
 import { Carousel } from '@mantine/carousel';
 import { useProducts } from '../hooks/useProducts';
+import { getImageUrl } from '../../../utils/imageUrl';
 
 export function ShopCarousel() {
   const { data: products } = useProducts();
   const navigate = useNavigate();
 
-  // Visa bara produkter som har lager
   const inStockProducts = (products ?? []).filter((p) =>
     p.variants.some((v) => v.stockQuantity > 0)
   );
@@ -33,15 +33,14 @@ export function ShopCarousel() {
         </Button>
       </Group>
 
-      <Carousel
-        slideSize={{ base: '100%', sm: '50%', md: '33.333%' }}
-        slideGap="md"
-        loop
-        align="start"
-        withIndicators
-      >
+        <Carousel
+          slideSize={{ base: '100%', sm: '50%', md: '33.333%' }}
+          slideGap="md"
+          withIndicators
+        >
         {inStockProducts.map((product) => {
           const totalStock = product.variants.reduce((sum, v) => sum + v.stockQuantity, 0);
+          const primaryImage = product.images.find((i) => i.isPrimary) ?? product.images[0];
 
           return (
             <Carousel.Slide key={product.id}>
@@ -55,7 +54,7 @@ export function ShopCarousel() {
               >
                 <Card.Section>
                   <Image
-                    src={product.imageUrl}
+                    src={getImageUrl(primaryImage?.imageUrl)}
                     height={200}
                     alt={product.title}
                     fallbackSrc="https://placehold.co/400x200?text=Ingen+bild"

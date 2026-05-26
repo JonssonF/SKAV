@@ -12,6 +12,7 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useLocalStorage } from '@mantine/hooks';
+import { IMAGE_BASE_URL } from '../utils/imageUrl';
 
 const sectionStyle: React.CSSProperties = {
   position: 'relative',
@@ -85,7 +86,7 @@ export function HomePage() {
       </section>
 
       {colorScheme === 'light' && (
-        <DecorationImage src="/images/sections/left-light.png" side="left" />
+        <DecorationImage src={`${IMAGE_BASE_URL}/images/sections/left-light.png`} side="left" />
       )}
 
       <section id="nyhetsbrev" style={sectionStyle}>
@@ -93,7 +94,7 @@ export function HomePage() {
       </section>
 
       {colorScheme === 'light' && (
-        <DecorationImage src="/images/sections/right-light.png" side="right" />
+        <DecorationImage src={`${IMAGE_BASE_URL}/images/sections/right-light.png`} side="right" />
       )}
 
       <section id="boka" style={sectionStyle}>
@@ -101,7 +102,7 @@ export function HomePage() {
       </section>
 
       {colorScheme === 'light' && (
-        <DecorationImage src="/images/sections/left1-light.png" side="left" />
+        <DecorationImage src={`${IMAGE_BASE_URL}/images/sections/left1-light.png`} side="left" />
       )}
 
       <section id="spelningar" style={sectionStyle}>
@@ -109,7 +110,7 @@ export function HomePage() {
       </section>
 
       {colorScheme === 'light' && (
-        <DecorationImage src="/images/sections/right1-light.png" side="right" />
+        <DecorationImage src={`${IMAGE_BASE_URL}/images/sections/right1-light.png`} side="right" />
       )}
 
       <section id="bandet" style={sectionStyle}>
@@ -117,7 +118,7 @@ export function HomePage() {
       </section>
 
       {colorScheme === 'light' && (
-        <DecorationImage src="/images/sections/left2-light.png" side="left" />
+        <DecorationImage src={`${IMAGE_BASE_URL}/images/sections/left2-light.png`} side="left" />
       )}
 
       <section id="rösta" style={sectionStyle}>
@@ -125,7 +126,7 @@ export function HomePage() {
       </section>
 
       {colorScheme === 'light' && (
-        <DecorationImage src="/images/sections/right2-light.png" side="right" />
+        <DecorationImage src={`${IMAGE_BASE_URL}/images/sections/right2-light.png`} side="right" />
       )}
 
       <section id="musik" style={sectionStyle}>
@@ -133,7 +134,7 @@ export function HomePage() {
       </section>
       
       {colorScheme === 'light' && (
-        <DecorationImage src="/images/sections/left3-light.png" side="left" />
+        <DecorationImage src={`${IMAGE_BASE_URL}/images/sections/left3-light.png`} side="left" />
       )}
 
       <section id="shop" style={sectionStyle}>

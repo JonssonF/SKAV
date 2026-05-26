@@ -14,6 +14,7 @@ namespace SKAV.Infrastructure.Database
         IBookingRequestRepository bookingRequestRepo,
         IBookingRecipientRepository bookingRecipientRepo,
         IProductRepository productRepo,
+        IProductImageRepository productImageRepo,
         IProductAttributeDefinitionRepository productAttrRepo,
         IProductVariantRepository productVariantRepo,
         IProductOrderRepository productOrderRepo,
@@ -31,6 +32,7 @@ namespace SKAV.Infrastructure.Database
             await SeedBookingRequestsAsync(ct);
             await SeedBookingRecipientsAsync(ct);
             await SeedProductsAsync(ct);
+            await SeedProductImagesAsync(ct);
             await SeedProductAttributeDefinitionsAsync(ct);
             await SeedProductVariantsAsync(ct);
             await SeedProductOrdersAsync(ct);
@@ -59,54 +61,91 @@ namespace SKAV.Infrastructure.Database
             if (existing.Any()) return;
 
             var products = new List<Product>
-    {
-        new()
-        {
-            Title = "SKAV T-shirt",
-            Description = "Klassisk t-shirt med SKAV-logga tryckt på bröstet. 100% bomull.",
-            Price = 249,
-            ImageUrl = "/images/products/t-shirt_shop.png",
-            Category = "Kläder",
-        },
-        new()
-        {
-            Title = "SKAV Hoodie",
-            Description = "Mysig hoodie med SKAV-tryck på ryggen. Perfekt för kalla kvällar.",
-            Price = 449,
-            ImageUrl = "/images/products/hoodie_svart_shop.png",
-            Category = "Kläder",
-        },
-        new()
-        {
-            Title = "Från Derome med kärlek – Vinyl",
-            Description = "Debutskivan på vinyl. Limiterad upplaga i svart och transparent.",
-            Price = 199,
-            ImageUrl = "/images/products/poster_shop.png",
-            Category = "Musik",
-        },
-        new()
-        {
-            Title = "SKAV Klistermärke",
-            Description = "Tåligt klistermärke med SKAV-logga. Perfekt för gitarrfodralet.",
-            Price = 29,
-            ImageUrl = "/images/products/stickers_shop.png",
-            Category = "Övrigt",
-        },
-        new()
-        {
-            Title = "SKAV Keps",
-            Description = "Snapback-keps med broderad SKAV-logga.",
-            Price = 199,
-            ImageUrl = "/images/products/Keps_shop.png",
-            Category = "Kläder",
-        },
-    };
+            {
+                new()
+                {
+                    Title = "SKAV T-shirt",
+                    Description = "Klassisk t-shirt med SKAV-logga tryckt på bröstet. 100% bomull.",
+                    Price = 249,
+                    Category = "Kläder",
+                    IsSignable = true,
+                    SigningPrice = 50,
+                },
+                new()
+                {
+                    Title = "SKAV Hoodie",
+                    Description = "Mysig hoodie med SKAV-tryck på ryggen. Perfekt för kalla kvällar.",
+                    Price = 449,
+                    Category = "Kläder",
+                    IsSignable = true,
+                    SigningPrice = 50,
+                },
+                new()
+                {
+                    Title = "Från Derome med kärlek – Vinyl",
+                    Description = "Debutskivan på vinyl. Limiterad upplaga i svart och transparent.",
+                    Price = 199,
+                    Category = "Musik",
+                    IsSignable = true,
+                    SigningPrice = 0,
+                },
+                new()
+                {
+                    Title = "SKAV Klistermärke",
+                    Description = "Tåligt klistermärke med SKAV-logga. Perfekt för gitarrfodralet.",
+                    Price = 29,
+                    Category = "Övrigt",
+                },
+                new()
+                {
+                    Title = "SKAV Keps",
+                    Description = "Snapback-keps med broderad SKAV-logga.",
+                    Price = 199,
+                    Category = "Kläder",
+                    IsSignable = true,
+                    SigningPrice = 30,
+                },
+            };
 
             using var scope = uow.BeginTransactionScope();
             foreach (var product in products)
             {
                 AuditHelper.SetCreated(product, null);
                 await productRepo.CreateAsync(product, ct);
+            }
+            await scope.CommitTransactionScopeAsync(ct);
+        }
+
+        private async Task SeedProductImagesAsync(CancellationToken ct)
+        {
+            var existing = await productImageRepo.GetAllAsync(ct);
+            if (existing.Any()) return;
+
+            var images = new List<ProductImage>
+            {
+                // T-shirt – två bilder
+                new() { ProductId = 1, ImageUrl = "/images/products/t-shirt_shop.png", IsPrimary = true, DisplayOrder = 1 },
+                new() { ProductId = 1, ImageUrl = "/images/products/t-shirt_back.png", IsPrimary = false, DisplayOrder = 2 },
+
+                // Hoodie – två bilder
+                new() { ProductId = 2, ImageUrl = "/images/products/hoodie_svart_shop.png", IsPrimary = true, DisplayOrder = 1 },
+                new() { ProductId = 2, ImageUrl = "/images/products/hoodie_back.png", IsPrimary = false, DisplayOrder = 2 },
+
+                // Vinyl
+                new() { ProductId = 3, ImageUrl = "/images/products/poster_shop.png", IsPrimary = true, DisplayOrder = 1 },
+
+                // Klistermärke
+                new() { ProductId = 4, ImageUrl = "/images/products/stickers_shop.png", IsPrimary = true, DisplayOrder = 1 },
+
+                // Keps
+                new() { ProductId = 5, ImageUrl = "/images/products/Keps_shop.png", IsPrimary = true, DisplayOrder = 1 },
+            };
+
+            using var scope = uow.BeginTransactionScope();
+            foreach (var image in images)
+            {
+                AuditHelper.SetCreated(image, null);
+                await productImageRepo.CreateAsync(image, ct);
             }
             await scope.CommitTransactionScopeAsync(ct);
         }
@@ -265,7 +304,7 @@ namespace SKAV.Infrastructure.Database
             }
             await scope.CommitTransactionScopeAsync(ct);
         }
-        
+
         private async Task SeedMembersAsync(CancellationToken ct)
         {
             var existing = await memberRepo.GetAllAsync(ct);

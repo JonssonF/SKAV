@@ -8,7 +8,7 @@ import {
   Group,
   Text,
   Divider,
-  Alert,
+  Badge,
 } from '@mantine/core';
 import type { CartItem } from '../hooks/useCart';
 
@@ -67,16 +67,17 @@ export function CheckoutModal({
           Fyll i dina uppgifter så hör vi av oss med betalningsinformation.
         </Text>
 
-        {/* Ordersammanfattning */}
         {items.map((item) => {
           const attrs = JSON.parse(item.variant.attributes) as Record<string, string>;
           const attrText = Object.entries(attrs)
             .map(([key, val]) => `${key}: ${val}`)
             .join(', ');
-          const price = item.variant.priceOverride ?? item.product.price;
+          const basePrice = item.variant.priceOverride ?? item.product.price;
+          const signingExtra = item.isSigned ? (item.product.signingPrice ?? 0) : 0;
+          const unitPrice = basePrice + signingExtra;
 
           return (
-            <Group key={item.variant.id} justify="space-between">
+            <Group key={`${item.variant.id}-${item.isSigned}`} justify="space-between">
               <div>
                 <Text size="sm" fw={500}>
                   {item.quantity}x {item.product.title}
@@ -84,8 +85,13 @@ export function CheckoutModal({
                 {attrText && (
                   <Text size="xs" c="dimmed">{attrText}</Text>
                 )}
+                {item.isSigned && (
+                  <Badge size="xs" variant="light" color="violet">
+                    Signerad (+{item.product.signingPrice ?? 0} kr)
+                  </Badge>
+                )}
               </div>
-              <Text size="sm">{price * item.quantity} kr</Text>
+              <Text size="sm">{unitPrice * item.quantity} kr</Text>
             </Group>
           );
         })}
@@ -99,7 +105,6 @@ export function CheckoutModal({
 
         <Divider />
 
-        {/* Kontaktuppgifter */}
         <form onSubmit={handleSubmit}>
           <Stack gap="md">
             <TextInput
@@ -110,7 +115,6 @@ export function CheckoutModal({
               error={errors?.name}
               required
             />
-
             <TextInput
               label="E-post"
               placeholder="din@email.se"
@@ -119,7 +123,6 @@ export function CheckoutModal({
               error={errors?.email}
               required
             />
-
             <TextInput
               label="Telefon"
               placeholder="0701234567 (valfritt)"
@@ -134,7 +137,6 @@ export function CheckoutModal({
               onChange={(e) => setAddress(e.currentTarget.value)}
               error={errors?.address}
             />
-
             <Group grow>
               <TextInput
                 label="Postnummer"
@@ -143,7 +145,6 @@ export function CheckoutModal({
                 onChange={(e) => setPostalCode(e.currentTarget.value)}
                 error={errors?.postalCode}
               />
-
               <TextInput
                 label="Ort"
                 placeholder="Derome"
@@ -160,7 +161,6 @@ export function CheckoutModal({
               error={errors?.message}
               minRows={2}
             />
-
             <Button type="submit" fullWidth loading={loading}>
               Skicka beställning
             </Button>

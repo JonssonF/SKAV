@@ -88,6 +88,7 @@ export function ShopPage() {
         items: cart.items.map((item) => ({
           productVariantId: item.variant.id,
           quantity: item.quantity,
+          isSigned: item.isSigned,
         })),
       },
       {
