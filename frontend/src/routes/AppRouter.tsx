@@ -3,6 +3,7 @@ import { PublicLayout } from '../components/layout/PublicLayout';
 import { AdminLayout } from '../components/layout/AdminLayout';
 import { HomePage } from '../pages/HomePage';
 import { LoginPage } from '../pages/LoginPage';
+import { UnsubscribePage } from '../pages/UnsubscribePage';
 import { AdminDashboardPage } from '../pages/Admin/AdminDashboardPage';
 import { AdminGigsPage } from '../pages/Admin/AdminGigsPage';
 import { AdminSongsPage } from '../pages/Admin/AdminSongsPage';
@@ -19,6 +20,7 @@ export function AppRouter() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/unsubscribe" element={<UnsubscribePage />} />
 
         <Route
           path="/"
