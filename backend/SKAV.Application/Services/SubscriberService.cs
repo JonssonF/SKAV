@@ -52,10 +52,8 @@ namespace SKAV.Application.Services
             var subscriber = await repo.GetByEmailAsync(request.Email, ct)
                 ?? throw new NotFoundException(BusinessRules.SubscriberNotFound);
 
-            AuditHelper.SetDeleted(subscriber, null);
-
             using var scope = uow.BeginTransactionScope();
-            await repo.DeleteAsync(subscriber.Id, subscriber, ct);
+            await repo.HardDeleteAsync(subscriber.Id, subscriber, ct);
             await scope.CommitTransactionScopeAsync(ct);
 
             return new UnsubscribeResponseDto();

@@ -6,5 +6,6 @@ namespace SKAV.Application.Interfaces.Repositories
     {
         Task<bool> EmailExistsAsync(string email, CancellationToken ct);
         Task<Subscriber?> GetByEmailAsync(string email, CancellationToken ct);
+        Task HardDeleteAsync(int id, CancellationToken ct);
     }
 }
