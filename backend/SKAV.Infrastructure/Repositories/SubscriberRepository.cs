@@ -41,5 +41,15 @@ namespace SKAV.Infrastructure.Repositories
                 parameters: new { Email = email },
                 cancellationToken: ct));
         }
+        public async Task HardDeleteAsync(int id, CancellationToken ct)
+        {
+            const string sql = "DELETE FROM Subscribers WHERE Id = @Id;";
+
+            await Uow.Connection.ExecuteAsync(new CommandDefinition(
+                commandText: sql,
+                parameters: new { Id = id },
+                transaction: Uow.Transaction,
+                cancellationToken: ct));
+        }
     }
 }
