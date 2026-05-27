@@ -67,19 +67,21 @@ namespace SKAV.Infrastructure.Database
 
             const string sqlUsers = """
                 CREATE TABLE IF NOT EXISTS Users (
-                Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                Email TEXT NOT NULL UNIQUE,
-                PasswordHash TEXT NOT NULL,
-                Roles INTEGER NOT NULL,
-                MemberId INTEGER,
-                CreatedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                CreatedBy INTEGER,
-                UpdatedAt TEXT,
-                UpdatedBy INTEGER,
-                DeletedAt TEXT,
-                DeletedBy INTEGER,
-                FOREIGN KEY(MemberId) REFERENCES Members(Id)
-                );
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Email TEXT NOT NULL UNIQUE,
+                    PasswordHash TEXT NOT NULL,
+                    Roles INTEGER NOT NULL,
+                    MemberId INTEGER,
+                    ResetToken TEXT,
+                    ResetTokenExpiry TEXT,
+                    CreatedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    CreatedBy INTEGER,
+                    UpdatedAt TEXT,
+                    UpdatedBy INTEGER,
+                    DeletedAt TEXT,
+                    DeletedBy INTEGER,
+                    FOREIGN KEY(MemberId) REFERENCES Members(Id)
+                    );
                 """;
             await connection.ExecuteAsync(sqlUsers);
 

@@ -14,6 +14,8 @@ import { AdminUsersPage } from '../pages/Admin/AdminUsersPage';
 import { AdminNewsletterPage } from '../pages/Admin/AdminNewsletterPage';
 import { ShopPage } from '../pages/ShopPage';
 import { AdminProductsPage } from '../pages/Admin/AdminProductsPage';
+import { ForgotPasswordPage } from '../pages/ForgotPasswordPage';
+import { ResetPasswordPage } from '../pages/ResetPasswordPage';
 
 export function AppRouter() {
   return (
@@ -38,6 +40,8 @@ export function AppRouter() {
             </PublicLayout>
           }
         />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+       <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route
           element={
             <ProtectedRoute>
@@ -45,6 +49,7 @@ export function AppRouter() {
             </ProtectedRoute>
           }
         >
+
           <Route path="/admin" element={<AdminDashboardPage />} />
           <Route path="/admin/members" element={<AdminMembersPage />} />
           <Route path="/admin/gigs" element={<AdminGigsPage />} />

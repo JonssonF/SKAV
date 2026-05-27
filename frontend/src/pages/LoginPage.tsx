@@ -8,6 +8,7 @@ import {
   Button,
   Alert,
   Stack,
+  Anchor,
 } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../providers/AuthProvider';
@@ -74,6 +75,15 @@ export function LoginPage() {
                 onChange={(e) => setPassword(e.currentTarget.value)}
                 required
               />
+
+              <Anchor
+                size="sm"
+                ta="right"
+                onClick={() => navigate('/forgot-password')}
+                style={{ cursor: 'pointer' }}
+              >
+                Glömt lösenord?
+              </Anchor>
 
               <Button type="submit" fullWidth loading={loading}>
                 Logga in
