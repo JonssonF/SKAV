@@ -1,17 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
+﻿using SKAV.Application.DTOs.Gigs;
 using System.Net;
-using SKAV.Api;
-using SKAV.Application.DTOs.Gigs;
 using System.Net.Http.Json;
 
 namespace SKAV.Tests.Api
 {
-    public class GigsControllerTests : IClassFixture<WebApplicationFactory<SKAV.Api.Program>>
+    public class GigsControllerTests : IClassFixture<CustomWebApplicationFactory>
     {
         private readonly HttpClient _client;
 
-        public GigsControllerTests(WebApplicationFactory<SKAV.Api.Program> factory)
+        public GigsControllerTests(CustomWebApplicationFactory factory)
         {
             _client = factory.CreateClient();
         }
