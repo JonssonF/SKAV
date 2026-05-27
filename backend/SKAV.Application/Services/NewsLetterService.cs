@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using SKAV.Application.Common.Helpers;
 using SKAV.Application.DTOs.Newsletter;
 using SKAV.Application.Interfaces.Repositories;
 using SKAV.Application.Services.Interface;
@@ -10,16 +12,18 @@ namespace SKAV.Application.Services
     public class NewsletterService(
         ISubscriberRepository subscriberRepo,
         IEmailService emailService,
+        IConfiguration configuration,
         ILogger<NewsletterService> logger) : INewsletterService
     {
         public async Task<SendNewsletterResponseDto> SendAsync(SendNewsletterRequestDto request, CancellationToken ct)
         {
             var subscribers = (await subscriberRepo.GetAllAsync(ct)).ToList();
-
             if (subscribers.Count == 0)
                 throw new BusinessRuleException(
                     "Det finns inga prenumeranter att skicka till.",
                     BusinessRules.NoSubscribers);
+
+            var siteUrl = configuration["Site:BaseUrl"] ?? "https://skav.nu";
 
             var sent = 0;
             var failed = 0;
@@ -28,16 +32,17 @@ namespace SKAV.Application.Services
             {
                 try
                 {
+                    var unsubscribeUrl = $"{siteUrl}/unsubscribe?email={Uri.EscapeDataString(subscriber.Email)}";
+                    var html = NewsletterTemplate.Build(request.Subject, request.Body, unsubscribeUrl);
+
                     var success = await emailService.SendAsync(
                         subscriber.Email,
                         request.Subject,
-                        request.Body,
+                        html,
                         ct);
 
-                    if (success)
-                        sent++;
-                    else
-                        failed++;
+                    if (success) sent++;
+                    else failed++;
                 }
                 catch (Exception ex)
                 {

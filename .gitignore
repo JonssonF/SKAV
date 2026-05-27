@@ -9,6 +9,7 @@ appsettings.Test.json
 appsettings.json
 appsettings.*.json
 !appsettings.json
+docker-compose.yml
 
 # SQLite database
 *.db
