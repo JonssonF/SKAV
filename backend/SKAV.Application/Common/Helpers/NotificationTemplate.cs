@@ -2,6 +2,21 @@
 {
     public static class NotificationTemplate
     {
+        public static string ResetPassword(string resetUrl)
+        {
+            return BuildWrapper("Återställ lösenord", $"""
+        <h2 style="margin:0 0 15px; font-size:20px; color:#1a1a1a;">Återställ ditt lösenord</h2>
+        <p style="margin:0 0 20px; font-size:15px; color:#333333; line-height:1.6;">
+            Någon har begärt att återställa lösenordet för ditt SKAV-konto. 
+            Klicka på knappen nedan för att välja ett nytt lösenord.
+        </p>
+        {AdminButton("Återställ lösenord", resetUrl)}
+        <p style="margin:20px 0 0; font-size:13px; color:#999999; line-height:1.5;">
+            Länken är giltig i 1 timme. Om du inte begärde detta kan du ignorera mailet.
+        </p>
+        """);
+        }
+
         public static string BookingRequest(
             string name, string email, string? phone,
             DateTimeOffset? eventDate, string? eventType,

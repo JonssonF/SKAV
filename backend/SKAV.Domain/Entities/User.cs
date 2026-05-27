@@ -11,6 +11,7 @@ namespace SKAV.Domain.Entities
         public Roles Roles { get; set; }
         public int? MemberId { get; set; }
         public Member? Member { get; set; }
-
+        public string? ResetToken { get; set; }
+        public DateTimeOffset? ResetTokenExpiry { get; set; }
     }
 }
