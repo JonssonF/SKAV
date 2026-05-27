@@ -100,9 +100,6 @@ export function FooterSection() {
               <Text size="sm" c="dimmed" component="a" href="https://www.instagram.com/skav.bandet" target="_blank">
                 Instagram
               </Text>
-              <Text size="sm" c="dimmed" component="a" href="https://facebook.com" target="_blank">
-                Facebook
-              </Text>
               <Text size="sm" c="dimmed" component="a" href="https://www.youtube.com/@SKAV-BynsB%C3%A4staBand" target="_blank">
                 YouTube
               </Text>
