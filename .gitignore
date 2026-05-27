@@ -5,6 +5,8 @@
 
 # Local settings with secrets
 appsettings.Development.json
+appsettings.Test.json
+appsettings.json
 appsettings.*.json
 !appsettings.json
 
