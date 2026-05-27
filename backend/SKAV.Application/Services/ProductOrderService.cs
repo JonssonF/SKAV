@@ -1,4 +1,5 @@
-﻿using SKAV.Application.Common.Helpers;
+﻿using Microsoft.Extensions.Configuration;
+using SKAV.Application.Common.Helpers;
 using SKAV.Application.DTOs.ProductOrder;
 using SKAV.Application.Interfaces;
 using SKAV.Application.Interfaces.Repositories;
@@ -15,7 +16,10 @@ namespace SKAV.Application.Services
         IProductOrderItemRepository itemRepo,
         IProductRepository productRepo,
         IProductVariantRepository variantRepo,
+        IProductOrderRecipientRepository recipientRepo,
         IUserRepository userRepo,
+        IEmailService emailService,
+        IConfiguration configuration,
         IUnitOfWork uow,
         ICurrentUserService currentUser) : IProductOrderService
     {
@@ -133,6 +137,43 @@ namespace SKAV.Application.Services
             }
 
             await scope.CommitTransactionScopeAsync(ct);
+
+            // Skicka notis till alla mottagare
+            var recipients = await recipientRepo.GetAllAsync(ct);
+            var siteUrl = configuration["Site:BaseUrl"] ?? "https://skav.nu";
+            var adminUrl = $"{siteUrl}/admin";
+
+            var orderItems = request.Items.Select(item =>
+            {
+                var variant = variantsToUpdate.First(v => v.Id == item.ProductVariantId);
+                var product = productRepo.GetByIdAsync(variant.ProductId, ct).Result;
+                var attrs = variant.Attributes != "{}"
+                    ? string.Join(", ", System.Text.Json.JsonDocument.Parse(variant.Attributes)
+                        .RootElement.EnumerateObject()
+                        .Select(p => $"{p.Name}: {p.Value.GetString()}"))
+                    : null;
+
+                return new NotificationTemplate.OrderItemInfo
+                {
+                    Title = product?.Title ?? "Okänd produkt",
+                    Attributes = attrs,
+                    Quantity = item.Quantity,
+                    IsSigned = item.IsSigned,
+                };
+            }).ToList();
+
+            var html = NotificationTemplate.ProductOrder(
+                request.Name, request.Email, request.Phone,
+                request.Message, request.Address, request.City, request.PostalCode,
+                orderItems, adminUrl);
+
+            foreach (var recipient in recipients)
+            {
+                await emailService.SendAsync(
+                    recipient.Email,
+                    $"Ny beställning från {request.Name}",
+                    html, ct);
+            }
 
             return new CreateProductOrderResponseDto { Id = orderId };
         }

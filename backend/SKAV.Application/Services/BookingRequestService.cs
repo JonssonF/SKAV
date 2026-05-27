@@ -1,4 +1,5 @@
-﻿using SKAV.Application.Common.Helpers;
+﻿using Microsoft.Extensions.Configuration;
+using SKAV.Application.Common.Helpers;
 using SKAV.Application.DTOs.BookingRequest;
 using SKAV.Application.Interfaces;
 using SKAV.Application.Interfaces.Repositories;
@@ -16,6 +17,8 @@ namespace SKAV.Application.Services
         IBookingRecipientRepository recipientRepo,
         ICurrentUserService currentUser,
         IUserRepository userRepo,
+        IEmailService emailService,
+        IConfiguration configuration,
         IUnitOfWork uow) : IBookingRequestService
     {
         public async Task<IEnumerable<BookingRequestResponseDto>> GetAllAsync(CancellationToken ct)
@@ -67,9 +70,23 @@ namespace SKAV.Application.Services
             var id = await repo.CreateAsync(bookingRequest, ct);
             await scope.CommitTransactionScopeAsync(ct);
 
-            // TODO: Skicka mailnotis till alla recipients via Resend
-            // var recipients = await recipientRepo.GetAllAsync(ct);
-            // await emailService.SendBookingNotification(recipients, bookingRequest);
+            // Skicka notis till alla mottagare
+            var recipients = await recipientRepo.GetAllAsync(ct);
+            var siteUrl = configuration["Site:BaseUrl"] ?? "https://skav.nu";
+            var adminUrl = $"{siteUrl}/admin";
+
+            var html = NotificationTemplate.BookingRequest(
+                request.Name, request.Email, request.Phone,
+                request.EventDate, request.EventType,
+                request.Message, adminUrl);
+
+            foreach (var recipient in recipients)
+            {
+                await emailService.SendAsync(
+                    recipient.Email,
+                    $"Ny bokningsförfrågan från {request.Name}",
+                    html, ct);
+            }
 
             return new CreateBookingRequestResponseDto { Id = id };
         }
