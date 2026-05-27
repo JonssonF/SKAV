@@ -33,8 +33,7 @@ namespace SKAV.Application.Services
                 try
                 {
                     var unsubscribeUrl = $"{siteUrl}/unsubscribe?email={Uri.EscapeDataString(subscriber.Email)}";
-                    var html = NewsletterTemplate.Build(request.Subject, request.Body, unsubscribeUrl);
-
+                    var html = NewsletterTemplate.Build(request.Subject, request.Body, unsubscribeUrl, siteUrl);
                     var success = await emailService.SendAsync(
                         subscriber.Email,
                         request.Subject,
