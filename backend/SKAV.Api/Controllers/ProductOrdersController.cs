@@ -40,6 +40,12 @@ namespace SKAV.Api.Controllers
         [Authorize(Roles = "Admin,Editor")]
         [SwaggerOperation("Avbryt en beställning och återställ lagersaldo")]
         public async Task<CancelProductOrderResponseDto> Cancel(int id, CancellationToken ct)
-    => await service.CancelAsync(id, ct);
+            => await service.CancelAsync(id, ct);
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin,Editor")]
+        [SwaggerOperation("Radera en beställning")]
+        public async Task<DeleteProductOrderResponseDto> Delete(int id, CancellationToken ct)
+            => await service.DeleteAsync(id, ct);
     }
 }

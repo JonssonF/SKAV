@@ -24,4 +24,8 @@ export const bookingRequestsApi = {
   markAsRead: async (id: number): Promise<void> => {
     await apiClient.put(`/booking-requests/${id}/read`);
   },
+
+  delete: async (id: number): Promise<void> => {
+  await apiClient.delete(`/booking-requests/${id}`);
+  },
 };
