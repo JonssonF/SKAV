@@ -75,7 +75,7 @@ export function AboutSection() {
             fs="italic"
             style={{ fontFamily: "'Caveat', cursive", fontSize: '1.1rem' }}
           >
-            — Derome, sen 2019 —
+            — Derome, sen 2008 —
           </Text>
         </motion.div>
       </Stack>
