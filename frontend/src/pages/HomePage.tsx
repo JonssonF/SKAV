@@ -60,7 +60,7 @@ export function HomePage() {
 
   const [colorScheme] = useLocalStorage<'light' | 'dark'>({
   key: 'color-scheme',
-  defaultValue: 'dark',
+  defaultValue: 'light',
   });
 
   useEffect(() => {
