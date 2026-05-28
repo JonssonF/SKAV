@@ -10,12 +10,15 @@ import {
   Alert,
   Badge,
   Select,
+  Card,
+  Stack,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useQueryClient } from '@tanstack/react-query';
-import { IconShoppingCart } from '@tabler/icons-react';
+import { IconShoppingCart, IconMailFast } from '@tabler/icons-react';
 import { useProducts } from '../features/shop/hooks/useProducts';
 import { useCreateProductOrder } from '../features/shop/hooks/useProductOrders';
+import { useSiteSettings } from '../features/shop/hooks/useSiteSettings';
 import { useCart } from '../features/shop/hooks/useCart';
 import { ProductCard } from '../features/shop/components/ProductCard';
 import { CartDrawer } from '../features/shop/components/CartDrawer';
@@ -25,6 +28,7 @@ import type { ProductResponse } from '../types/product.types';
 
 export function ShopPage() {
   const { data: products, isLoading, error } = useProducts();
+  const { data: settings } = useSiteSettings();
   const createOrder = useCreateProductOrder();
   const cart = useCart();
   const queryClient = useQueryClient();
@@ -34,6 +38,10 @@ export function ShopPage() {
   const [checkoutErrors, setCheckoutErrors] = useState<Record<string, string> | null>(null);
   const [orderComplete, setOrderComplete] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+
+  // Shop-status
+  const shopPaused = settings?.find((s) => s.key === 'ShopPaused')?.value === 'true';
+  const shopPausedMessage = settings?.find((s) => s.key === 'ShopPausedMessage')?.value;
 
   // Unika kategorier
   const categories = [...new Set(
@@ -46,7 +54,6 @@ export function ShopPage() {
 
   // Validera lagersaldo och öppna checkout
   const handleOpenCheckout = async () => {
-    // Hämta färskt lagersaldo
     await queryClient.invalidateQueries({ queryKey: ['products'] });
 
     const freshProducts = queryClient.getQueryData<ProductResponse[]>(['products']);
@@ -142,17 +149,37 @@ export function ShopPage() {
     <Container size="lg" py="xl">
       <Group justify="space-between" mb="lg">
         <Title order={1}>Shop</Title>
-        <Button
-          variant="light"
-          leftSection={<IconShoppingCart size={18} />}
-          onClick={() => setCartOpen(true)}
-        >
-          Varukorg
-          {cart.totalItems > 0 && (
-            <Badge ml="xs" size="sm" circle>{cart.totalItems}</Badge>
-          )}
-        </Button>
+        {!shopPaused && (
+          <Button
+            variant="light"
+            leftSection={<IconShoppingCart size={18} />}
+            onClick={() => setCartOpen(true)}
+          >
+            Varukorg
+            {cart.totalItems > 0 && (
+              <Badge ml="xs" size="sm" circle>{cart.totalItems}</Badge>
+            )}
+          </Button>
+        )}
       </Group>
+
+      {shopPaused && (
+        <Card shadow="sm" padding="lg" radius="md" withBorder mb="lg" bg="var(--mantine-color-yellow-light)">
+          <Stack gap="sm" align="center">
+            <Text ta="center" fw={600} size="lg">
+              {shopPausedMessage || 'Vi tar inte emot beställningar just nu.'}
+            </Text>
+            <Button
+              component="a"
+              href="/#nyhetsbrev"
+              variant="light"
+              leftSection={<IconMailFast size={18} />}
+            >
+              Prenumerera på nyhetsbrevet
+            </Button>
+          </Stack>
+        </Card>
+      )}
 
       {orderComplete && (
         <Alert color="green" title="Tack för din beställning!" mb="lg" withCloseButton onClose={() => setOrderComplete(false)}>
@@ -181,35 +208,40 @@ export function ShopPage() {
             <ProductCard
               key={product.id}
               product={product}
-              onAddToCart={cart.addItem}
+              onAddToCart={shopPaused ? undefined : cart.addItem}
+              disabled={shopPaused}
             />
           ))}
         </SimpleGrid>
       )}
 
-      <CartDrawer
-        opened={cartOpen}
-        onClose={() => setCartOpen(false)}
-        items={cart.items}
-        totalItems={cart.totalItems}
-        totalPrice={cart.totalPrice}
-        onUpdateQuantity={cart.updateQuantity}
-        onRemoveItem={cart.removeItem}
-        onCheckout={() => {
-          setCartOpen(false);
-          handleOpenCheckout();
-        }}
-      />
+      {!shopPaused && (
+        <>
+          <CartDrawer
+            opened={cartOpen}
+            onClose={() => setCartOpen(false)}
+            items={cart.items}
+            totalItems={cart.totalItems}
+            totalPrice={cart.totalPrice}
+            onUpdateQuantity={cart.updateQuantity}
+            onRemoveItem={cart.removeItem}
+            onCheckout={() => {
+              setCartOpen(false);
+              handleOpenCheckout();
+            }}
+          />
 
-      <CheckoutModal
-        opened={checkoutOpen}
-        onClose={() => setCheckoutOpen(false)}
-        items={cart.items}
-        totalPrice={cart.totalPrice}
-        onSubmit={handleCheckout}
-        loading={createOrder.isPending}
-        errors={checkoutErrors}
-      />
+          <CheckoutModal
+            opened={checkoutOpen}
+            onClose={() => setCheckoutOpen(false)}
+            items={cart.items}
+            totalPrice={cart.totalPrice}
+            onSubmit={handleCheckout}
+            loading={createOrder.isPending}
+            errors={checkoutErrors}
+          />
+        </>
+      )}
     </Container>
   );
 }
