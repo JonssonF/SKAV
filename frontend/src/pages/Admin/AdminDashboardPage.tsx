@@ -189,28 +189,28 @@ export function AdminDashboardPage() {
       <Text c="dimmed" mb="lg">Inloggad som {user?.email}</Text>
 
       {/* ── Statistik ──────────────────────────────────── */}
-      <Group mb="xl" gap="md">
-        <Card shadow="sm" padding="lg" radius="md" withBorder style={{ flex: 1 }}>
+      <SimpleGrid cols={{ base: 2, sm: 3, md: 5 }} mb="xl">
+        <Card shadow="sm" padding="lg" radius="md" withBorder>
           <Text size="sm" c="dimmed">Prenumeranter</Text>
           <Title order={2}>{activeSubscribers}</Title>
         </Card>
-        <Card shadow="sm" padding="lg" radius="md" withBorder style={{ flex: 1 }}>
+        <Card shadow="sm" padding="lg" radius="md" withBorder>
           <Text size="sm" c="dimmed">Bokningsförfrågningar</Text>
-          <Title order={2}>{bookings?.length ?? 0}</Title>
+          <Title order={2}>{totalBookings}</Title>
         </Card>
-        <Card shadow="sm" padding="lg" radius="md" withBorder style={{ flex: 1 }}>
+        <Card shadow="sm" padding="lg" radius="md" withBorder>
           <Text size="sm" c="dimmed">Obesvarade bokningar</Text>
           <Title order={2} c={unreadBookings > 0 ? 'red' : undefined}>{unreadBookings}</Title>
         </Card>
-        <Card shadow="sm" padding="lg" radius="md" withBorder style={{ flex: 1 }}>
+        <Card shadow="sm" padding="lg" radius="md" withBorder>
           <Text size="sm" c="dimmed">Beställningar</Text>
-          <Title order={2}>{orders?.length ?? 0}</Title>
+          <Title order={2}>{totalOrders}</Title>
         </Card>
-        <Card shadow="sm" padding="lg" radius="md" withBorder style={{ flex: 1 }}>
+        <Card shadow="sm" padding="lg" radius="md" withBorder>
           <Text size="sm" c="dimmed">Ohanterade beställningar</Text>
           <Title order={2} c={unhandledOrders > 0 ? 'red' : undefined}>{unhandledOrders}</Title>
         </Card>
-      </Group>
+      </SimpleGrid>
 
       {/* ── Bokningsförfrågningar ────────────────────────── */}
       <Title order={2} mb="md">
