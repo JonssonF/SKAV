@@ -19,13 +19,16 @@ import {
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useAuth } from '../../providers/AuthProvider';
-import { useBookingRequests, useMarkBookingRead } from '../../features/booking/hooks/useBookingRequests';
+import { useBookingRequests, useMarkBookingRead, useDeleteBookingRequest } from '../../features/booking/hooks/useBookingRequests';
 import { useBookingRecipients, useCreateBookingRecipient, useDeleteBookingRecipient } from '../../features/booking/hooks/useBookingRecipients';
-import { useProductOrders, useHandleProductOrder, useCancelProductOrder } from '../../features/shop/hooks/useProductOrders';
+import { useProductOrders, useHandleProductOrder, useCancelProductOrder, useDeleteProductOrder } from '../../features/shop/hooks/useProductOrders';
 import { useProductOrderRecipients, useCreateProductOrderRecipient, useDeleteProductOrderRecipient } from '../../features/shop/hooks/useProductOrderRecipients';
 import { useSubscribers } from '../../features/subscribers/hooks/useSubscribers';
 import { getApiMessage } from '../../utils/getApiErrors';
 import { IconTrash } from '@tabler/icons-react';
+
+const INITIAL_COUNT = 5;
+const PAGE_SIZE = 10;
 
 export function AdminDashboardPage() {
   const { user } = useAuth();
@@ -33,6 +36,7 @@ export function AdminDashboardPage() {
   // Bokningar
   const { data: bookings, isLoading: bookingsLoading, error: bookingsError } = useBookingRequests();
   const markAsRead = useMarkBookingRead();
+  const deleteBookingRequest = useDeleteBookingRequest();
   const { data: bookingRecipients, isLoading: bookingRecipientsLoading } = useBookingRecipients();
   const createBookingRecipient = useCreateBookingRecipient();
   const deleteBookingRecipient = useDeleteBookingRecipient();
@@ -41,6 +45,7 @@ export function AdminDashboardPage() {
   const { data: orders, isLoading: ordersLoading, error: ordersError } = useProductOrders();
   const handleOrder = useHandleProductOrder();
   const cancelOrder = useCancelProductOrder();
+  const deleteProductOrder = useDeleteProductOrder();
   const { data: orderRecipients, isLoading: orderRecipientsLoading } = useProductOrderRecipients();
   const createOrderRecipient = useCreateProductOrderRecipient();
   const deleteOrderRecipient = useDeleteProductOrderRecipient();
@@ -54,11 +59,35 @@ export function AdminDashboardPage() {
   const [newBookingEmail, setNewBookingEmail] = useState('');
   const [newOrderEmail, setNewOrderEmail] = useState('');
 
+  // Paginering – bokningar
+  const [bookingsExpanded, setBookingsExpanded] = useState(false);
+  const [bookingsPage, setBookingsPage] = useState(1);
+
+  // Paginering – köpförfrågningar
+  const [ordersExpanded, setOrdersExpanded] = useState(false);
+  const [ordersPage, setOrdersPage] = useState(1);
+
   // Räknare
   const activeSubscribers = subscribers?.length ?? 0;
   const unreadBookings = bookings?.filter((b) => !b.isRead).length ?? 0;
   const unhandledOrders = orders?.filter((o) => !o.isHandled && !o.isCancelled).length ?? 0;
-  
+
+  // Paginering – beräkna synliga bokningar
+  const totalBookings = bookings?.length ?? 0;
+  const bookingsShowCount = bookingsExpanded ? PAGE_SIZE : INITIAL_COUNT;
+  const bookingsTotalPages = bookingsExpanded ? Math.ceil(totalBookings / PAGE_SIZE) : 1;
+  const bookingsStart = bookingsExpanded ? (bookingsPage - 1) * PAGE_SIZE : 0;
+  const visibleBookings = bookings?.slice(bookingsStart, bookingsStart + bookingsShowCount) ?? [];
+  const showBookingsExpandButton = !bookingsExpanded && totalBookings > INITIAL_COUNT;
+
+  // Paginering – beräkna synliga köpförfrågningar
+  const totalOrders = orders?.length ?? 0;
+  const ordersShowCount = ordersExpanded ? PAGE_SIZE : INITIAL_COUNT;
+  const ordersTotalPages = ordersExpanded ? Math.ceil(totalOrders / PAGE_SIZE) : 1;
+  const ordersStart = ordersExpanded ? (ordersPage - 1) * PAGE_SIZE : 0;
+  const visibleOrders = orders?.slice(ordersStart, ordersStart + ordersShowCount) ?? [];
+  const showOrdersExpandButton = !ordersExpanded && totalOrders > INITIAL_COUNT;
+
   // ── Booking handlers ──────────────────────────────────
   const handleAddBookingRecipient = () => {
     if (!newBookingEmail.trim()) return;
@@ -93,6 +122,19 @@ export function AdminDashboardPage() {
     });
   };
 
+  const handleDeleteBooking = (id: number) => {
+    if (!window.confirm('Vill du ta bort denna bokningsförfrågan?')) return;
+    deleteBookingRequest.mutate(id, {
+      onSuccess: () => {
+        setExpandedBookingId(null);
+        notifications.show({ title: 'Borttagen', message: 'Bokningsförfrågan borttagen.', color: 'green' });
+      },
+      onError: (err) => {
+        notifications.show({ title: 'Något gick fel', message: getApiMessage(err), color: 'red' });
+      },
+    });
+  };
+
   // ── Order handlers ────────────────────────────────────
   const handleAddOrderRecipient = () => {
     if (!newOrderEmail.trim()) return;
@@ -120,6 +162,19 @@ export function AdminDashboardPage() {
           message: `${email} får inte längre beställningsnotiser.`,
           color: 'green',
         });
+      },
+      onError: (err) => {
+        notifications.show({ title: 'Något gick fel', message: getApiMessage(err), color: 'red' });
+      },
+    });
+  };
+
+  const handleDeleteOrder = (id: number) => {
+    if (!window.confirm('Vill du ta bort denna beställning?')) return;
+    deleteProductOrder.mutate(id, {
+      onSuccess: () => {
+        setExpandedOrderId(null);
+        notifications.show({ title: 'Borttagen', message: 'Beställning borttagen.', color: 'green' });
       },
       onError: (err) => {
         notifications.show({ title: 'Något gick fel', message: getApiMessage(err), color: 'red' });
@@ -176,13 +231,13 @@ export function AdminDashboardPage() {
         </Alert>
       )}
 
-      {!bookingsLoading && !bookingsError && (!bookings || bookings.length === 0) && (
+      {!bookingsLoading && !bookingsError && totalBookings === 0 && (
         <Text c="dimmed" mb="xl">Inga bokningsförfrågningar ännu.</Text>
       )}
 
-      {bookings && bookings.length > 0 && (
-        <Stack gap="xs" mb="xl">
-          {bookings.map((booking) => (
+      {totalBookings > 0 && (
+        <Stack gap="xs" mb="md">
+          {visibleBookings.map((booking) => (
             <Card
               key={booking.id}
               shadow="sm"
@@ -250,17 +305,37 @@ export function AdminDashboardPage() {
                   <Text size="sm" mb="md">{booking.message}</Text>
 
                   {booking.isRead ? (
-                    <Text size="xs" c="dimmed" ta="right">
-                      Besvarad av {booking.answeredByEmail ?? 'okänd'}{' '}
-                      {booking.answeredAt && new Date(booking.answeredAt).toLocaleDateString('sv-SE', {
-                        month: 'short',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </Text>
+                    <Group justify="space-between">
+                      <Text size="xs" c="dimmed">
+                        Besvarad av {booking.answeredByEmail ?? 'okänd'}{' '}
+                        {booking.answeredAt && new Date(booking.answeredAt).toLocaleDateString('sv-SE', {
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </Text>
+                      <ActionIcon
+                        variant="subtle"
+                        color="red"
+                        onClick={() => handleDeleteBooking(booking.id)}
+                        loading={deleteBookingRequest.isPending}
+                        title="Ta bort"
+                      >
+                        <IconTrash size={16} />
+                      </ActionIcon>
+                    </Group>
                   ) : (
-                    <Group justify="flex-end">
+                    <Group justify="flex-end" gap="sm">
+                      <ActionIcon
+                        variant="subtle"
+                        color="red"
+                        onClick={() => handleDeleteBooking(booking.id)}
+                        loading={deleteBookingRequest.isPending}
+                        title="Ta bort"
+                      >
+                        <IconTrash size={16} />
+                      </ActionIcon>
                       <Badge
                         variant="light"
                         color="green"
@@ -277,6 +352,31 @@ export function AdminDashboardPage() {
             </Card>
           ))}
         </Stack>
+      )}
+
+      {/* Visa fler / Paginering – bokningar */}
+      {showBookingsExpandButton && (
+        <Group justify="center" mb="md">
+          <Button
+            variant="light"
+            onClick={() => {
+              setBookingsExpanded(true);
+              setBookingsPage(1);
+            }}
+          >
+            Visa fler ({totalBookings - INITIAL_COUNT} till)
+          </Button>
+        </Group>
+      )}
+
+      {bookingsExpanded && bookingsTotalPages > 1 && (
+        <Group justify="center" mb="xl">
+          <Pagination
+            total={bookingsTotalPages}
+            value={bookingsPage}
+            onChange={setBookingsPage}
+          />
+        </Group>
       )}
 
       {/* ── Bokningsnotiser ──────────────────────────────── */}
@@ -347,13 +447,13 @@ export function AdminDashboardPage() {
         </Alert>
       )}
 
-      {!ordersLoading && !ordersError && (!orders || orders.length === 0) && (
+      {!ordersLoading && !ordersError && totalOrders === 0 && (
         <Text c="dimmed" mb="xl">Inga köpförfrågningar ännu.</Text>
       )}
 
-      {orders && orders.length > 0 && (
-        <Stack gap="xs" mb="xl">
-          {orders.map((order) => {
+      {totalOrders > 0 && (
+        <Stack gap="xs" mb="md">
+          {visibleOrders.map((order) => {
             const totalPrice = order.items.reduce((sum, item) => sum + item.productPrice * item.quantity, 0);
 
             return (
@@ -400,30 +500,30 @@ export function AdminDashboardPage() {
 
                 <Collapse expanded={expandedOrderId === order.id}>
                   <div style={{ paddingTop: 12 }} onClick={(e) => e.stopPropagation()}>
-                <Table withRowBorders={false} mb="sm">
-                  <Table.Tbody>
-                    <Table.Tr>
-                      <Table.Td w={100}><Text size="sm" c="dimmed">E-post</Text></Table.Td>
-                      <Table.Td><Text size="sm">{order.email}</Text></Table.Td>
-                    </Table.Tr>
-                    {order.phone && (
-                      <Table.Tr>
-                        <Table.Td><Text size="sm" c="dimmed">Telefon</Text></Table.Td>
-                        <Table.Td><Text size="sm">{order.phone}</Text></Table.Td>
-                      </Table.Tr>
-                    )}
-                    {(order.address || order.city || order.postalCode) && (
-                      <Table.Tr>
-                        <Table.Td><Text size="sm" c="dimmed">Adress</Text></Table.Td>
-                        <Table.Td>
-                          <Text size="sm">
-                            {[order.address, `${order.postalCode ?? ''} ${order.city ?? ''}`.trim()].filter(Boolean).join(', ')}
-                          </Text>
-                        </Table.Td>
-                      </Table.Tr>
-                    )}
-                  </Table.Tbody>
-                </Table>
+                    <Table withRowBorders={false} mb="sm">
+                      <Table.Tbody>
+                        <Table.Tr>
+                          <Table.Td w={100}><Text size="sm" c="dimmed">E-post</Text></Table.Td>
+                          <Table.Td><Text size="sm">{order.email}</Text></Table.Td>
+                        </Table.Tr>
+                        {order.phone && (
+                          <Table.Tr>
+                            <Table.Td><Text size="sm" c="dimmed">Telefon</Text></Table.Td>
+                            <Table.Td><Text size="sm">{order.phone}</Text></Table.Td>
+                          </Table.Tr>
+                        )}
+                        {(order.address || order.city || order.postalCode) && (
+                          <Table.Tr>
+                            <Table.Td><Text size="sm" c="dimmed">Adress</Text></Table.Td>
+                            <Table.Td>
+                              <Text size="sm">
+                                {[order.address, `${order.postalCode ?? ''} ${order.city ?? ''}`.trim()].filter(Boolean).join(', ')}
+                              </Text>
+                            </Table.Td>
+                          </Table.Tr>
+                        )}
+                      </Table.Tbody>
+                    </Table>
 
                     {/* Produktlista */}
                     <Table mb="sm">
@@ -457,28 +557,60 @@ export function AdminDashboardPage() {
                     {order.message && (
                       <Text size="sm" mb="md">{order.message}</Text>
                     )}
+
                     {order.isCancelled ? (
-                      <Text size="xs" c="red" ta="right">
-                        Avbruten av {order.cancelledByEmail ?? 'okänd'}{' '}
-                        {order.cancelledAt && new Date(order.cancelledAt).toLocaleDateString('sv-SE', {
-                          month: 'short',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </Text>
+                      <Group justify="space-between">
+                        <Text size="xs" c="red">
+                          Avbruten av {order.cancelledByEmail ?? 'okänd'}{' '}
+                          {order.cancelledAt && new Date(order.cancelledAt).toLocaleDateString('sv-SE', {
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </Text>
+                        <ActionIcon
+                          variant="subtle"
+                          color="red"
+                          onClick={() => handleDeleteOrder(order.id)}
+                          loading={deleteProductOrder.isPending}
+                          title="Ta bort"
+                        >
+                          <IconTrash size={16} />
+                        </ActionIcon>
+                      </Group>
                     ) : order.isHandled ? (
-                      <Text size="xs" c="dimmed" ta="right">
-                        Hanterad av {order.handledByEmail ?? 'okänd'}{' '}
-                        {order.handledAt && new Date(order.handledAt).toLocaleDateString('sv-SE', {
-                          month: 'short',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </Text>
+                      <Group justify="space-between">
+                        <Text size="xs" c="dimmed">
+                          Hanterad av {order.handledByEmail ?? 'okänd'}{' '}
+                          {order.handledAt && new Date(order.handledAt).toLocaleDateString('sv-SE', {
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </Text>
+                        <ActionIcon
+                          variant="subtle"
+                          color="red"
+                          onClick={() => handleDeleteOrder(order.id)}
+                          loading={deleteProductOrder.isPending}
+                          title="Ta bort"
+                        >
+                          <IconTrash size={16} />
+                        </ActionIcon>
+                      </Group>
                     ) : (
                       <Group justify="flex-end" gap="sm">
+                        <ActionIcon
+                          variant="subtle"
+                          color="red"
+                          onClick={() => handleDeleteOrder(order.id)}
+                          loading={deleteProductOrder.isPending}
+                          title="Ta bort"
+                        >
+                          <IconTrash size={16} />
+                        </ActionIcon>
                         <Badge
                           variant="light"
                           color="red"
@@ -509,6 +641,31 @@ export function AdminDashboardPage() {
             );
           })}
         </Stack>
+      )}
+
+      {/* Visa fler / Paginering – köpförfrågningar */}
+      {showOrdersExpandButton && (
+        <Group justify="center" mb="md">
+          <Button
+            variant="light"
+            onClick={() => {
+              setOrdersExpanded(true);
+              setOrdersPage(1);
+            }}
+          >
+            Visa fler ({totalOrders - INITIAL_COUNT} till)
+          </Button>
+        </Group>
+      )}
+
+      {ordersExpanded && ordersTotalPages > 1 && (
+        <Group justify="center" mb="xl">
+          <Pagination
+            total={ordersTotalPages}
+            value={ordersPage}
+            onChange={setOrdersPage}
+          />
+        </Group>
       )}
 
       {/* ── Beställningsnotiser ──────────────────────────── */}

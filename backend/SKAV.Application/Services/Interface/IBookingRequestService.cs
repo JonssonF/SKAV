@@ -7,6 +7,7 @@ namespace SKAV.Application.Services.Interface
         Task<IEnumerable<BookingRequestResponseDto>> GetAllAsync(CancellationToken ct);
         Task<BookingRequestResponseDto> GetByIdAsync(int id, CancellationToken ct);
         Task<CreateBookingRequestResponseDto> CreateAsync(CreateBookingRequestDto request, CancellationToken ct);
+        Task<DeleteBookingRequestResponseDto> DeleteAsync(int id, CancellationToken ct);
         Task<MarkBookingReadResponseDto> MarkAsReadAsync(int id, CancellationToken ct);
     }
 }

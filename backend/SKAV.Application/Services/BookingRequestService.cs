@@ -91,6 +91,20 @@ namespace SKAV.Application.Services
             return new CreateBookingRequestResponseDto { Id = id };
         }
 
+        public async Task<DeleteBookingRequestResponseDto> DeleteAsync(int id, CancellationToken ct)
+        {
+            var existing = await repo.GetByIdAsync(id, ct)
+                ?? throw new NotFoundException(BusinessRules.BookingRequestNotFound);
+            
+            AuditHelper.SetDeleted(existing, currentUser.UserId);
+
+            using var scope = uow.BeginTransactionScope();
+            await repo.DeleteAsync(id, existing, ct);
+            await scope.CommitTransactionScopeAsync(ct);
+
+            return new DeleteBookingRequestResponseDto();
+        }
+
         public async Task<MarkBookingReadResponseDto> MarkAsReadAsync(int id, CancellationToken ct)
         {
             var existing = await repo.GetByIdAsync(id, ct)

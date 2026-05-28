@@ -33,3 +33,13 @@ export function useMarkBookingRead() {
     },
   });
 }
+
+export function useDeleteBookingRequest() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => bookingRequestsApi.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bookingRequests'] });
+    },
+  });
+}
