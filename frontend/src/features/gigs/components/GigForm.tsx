@@ -6,8 +6,10 @@ import {
   Button,
   Stack,
   Group,
+  Checkbox,
 } from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
+import { AddressAutocomplete } from '../../../components/ui/AdressAutocomplete';
 import type { GigResponse } from '../../../types/gig.types';
 
 interface GigFormProps {
@@ -35,6 +37,7 @@ export function GigForm({ initialData, onSubmit, loading, errors }: GigFormProps
   const [price, setPrice] = useState<number | string>('');
   const [notes, setNotes] = useState('');
   const [ticketUrl, setTicketUrl] = useState('');
+  const [allowPastDate, setAllowPastDate] = useState(false);
 
   useEffect(() => {
     if (initialData) {
@@ -46,6 +49,10 @@ export function GigForm({ initialData, onSubmit, loading, errors }: GigFormProps
       setPrice(initialData.price ?? '');
       setNotes(initialData.notes ?? '');
       setTicketUrl(initialData.ticketUrl ?? '');
+
+      if (new Date(initialData.date) < new Date()) {
+        setAllowPastDate(true);
+      }
     }
   }, [initialData]);
 
@@ -102,14 +109,21 @@ export function GigForm({ initialData, onSubmit, loading, errors }: GigFormProps
           value={date}
           onChange={setDate}
           error={errors?.date}
+          minDate={allowPastDate ? undefined : new Date()}
           required
         />
 
-        <TextInput
-          label="Adress"
-          placeholder="Gatuadress (valfritt)"
+        <Checkbox
+          label="Lägg in gammal spelning"
+          checked={allowPastDate}
+          onChange={(e) => setAllowPastDate(e.currentTarget.checked)}
+        />
+
+        <AddressAutocomplete
           value={adress}
-          onChange={(e) => setAdress(e.currentTarget.value)}
+          onChange={setAdress}
+          label="Adress"
+          placeholder="Sök adress..."
           error={errors?.adress}
         />
 

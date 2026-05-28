@@ -24,9 +24,6 @@ public class GigValidator(IGigRepository repo) : IGigValidator
     {
         var now = DateTimeOffset.UtcNow;
 
-        if (date < now)
-            throw new ValidationException("Date", "Datum kan inte vara i det förflutna.");
-
         if (date > now.AddYears(2))
             throw new ValidationException("Date", "Datum får max vara två år framåt.");
     }
