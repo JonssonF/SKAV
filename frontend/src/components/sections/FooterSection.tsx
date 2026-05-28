@@ -94,7 +94,7 @@ export function FooterSection() {
               © {new Date().getFullYear()} SKAV
             </Text>
             <Group gap="md">
-              <Text size="sm" c="dimmed" component="a" href="mailto:kontakt@skav.se">
+              <Text size="sm" c="dimmed" component="a" href="mailto:kontakt@skav.nu">
                 Kontakt
               </Text>
               <Text size="sm" c="dimmed" component="a" href="https://www.instagram.com/skav.bandet" target="_blank">
