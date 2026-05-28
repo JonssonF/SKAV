@@ -41,8 +41,8 @@ export function BookingSection() {
   return (
     <Container size="sm" py="xl">
       <SectionTitle text="Boka oss" />
-      <Text ta="center" c="dimmed" mb="xl">
-        Vill ni ha livemusik på ert event? Skicka en förfrågan så hör vi av oss!
+      <Text ta="center" c="dimmed" mb="xl" style={{ whiteSpace: 'pre-line' }}>
+        {'Vill ni ha livemusik på ert event?\nSkicka en förfrågan så hör vi av oss!'}
       </Text>
 
       {submitted ? (
