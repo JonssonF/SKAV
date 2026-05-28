@@ -28,7 +28,7 @@ const theme = createTheme({
 function App() {
   const [colorScheme] = useLocalStorage<'light' | 'dark'>({
     key: 'color-scheme',
-    defaultValue: 'dark',
+    defaultValue: 'light',
   });
 
   return (
