@@ -35,5 +35,11 @@ namespace SKAV.Api.Controllers
         [SwaggerOperation("Markera en bokningsförfrågan som läst")]
         public async Task<MarkBookingReadResponseDto> MarkAsRead(int id, CancellationToken ct)
             => await service.MarkAsReadAsync(id, ct);
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin,Editor")]
+        [SwaggerOperation("Radera en bokningsförfrågan")]
+        public async Task<DeleteBookingRequestResponseDto> Delete(int id, CancellationToken ct)
+            => await service.DeleteAsync(id, ct);
     }
 }

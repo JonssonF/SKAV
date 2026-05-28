@@ -239,6 +239,20 @@ namespace SKAV.Application.Services
 
             return new CancelProductOrderResponseDto();
         }
+        public async Task<DeleteProductOrderResponseDto> DeleteAsync(int id, CancellationToken ct)
+        {
+            var existing = await orderRepo.GetByIdAsync(id, ct)
+                ?? throw new NotFoundException(BusinessRules.ProductOrderNotFound);
+
+            AuditHelper.SetDeleted(existing, currentUser.UserId);
+
+            using var scope = uow.BeginTransactionScope();
+            await orderRepo.DeleteAsync(id, existing, ct);
+            await scope.CommitTransactionScopeAsync(ct);
+            
+            return new DeleteProductOrderResponseDto();
+
+        }
 
         private static ProductOrderResponseDto MapToDto(
             ProductOrder order,
@@ -288,5 +302,6 @@ namespace SKAV.Application.Services
                         : null,
                 }).ToList(),
             };
+
     }
 }

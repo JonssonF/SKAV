@@ -28,4 +28,8 @@ export const productOrdersApi = {
   cancel: async (id: number): Promise<void> => {
   await apiClient.put(`/product-orders/${id}/cancel`);
   },
+
+  delete: async (id: number): Promise<void> => {
+  await apiClient.delete(`/product-orders/${id}`);
+  },
 };
