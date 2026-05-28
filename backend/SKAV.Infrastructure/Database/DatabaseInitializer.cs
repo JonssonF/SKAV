@@ -17,6 +17,17 @@ namespace SKAV.Infrastructure.Database
 
             await connection.ExecuteAsync("PRAGMA foreign_keys = ON;");
 
+            const string sqlSiteSettings = """
+                CREATE TABLE IF NOT EXISTS SiteSettings(
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Key TEXT NOT NULL UNIQUE,
+                    Value TEXT NOT NULL,
+                    UpdatedAt TEXT,
+                    UpdatedBy INTEGER
+                );
+            """;
+            await connection.ExecuteAsync(sqlSiteSettings);
+
             const string sqlGigs = """
                 CREATE TABLE IF NOT EXISTS Gigs (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
