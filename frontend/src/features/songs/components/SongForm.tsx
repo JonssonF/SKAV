@@ -9,6 +9,7 @@ import {
 } from '@mantine/core';
 import { useAlbums } from '../../albums/hooks/useAlbums';
 import type { SongResponse } from '../../../types/song.types';
+import { DateInput } from '@mantine/dates';
 
 interface SongFormProps {
   initialData?: SongResponse;
@@ -21,7 +22,7 @@ interface SongFormProps {
     lyricsWriter?: string;
     trackNumber?: number;
     youtubeUrl?: string;
-    year?: number;
+    releaseDate?: string;
   }) => void;
   loading?: boolean;
   errors?: Record<string, string> | null;
@@ -38,7 +39,7 @@ export function SongForm({ initialData, onSubmit, loading, errors }: SongFormPro
   const [lyricsWriter, setLyricsWriter] = useState('');
   const [trackNumber, setTrackNumber] = useState<number | string>('');
   const [youtubeUrl, setYoutubeUrl] = useState('');
-  const [year, setYear] = useState<number | string>('');
+  const [releaseDate, setReleaseDate] = useState<Date | null>(null);
 
   useEffect(() => {
     if (initialData) {
@@ -50,7 +51,7 @@ export function SongForm({ initialData, onSubmit, loading, errors }: SongFormPro
       setLyricsWriter(initialData.lyricsWriter ?? '');
       setTrackNumber(initialData.trackNumber ?? '');
       setYoutubeUrl(initialData.youtubeUrl ?? '');
-      setYear(initialData.year ?? '');
+      setReleaseDate(initialData.releaseDate ? new Date(initialData.releaseDate) : null);
     }
   }, [initialData]);
 
@@ -71,7 +72,7 @@ export function SongForm({ initialData, onSubmit, loading, errors }: SongFormPro
       lyricsWriter: lyricsWriter || undefined,
       trackNumber: trackNumber !== '' ? Number(trackNumber) : undefined,
       youtubeUrl: youtubeUrl || undefined,
-      year: year !== '' ? Number(year) : undefined,
+      releaseDate: releaseDate ? releaseDate.toISOString() : undefined,
     });
   };
 
@@ -152,14 +153,14 @@ export function SongForm({ initialData, onSubmit, loading, errors }: SongFormPro
           error={errors?.youtubeUrl}
         />
 
-        <NumberInput
-          label="År"
-          placeholder="T.ex. 2025"
-          value={year}
-          onChange={(value) => setYear(Number(value))}
-          error={errors?.year}
-          min={1900}
-          max={2100}
+        <DateInput
+          valueFormat="YYYY-MM-DD"
+          label="Releasedatum"
+          placeholder="T.ex. 2025-01-01"
+          value={releaseDate}
+          onChange={(value) => setReleaseDate(value ? new Date(value) : null)}
+          error={errors?.releaseDate}
+          clearable
         />
 
         <Group justify="flex-end">

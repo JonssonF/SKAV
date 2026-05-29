@@ -37,9 +37,7 @@ namespace SKAV.Application.DTOs.Song
         [DefaultValue("https://youtube.com/watch?v=example")]
         public string? YoutubeUrl { get; set; }
 
-        [Range(1900, 2100, ErrorMessage = "År måste vara mellan 1900 och 2100")]
-        [DefaultValue(2025)]
-        public int? Year { get; set; }
+        public DateTimeOffset? ReleaseDate { get; set; }
 
         [Range(1, 100, ErrorMessage = "Spårnummer måste vara mellan 1 och 100")]
         public int? TrackNumber { get; set; }

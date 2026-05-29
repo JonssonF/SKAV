@@ -36,8 +36,7 @@ namespace SKAV.Application.DTOs.Song
         [RegularExpression(ValidationRegularExpression.Url, ErrorMessage = "Ogiltig URL")]
         public string? YoutubeUrl { get; set; }
 
-        [Range(1900, 2100, ErrorMessage = "År måste vara mellan 1900 och 2100")]
-        public int? Year { get; set; }
+        public DateTimeOffset? ReleaseDate { get; set; }
 
         [Range(1, 100, ErrorMessage = "Spårnummer måste vara mellan 1 och 100")]
         [DefaultValue(1)]
