@@ -38,51 +38,42 @@ namespace SKAV.Infrastructure.Database
             await SeedProductOrderRecipientsAsync(ct);
         }
 
-        private async Task SeedUsersAsync(CancellationToken ct)
-        {
-            var existing = await memberRepo.GetAllAsync(ct);
-            if (existing.Any()) return;
-            var admin = new Member
-            {
-                Name = "Admin",
-                Quote = "Jag har full koll på allt!",
-                DisplayOrder = 0,
-            };
-            AuditHelper.SetCreated(admin, null);
-            using var scope = uow.BeginTransactionScope();
-            await memberRepo.CreateAsync(admin, ct);
-            await scope.CommitTransactionScopeAsync(ct);
-        }
-
         private async Task SeedSiteSettingsAsync(CancellationToken ct)
         {
-            var existing = await siteRepo.GetAllAsync(ct);
-            if (existing.Any()) return;
-
             var settings = new List<SiteSetting>
             {
-                new() { 
-                    Key = "ShopPaused", 
-                    Value = "false" },
-
-                new() { 
-                    Key = "ShopPausedMessage", 
-                    Value = "Vi tar inte emot beställningar just nu – prenumerera på vårt nyhetsbrev så meddelar vi när shopen öppnar igen!" },
-                
-                new() { 
-                    Key = "BookingPaused", 
-                    Value = "false" },
-
-                new() { 
-                    Key = "BookingPausedMessage", 
-                    Value = "Vi tar inte emot bokningar just nu – prenumerera på vårt nyhetsbrev så meddelar vi när vi öppnar igen!" },
+                new()
+                {
+                    Key = "ShopPaused",
+                    Value = "false"
+                },
+                new()
+                {
+                    Key = "ShopPausedMessage",
+                    Value = "Vi tar inte emot beställningar just nu – prenumerera på vårt nyhetsbrev så meddelar vi när shopen öppnar igen!"
+                },
+                new()
+                {
+                    Key = "BookingPaused",
+                    Value = "false"
+                },
+                new()
+                {
+                    Key = "BookingPausedMessage",
+                    Value = "Vi tar inte emot bokningar just nu – prenumerera på vårt nyhetsbrev så meddelar vi när vi öppnar igen!"
+                }
             };
 
             using var scope = uow.BeginTransactionScope();
+
             foreach (var setting in settings)
             {
+                if (await siteRepo.GetByKeyAsync(setting.Key, ct) is not null)
+                    continue;
+
                 await siteRepo.CreateAsync(setting, ct);
             }
+
             await scope.CommitTransactionScopeAsync(ct);
         }
 
