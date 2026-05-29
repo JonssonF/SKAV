@@ -61,8 +61,21 @@ namespace SKAV.Infrastructure.Database
 
             var settings = new List<SiteSetting>
             {
-                new() { Key = "ShopPaused", Value = "false" },
-                new() { Key = "ShopPausedMessage", Value = "Vi tar inte emot beställningar just nu – prenumerera på vårt nyhetsbrev så meddelar vi när shopen öppnar igen!" },
+                new() { 
+                    Key = "ShopPaused", 
+                    Value = "false" },
+
+                new() { 
+                    Key = "ShopPausedMessage", 
+                    Value = "Vi tar inte emot beställningar just nu – prenumerera på vårt nyhetsbrev så meddelar vi när shopen öppnar igen!" },
+                
+                new() { 
+                    Key = "BookingPaused", 
+                    Value = "false" },
+
+                new() { 
+                    Key = "BookingPausedMessage", 
+                    Value = "Vi tar inte emot bokningar just nu – prenumerera på vårt nyhetsbrev så meddelar vi när vi öppnar igen!" },
             };
 
             using var scope = uow.BeginTransactionScope();

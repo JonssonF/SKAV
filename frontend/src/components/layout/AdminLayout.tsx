@@ -2,7 +2,7 @@ import { AppShell, NavLink, Title, Group, Button, ActionIcon, Burger } from '@ma
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../../providers/AuthProvider';
 import { useLocalStorage, useDisclosure } from '@mantine/hooks';
-import { IconShoppingCart } from '@tabler/icons-react';
+import { IconSettings } from '@tabler/icons-react';
 
 const adminItems = [
   { label: 'Dashboard', path: '/admin' },
@@ -13,7 +13,7 @@ const adminItems = [
   { label: 'Låtförslag', path: '/admin/song-proposals' },
   { label: 'Nyhetsbrev', path: '/admin/newsletter' },
   { label: 'Produkter', path: '/admin/products' },
-  { label: 'Webshop', path: '/admin/shop-settings', icon: IconShoppingCart }
+  { label: 'Inställningar', path: '/admin/site-settings', icon: IconSettings },
 ];
 
 export function AdminLayout() {

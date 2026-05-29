@@ -16,7 +16,7 @@ import { ShopPage } from '../pages/ShopPage';
 import { AdminProductsPage } from '../pages/Admin/AdminProductsPage';
 import { ForgotPasswordPage } from '../pages/ForgotPasswordPage';
 import { ResetPasswordPage } from '../pages/ResetPasswordPage';
-import { AdminShopSettingsPage } from '../pages/Admin/AdminShopSettingsPage';
+import { AdminSiteSettingsPage } from '../pages/Admin/AdminSiteSettingsPage';
 
 export function AppRouter() {
   return (
@@ -59,7 +59,7 @@ export function AppRouter() {
           <Route path="/admin/users" element={<AdminUsersPage />} />
           <Route path="/admin/newsletter" element={<AdminNewsletterPage />} />
           <Route path="/admin/products" element={<AdminProductsPage />} />
-          <Route path="/admin/shop-settings" element={<AdminShopSettingsPage />} />
+          <Route path="/admin/site-settings" element={<AdminSiteSettingsPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
