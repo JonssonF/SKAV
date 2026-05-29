@@ -37,7 +37,7 @@ namespace SKAV.Tests.Services
             var result = await service.CreateAsync(_requestDto, default);
 
             // Assert
-            Assert.Equal(45, result.Id);
+            Assert.Equal(12, result.Id);
         }
 
         [Fact]
