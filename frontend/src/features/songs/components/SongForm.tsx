@@ -6,10 +6,17 @@ import {
   Stack,
   Group,
   Select,
+  Image,
+  ActionIcon,
+  Text,
 } from '@mantine/core';
-import { useAlbums } from '../../albums/hooks/useAlbums';
-import type { SongResponse } from '../../../types/song.types';
+import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone';
+import { IconUpload, IconX, IconPhoto } from '@tabler/icons-react';
 import { DateInput } from '@mantine/dates';
+import { useAlbums } from '../../albums/hooks/useAlbums';
+import { productsApi } from '../../../api/products.api';
+import { getImageUrl } from '../../../utils/imageUrl';
+import type { SongResponse } from '../../../types/song.types';
 
 interface SongFormProps {
   initialData?: SongResponse;
@@ -23,6 +30,7 @@ interface SongFormProps {
     trackNumber?: number;
     youtubeUrl?: string;
     releaseDate?: string;
+    imageUrl?: string;
   }) => void;
   loading?: boolean;
   errors?: Record<string, string> | null;
@@ -40,6 +48,8 @@ export function SongForm({ initialData, onSubmit, loading, errors }: SongFormPro
   const [trackNumber, setTrackNumber] = useState<number | string>('');
   const [youtubeUrl, setYoutubeUrl] = useState('');
   const [releaseDate, setReleaseDate] = useState<Date | null>(null);
+  const [imageUrl, setImageUrl] = useState('');
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (initialData) {
@@ -52,6 +62,7 @@ export function SongForm({ initialData, onSubmit, loading, errors }: SongFormPro
       setTrackNumber(initialData.trackNumber ?? '');
       setYoutubeUrl(initialData.youtubeUrl ?? '');
       setReleaseDate(initialData.releaseDate ? new Date(initialData.releaseDate) : null);
+      setImageUrl(initialData.imageUrl ?? '');
     }
   }, [initialData]);
 
@@ -59,6 +70,19 @@ export function SongForm({ initialData, onSubmit, loading, errors }: SongFormPro
     value: a.id.toString(),
     label: a.title,
   }));
+
+  const handleUpload = async (files: File[]) => {
+    if (files.length === 0) return;
+    setUploading(true);
+    try {
+      const res = await productsApi.uploadImage(files[0], 'songs');
+      setImageUrl(res.url ?? '');
+    } catch {
+      // Error handling via notifications om du vill
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,6 +97,7 @@ export function SongForm({ initialData, onSubmit, loading, errors }: SongFormPro
       trackNumber: trackNumber !== '' ? Number(trackNumber) : undefined,
       youtubeUrl: youtubeUrl || undefined,
       releaseDate: releaseDate ? releaseDate.toISOString() : undefined,
+      imageUrl: imageUrl || undefined,
     });
   };
 
@@ -156,12 +181,60 @@ export function SongForm({ initialData, onSubmit, loading, errors }: SongFormPro
         <DateInput
           valueFormat="YYYY-MM-DD"
           label="Releasedatum"
-          placeholder="T.ex. 2025-01-01"
+          placeholder="Välj datum"
           value={releaseDate}
           onChange={(value) => setReleaseDate(value ? new Date(value) : null)}
           error={errors?.releaseDate}
           clearable
         />
+
+        {/* Låtbild */}
+        <div>
+          <Text size="sm" fw={500} mb={4}>Låtbild</Text>
+          {imageUrl ? (
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+              <Image
+                src={getImageUrl(imageUrl)}
+                alt="Låtbild"
+                radius="md"
+                maw={200}
+              />
+              <ActionIcon
+                color="red"
+                variant="filled"
+                size="sm"
+                radius="xl"
+                style={{ position: 'absolute', top: 4, right: 4 }}
+                onClick={() => setImageUrl('')}
+              >
+                <IconX size={14} />
+              </ActionIcon>
+            </div>
+          ) : (
+            <Dropzone
+              onDrop={handleUpload}
+              accept={IMAGE_MIME_TYPE}
+              maxSize={10 * 1024 * 1024}
+              multiple={false}
+              loading={uploading}
+            >
+              <Group justify="center" gap="sm" style={{ pointerEvents: 'none', padding: 20 }}>
+                <Dropzone.Accept>
+                  <IconUpload size={32} stroke={1.5} />
+                </Dropzone.Accept>
+                <Dropzone.Reject>
+                  <IconX size={32} stroke={1.5} />
+                </Dropzone.Reject>
+                <Dropzone.Idle>
+                  <IconPhoto size={32} stroke={1.5} />
+                </Dropzone.Idle>
+                <Text size="sm" c="dimmed">
+                  Dra hit en bild eller klicka för att välja
+                </Text>
+              </Group>
+            </Dropzone>
+          )}
+        </div>
 
         <Group justify="flex-end">
           <Button type="submit" loading={loading}>

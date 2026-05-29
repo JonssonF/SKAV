@@ -11,6 +11,7 @@
         public string? LyricsWriter { get; init; }
         public int? TrackNumber { get; init; }
         public string? YoutubeUrl { get; init; }
+        public string? ImageUrl { get; init; }
         public DateTimeOffset? ReleaseDate { get; init; }
     }
 }

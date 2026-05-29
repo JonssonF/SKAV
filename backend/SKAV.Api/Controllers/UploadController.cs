@@ -16,13 +16,12 @@ namespace SKAV.Api.Controllers
         private const long MaxFileSize = 10 * 1024 * 1024; // 10 MB
 
         [HttpPost("{folder}")]
-        [SwaggerOperation("Ladda upp en bild till angiven mapp (products, members, albums)")]
+        [SwaggerOperation("Ladda upp en bild till angiven mapp (products, members, albums, songs)")]
         public async Task<UploadResponseDto> Upload(
             string folder, IFormFile file, CancellationToken ct)
         {
             // Validera mapp
-            var allowedFolders = new[] { "products", "members", "albums" };
-            if (!allowedFolders.Contains(folder.ToLower()))
+            var allowedFolders = new[] { "products", "members", "albums", "songs" }; if (!allowedFolders.Contains(folder.ToLower()))
                 return new UploadResponseDto { Error = "Ogiltig mapp." };
 
             // Validera fil
