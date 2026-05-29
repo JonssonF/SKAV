@@ -13,6 +13,7 @@ namespace SKAV.Domain.Entities
         public string? LyricsWriter { get; set; }
         public int? TrackNumber { get; set; }
         public string? YoutubeUrl { get; set; }
+        public string? ImageUrl { get; set; }
         public DateTimeOffset? ReleaseDate{ get; set; }
     }
 }

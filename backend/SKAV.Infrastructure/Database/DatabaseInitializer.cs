@@ -138,6 +138,7 @@ namespace SKAV.Infrastructure.Database
                     MusicWriter TEXT,
                     LyricsWriter TEXT,
                     YoutubeUrl TEXT NULL,
+                    ImageUrl TEXT NULL,
                     ReleaseDate TEXT NULL,
                     TrackNumber INTEGER NULL,
                     CreatedAt TEXT NOT NULL,

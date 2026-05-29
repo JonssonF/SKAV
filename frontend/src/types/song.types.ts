@@ -8,6 +8,7 @@ export interface SongResponse {
   lyricsWriter?: string;
   trackNumber?: number;
   youtubeUrl?: string;
+  imageUrl?: string;
   releaseDate?: string;
 }
 
@@ -20,6 +21,7 @@ export interface CreateSongRequest {
   lyricsWriter?: string;
   trackNumber?: number;
   youtubeUrl?: string;
+  imageUrl?: string;
   releaseDate?: string;
 }
 
@@ -36,5 +38,6 @@ export interface UpdateSongRequest {
   lyricsWriter?: string;
   trackNumber?: number;
   youtubeUrl?: string;
+  imageUrl?: string;
   releaseDate?: string;
 }
