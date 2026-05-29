@@ -20,10 +20,11 @@ import type { ProductResponse, ProductVariant } from '../../../types/product.typ
 
 interface ProductCardProps {
   product: ProductResponse;
-  onAddToCart: (product: ProductResponse, variant: ProductVariant, quantity: number, isSigned: boolean) => void;
+  onAddToCart?: (product: ProductResponse, variant: ProductVariant, quantity: number, isSigned: boolean) => void;
+  disabled?: boolean;
 }
 
-export function ProductCard({ product, onAddToCart }: ProductCardProps) {
+export function ProductCard({ product, onAddToCart, disabled }: ProductCardProps) {
   const [selections, setSelections] = useState<Record<string, string>>({});
   const [quantity, setQuantity] = useState<number>(1);
   const [isSigned, setIsSigned] = useState(false);
@@ -68,7 +69,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
   const allSelected = !hasAttributes || Object.keys(selections).length === attributeDefinitions.length;
 
   const handleAddToCart = () => {
-    if (!selectedVariant) return;
+  if (!selectedVariant || !onAddToCart) return;
 
     if (quantity > selectedVariant.stockQuantity) {
       notifications.show({
@@ -189,11 +190,11 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
             />
             <Button
               onClick={handleAddToCart}
-              disabled={!selectedVariant || !inStock}
+              disabled={disabled || !selectedVariant || !inStock}
               size="sm"
               style={{ flex: 1 }}
             >
-              Lägg i varukorg
+              {disabled ? 'Shopen är pausad' : 'Lägg i varukorg'}
             </Button>
           </Group>
         </Stack>

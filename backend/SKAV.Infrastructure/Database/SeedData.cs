@@ -1,4 +1,5 @@
-﻿using SKAV.Application.Common.Helpers;
+﻿using Microsoft.Data.Sqlite;
+using SKAV.Application.Common.Helpers;
 using SKAV.Application.Interfaces.Repositories;
 using SKAV.Application.Interfaces.UoW;
 using SKAV.Domain.Entities;
@@ -12,6 +13,7 @@ namespace SKAV.Infrastructure.Database
         IBookingRequestRepository bookingRequestRepo,
         IBookingRecipientRepository bookingRecipientRepo,
         IProductRepository productRepo,
+        ISiteSettingRepository siteRepo,
         IProductImageRepository productImageRepo,
         IProductAttributeDefinitionRepository productAttrRepo,
         IProductVariantRepository productVariantRepo,
@@ -22,6 +24,7 @@ namespace SKAV.Infrastructure.Database
     {
         public async Task SeedAsync(CancellationToken ct = default)
         {
+            await SeedSiteSettingsAsync(ct);
             await SeedMembersAsync(ct);
             await SeedGigsAsync(ct);
             await SeedSongsAsync(ct);
@@ -48,6 +51,38 @@ namespace SKAV.Infrastructure.Database
             AuditHelper.SetCreated(admin, null);
             using var scope = uow.BeginTransactionScope();
             await memberRepo.CreateAsync(admin, ct);
+            await scope.CommitTransactionScopeAsync(ct);
+        }
+
+        private async Task SeedSiteSettingsAsync(CancellationToken ct)
+        {
+            var existing = await siteRepo.GetAllAsync(ct);
+            if (existing.Any()) return;
+
+            var settings = new List<SiteSetting>
+            {
+                new() { 
+                    Key = "ShopPaused", 
+                    Value = "false" },
+
+                new() { 
+                    Key = "ShopPausedMessage", 
+                    Value = "Vi tar inte emot beställningar just nu – prenumerera på vårt nyhetsbrev så meddelar vi när shopen öppnar igen!" },
+                
+                new() { 
+                    Key = "BookingPaused", 
+                    Value = "false" },
+
+                new() { 
+                    Key = "BookingPausedMessage", 
+                    Value = "Vi tar inte emot bokningar just nu – prenumerera på vårt nyhetsbrev så meddelar vi när vi öppnar igen!" },
+            };
+
+            using var scope = uow.BeginTransactionScope();
+            foreach (var setting in settings)
+            {
+                await siteRepo.CreateAsync(setting, ct);
+            }
             await scope.CommitTransactionScopeAsync(ct);
         }
 
