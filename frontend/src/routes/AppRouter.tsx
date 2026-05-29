@@ -17,6 +17,7 @@ import { AdminProductsPage } from '../pages/Admin/AdminProductsPage';
 import { ForgotPasswordPage } from '../pages/ForgotPasswordPage';
 import { ResetPasswordPage } from '../pages/ResetPasswordPage';
 import { AdminSiteSettingsPage } from '../pages/Admin/AdminSiteSettingsPage';
+import { AdminAlbumsPage } from '../pages/Admin/AdminAlbumsPage';
 
 export function AppRouter() {
   return (
@@ -55,6 +56,7 @@ export function AppRouter() {
           <Route path="/admin/members" element={<AdminMembersPage />} />
           <Route path="/admin/gigs" element={<AdminGigsPage />} />
           <Route path="/admin/songs" element={<AdminSongsPage />} />
+          <Route path="/admin/albums" element={<AdminAlbumsPage />} />
           <Route path="/admin/song-proposals" element={<AdminSongProposalsPage />} />
           <Route path="/admin/users" element={<AdminUsersPage />} />
           <Route path="/admin/newsletter" element={<AdminNewsletterPage />} />

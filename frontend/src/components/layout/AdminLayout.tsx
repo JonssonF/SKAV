@@ -2,17 +2,29 @@ import { AppShell, NavLink, Title, Group, Button, ActionIcon, Burger } from '@ma
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../../providers/AuthProvider';
 import { useLocalStorage, useDisclosure } from '@mantine/hooks';
-import { IconSettings } from '@tabler/icons-react';
+import {
+  IconDashboard,
+  IconUsers,
+  IconUserStar,
+  IconCalendarEvent,
+  IconDisc,
+  IconMusic,
+  IconThumbUp,
+  IconMail,
+  IconShoppingBag,
+  IconSettings,
+} from '@tabler/icons-react';
 
 const adminItems = [
-  { label: 'Dashboard', path: '/admin' },
-  { label: 'Användare', path: '/admin/users' },
-  { label: 'Medlemmar', path: '/admin/members' },
-  { label: 'Spelningar', path: '/admin/gigs' },
-  { label: 'Låtar', path: '/admin/songs' },
-  { label: 'Låtförslag', path: '/admin/song-proposals' },
-  { label: 'Nyhetsbrev', path: '/admin/newsletter' },
-  { label: 'Produkter', path: '/admin/products' },
+  { label: 'Dashboard', path: '/admin', icon: IconDashboard },
+  { label: 'Användare', path: '/admin/users', icon: IconUsers },
+  { label: 'Medlemmar', path: '/admin/members', icon: IconUserStar },
+  { label: 'Spelningar', path: '/admin/gigs', icon: IconCalendarEvent },
+  { label: 'Album', path: '/admin/albums', icon: IconDisc },
+  { label: 'Låtar', path: '/admin/songs', icon: IconMusic },
+  { label: 'Låtförslag', path: '/admin/song-proposals', icon: IconThumbUp },
+  { label: 'Nyhetsbrev', path: '/admin/newsletter', icon: IconMail },
+  { label: 'Produkter', path: '/admin/products', icon: IconShoppingBag },
   { label: 'Inställningar', path: '/admin/site-settings', icon: IconSettings },
 ];
 
@@ -77,8 +89,9 @@ export function AdminLayout() {
           <NavLink
             key={item.path}
             label={item.label}
+            leftSection={item.icon && <item.icon size={18} stroke={1.5} />}
+            onClick={() => navigate(item.path)}
             active={location.pathname === item.path}
-            onClick={() => handleNavigate(item.path)}
           />
         ))}
       </AppShell.Navbar>
