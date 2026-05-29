@@ -14,6 +14,7 @@ import { useLyrics } from '../../lyrics/hooks/useLyrics';
 import type { SongResponse } from '../../../types/song.types';
 import type { LyricsResponse } from '../../../types/lyrics.types';
 import { SectionTitle } from '../../../components/ui/SectionTitle';
+import { SpotifyPlayer } from './SpotifyPlayer';
 
 function formatDuration(seconds?: number): string {
   if (!seconds) return '';
@@ -143,9 +144,10 @@ export function MusicSection() {
 
   return (
     <Container size="lg" py="xl">
-      <SectionTitle text="Musik" />
+        <SectionTitle text="Musik" />
+        <SpotifyPlayer />
       <Card shadow="sm" padding="lg" radius="md" withBorder>
-        {sortedSongs.map((song, i) => (
+          {sortedSongs.map((song, i) => (
           <SongRow
             key={song.id}
             song={song}
