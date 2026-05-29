@@ -8,7 +8,7 @@ export interface SongResponse {
   lyricsWriter?: string;
   trackNumber?: number;
   youtubeUrl?: string;
-  year?: number;
+  releaseDate?: string;
 }
 
 export interface CreateSongRequest {
@@ -20,7 +20,7 @@ export interface CreateSongRequest {
   lyricsWriter?: string;
   trackNumber?: number;
   youtubeUrl?: string;
-  year?: number;
+  releaseDate?: string;
 }
 
 export interface CreateSongResponse {
@@ -36,5 +36,5 @@ export interface UpdateSongRequest {
   lyricsWriter?: string;
   trackNumber?: number;
   youtubeUrl?: string;
-  year?: number;
+  releaseDate?: string;
 }

@@ -53,7 +53,7 @@ namespace SKAV.Application.Services
                 LyricsWriter = request.LyricsWriter,
                 TrackNumber = request.TrackNumber,
                 YoutubeUrl = request.YoutubeUrl,
-                Year = request.Year,
+                ReleaseDate = request.ReleaseDate,
             };
             
 
@@ -82,7 +82,7 @@ namespace SKAV.Application.Services
             existing.LyricsWriter = request.LyricsWriter;
             existing.TrackNumber = request.TrackNumber;
             existing.YoutubeUrl = request.YoutubeUrl;
-            existing.Year = request.Year;
+            existing.ReleaseDate = request.ReleaseDate;
 
             AuditHelper.SetUpdated(existing, currentUser.UserId);
 
@@ -118,7 +118,7 @@ namespace SKAV.Application.Services
             LyricsWriter = s.LyricsWriter,
             TrackNumber = s.TrackNumber,
             YoutubeUrl = s.YoutubeUrl,
-            Year = s.Year,
+            ReleaseDate = s.ReleaseDate,
         };
     }
 }

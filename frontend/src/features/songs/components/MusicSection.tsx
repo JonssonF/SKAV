@@ -50,10 +50,10 @@ function SongRow({ song, index, lyrics }: { song: SongResponse; index: number; l
                 </Badge>
               )}
             </Group>
-            {(song.musicWriter || song.lyricsWriter || song.year) && (
+            {(song.musicWriter || song.lyricsWriter || song.releaseDate) && (
               <Text size="xs" c="dimmed">
-                {song.year && `${song.year}`}
-                {song.year && (song.musicWriter || song.lyricsWriter) && ' · '}
+                {song.releaseDate && new Date(song.releaseDate).getFullYear()}
+                {song.releaseDate && (song.musicWriter || song.lyricsWriter) && ' · '}
                 {song.musicWriter && `Musik: ${song.musicWriter}`}
                 {song.musicWriter && song.lyricsWriter && ' · '}
                 {song.lyricsWriter && `Text: ${song.lyricsWriter}`}
@@ -134,11 +134,18 @@ export function MusicSection() {
     );
   }
 
+  const sortedSongs = [...songs].sort((a, b) => {
+  if (!a.releaseDate && !b.releaseDate) return 0;
+  if (!a.releaseDate) return 1;
+  if (!b.releaseDate) return -1;
+  return new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime();
+});
+
   return (
     <Container size="lg" py="xl">
       <SectionTitle text="Musik" />
       <Card shadow="sm" padding="lg" radius="md" withBorder>
-        {songs.map((song, i) => (
+        {sortedSongs.map((song, i) => (
           <SongRow
             key={song.id}
             song={song}
