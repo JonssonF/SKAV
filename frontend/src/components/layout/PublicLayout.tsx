@@ -25,7 +25,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [colorScheme, setColorScheme] = useLocalStorage<'light' | 'dark'>({
     key: 'color-scheme',
-    defaultValue: 'dark',
+    defaultValue: 'light',
   });
 
   const isAdmin = user?.roles.includes('Admin') ?? false;
@@ -95,7 +95,8 @@ const scrollTo = (href: string) => {
               <ActionIcon
                 variant="subtle"
                 color="gray"
-                onClick={() => setColorScheme(colorScheme === 'dark' ? 'light' : 'dark')}
+                onClick={() => setColorScheme(colorScheme === 'dark' ? 'light' : 'light')}
+
               >
                 {colorScheme === 'dark' ? '☀️' : '🌙'}
               </ActionIcon>
@@ -158,7 +159,7 @@ const scrollTo = (href: string) => {
             fullWidth
             justify="flex-start"
             onClick={() => {
-              setColorScheme(colorScheme === 'dark' ? 'light' : 'dark');
+              setColorScheme(colorScheme === 'dark' ? 'light' : 'light');
               setDrawerOpen(false);
             }}
           >
