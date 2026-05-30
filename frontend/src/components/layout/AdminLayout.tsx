@@ -35,7 +35,7 @@ export function AdminLayout() {
   const [opened, { toggle, close }] = useDisclosure();
   const [colorScheme, setColorScheme] = useLocalStorage<'light' | 'dark'>({
     key: 'color-scheme',
-    defaultValue: 'dark',
+    defaultValue: 'light',
   });
 
   const handleLogout = () => {
@@ -70,7 +70,7 @@ export function AdminLayout() {
             <ActionIcon
               variant="subtle"
               color="gray"
-              onClick={() => setColorScheme(colorScheme === 'dark' ? 'light' : 'dark')}
+              onClick={() => setColorScheme(colorScheme === 'dark' ? 'light' : 'light')}
             >
               {colorScheme === 'dark' ? '☀️' : '🌙'}
             </ActionIcon>
