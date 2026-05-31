@@ -90,7 +90,7 @@ export function AdminLayout() {
             key={item.path}
             label={item.label}
             leftSection={item.icon && <item.icon size={18} stroke={1.5} />}
-            onClick={() => navigate(item.path)}
+            onClick={() => handleNavigate(item.path)}
             active={location.pathname === item.path}
           />
         ))}

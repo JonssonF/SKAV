@@ -66,7 +66,7 @@ export function VotingCard({
             <div>
               <Group justify="space-between" mb="xs">
                 <IconMusic size={20} style={{ opacity: 0.5 }} />
-                <Badge variant="light" color="violet" size="sm">
+                <Badge variant="gradient" gradient={{ from: 'red', to: 'gray' }} size="sm">
                   {proposal.voteCount} {proposal.voteCount === 1 ? 'röst' : 'röster'}
                 </Badge>
               </Group>
@@ -118,7 +118,7 @@ export function VotingCard({
                 <Stack gap="md">
                   <Group justify="space-between">
                     <Title order={3}>{proposal.title}</Title>
-                    <Badge variant="light" color="violet">
+                    <Badge variant="gradient" gradient={{ from: 'red', to: 'gray' }} size="xl">
                       {proposal.voteCount} {proposal.voteCount === 1 ? 'röst' : 'röster'}
                     </Badge>
                   </Group>
@@ -143,7 +143,7 @@ export function VotingCard({
                       <Text size="sm" fw={600} mb="xs">Tidigare omröstningar</Text>
                       <Group gap="xs">
                         {proposal.voteHistory.map((snap, i) => (
-                          <Badge key={i} variant="outline" color="gray" size="sm">
+                          <Badge key={i} variant="outline" color="gray" size="lg">
                             {snap.voteCount} {snap.voteCount === 1 ? 'röst' : 'röster'} – {new Date(snap.snapshotDate).toLocaleDateString('sv-SE')}
                           </Badge>
                         ))}
@@ -151,15 +151,11 @@ export function VotingCard({
                     </div>
                   )}
 
-                  {proposal.createdByEmail && (
-                    <Text size="xs" c="dimmed">
-                      Föreslagen av: {proposal.createdByEmail}
-                    </Text>
-                  )}
-
                   <Button
                     fullWidth
                     size="md"
+                    variant="gradient"
+                    gradient={{ from: 'red', to: 'gray' }}
                     leftSection={<IconThumbUp size={18} />}
                     onClick={handleVote}
                     loading={voteLoading}

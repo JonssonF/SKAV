@@ -60,7 +60,8 @@ export function BookingSection() {
             <Button
               component="a"
               href="/#nyhetsbrev"
-              variant="light"
+              variant="gradient"
+              gradient={{ from: 'red', to: 'gray' }}
               leftSection={<IconMailFast size={18} />}
             >
               Prenumerera på nyhetsbrevet
