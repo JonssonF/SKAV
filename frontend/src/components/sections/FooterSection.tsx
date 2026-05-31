@@ -8,7 +8,7 @@ import { IMAGE_BASE_URL } from '../../utils/imageUrl';
 export function FooterSection() {
   const [colorScheme] = useLocalStorage<'light' | 'dark'>({
     key: 'color-scheme',
-    defaultValue: 'dark',
+    defaultValue: 'light',
   });
 
   const [unsubOpen, setUnsubOpen] = useState(false);

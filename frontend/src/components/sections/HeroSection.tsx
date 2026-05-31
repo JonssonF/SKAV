@@ -5,7 +5,7 @@ import { IMAGE_BASE_URL } from '../../utils/imageUrl';
 export function HeroSection() {
   const [colorScheme] = useLocalStorage<'light' | 'dark'>({
     key: 'color-scheme',
-    defaultValue: 'dark',
+    defaultValue: 'light',
   });
   
   const isMobile = useMediaQuery('(max-width: 48em)');

@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './providers/AuthProvider';
 import { AppRouter } from './routes/AppRouter';
 import '@mantine/carousel/styles.css';
-
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
 import '@mantine/dates/styles.css';
@@ -30,10 +29,10 @@ function App() {
     key: 'color-scheme',
     defaultValue: 'light',
   });
-
+  
   return (
     <QueryClientProvider client={queryClient}>
-      <MantineProvider theme={theme} forceColorScheme={colorScheme}>
+      <MantineProvider theme={theme} forceColorScheme={colorScheme ?? 'light'}>
         <Notifications position="top-right" />
         <AuthProvider>
           <AppRouter />
