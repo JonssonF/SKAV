@@ -30,8 +30,8 @@ function getCountdown(targetDate: string): CountdownValues {
 function CountdownBox({ value, label }: { value: number; label: string }) {
   const { colorScheme } = useMantineColorScheme();
   const isDark = colorScheme === 'dark';
-  
-    return (
+
+  return (
     <Box ta="center">
       <Paper
         radius="md"
@@ -39,7 +39,11 @@ function CountdownBox({ value, label }: { value: number; label: string }) {
         style={{
           background: isDark ? 'var(--mantine-color-dark-5)' : 'var(--mantine-color-gray-1)',
           border: '2px solid var(--mantine-color-red-3)',
-          minWidth: 64,
+          width: 80,        // fast bredd istället för minWidth
+          height: 72,       // fast höjd
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
         <Text
@@ -47,7 +51,7 @@ function CountdownBox({ value, label }: { value: number; label: string }) {
           size="2rem"
           lh={1}
           style={{
-            fontFamily: '"Orbitron", bold, monospace',
+            fontFamily: '"Orbitron", monospace',
             color: 'var(--mantine-color-black-7)',
           }}
         >
@@ -63,7 +67,13 @@ function CountdownBox({ value, label }: { value: number; label: string }) {
 
 function Separator() {
   return (
-    <Text fw={900} size="xl" c="red" mb={22} style={{ userSelect: 'none' }}>
+    <Text
+      fw={900}
+      size="xl"
+      c="red"
+      mb={50}   // högre mb skjuter kolon uppåt relativt boxarna
+      style={{ userSelect: 'none', lineHeight: 1 }}
+    >
       :
     </Text>
   );
