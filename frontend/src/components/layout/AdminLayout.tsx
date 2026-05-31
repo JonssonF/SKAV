@@ -70,7 +70,7 @@ export function AdminLayout() {
             <ActionIcon
               variant="subtle"
               color="gray"
-              onClick={() => setColorScheme(colorScheme === 'dark' ? 'light' : 'light')}
+              onClick={() => setColorScheme(colorScheme === 'dark' ? 'light' : 'dark')}
             >
               {colorScheme === 'dark' ? '☀️' : '🌙'}
             </ActionIcon>

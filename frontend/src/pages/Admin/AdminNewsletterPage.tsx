@@ -2,59 +2,78 @@ import { useState } from 'react';
 import {
   Container,
   Title,
-  Text,
   TextInput,
   Textarea,
   Button,
   Stack,
   Group,
-  Card,
   Badge,
   Alert,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { useSendNewsletter } from '../../features/newsletter/hooks/useNewsletter';
+import { useSendNewsletter, usePreviewNewsletter } from '../../features/newsletter/hooks/useNewsletter';
 import { useSubscribers } from '../../features/subscribers/hooks/useSubscribers';
 import { getApiMessage } from '../../utils/getApiErrors';
 
 export function AdminNewsletterPage() {
   const { data: subscribers } = useSubscribers();
   const sendNewsletter = useSendNewsletter();
+  const previewNewsletter = usePreviewNewsletter();
 
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
-  const [preview, setPreview] = useState(false);
+  const [previewHtml, setPreviewHtml] = useState<string | null>(null);
 
   const activeCount = subscribers?.length ?? 0;
 
+  const handlePreview = () => {
+    if (previewHtml) {
+      setPreviewHtml(null);
+      return;
+    }
+
+    previewNewsletter.mutate(
+      { subject: subject.trim(), body: body.trim() },
+      {
+        onSuccess: (result) => setPreviewHtml(result.html),
+        onError: (err) => {
+          notifications.show({
+            title: 'Kunde inte generera förhandsgranskning',
+            message: getApiMessage(err),
+            color: 'red',
+          });
+        },
+      }
+    );
+  };
+
   const handleSend = () => {
     if (!subject.trim() || !body.trim()) return;
-
     if (!window.confirm(`Skicka nyhetsbrevet till ${activeCount} prenumeranter?`)) return;
 
     sendNewsletter.mutate(
-        { subject: subject.trim(), body: body.trim() },
-        {
+      { subject: subject.trim(), body: body.trim() },
+      {
         onSuccess: (result) => {
-            setSubject('');
-            setBody('');
-            setPreview(false);
-            notifications.show({
+          setSubject('');
+          setBody('');
+          setPreviewHtml(null);
+          notifications.show({
             title: 'Nyhetsbrev skickat!',
             message: `${result.sent} av ${result.totalSubscribers} skickade.${result.failed > 0 ? ` ${result.failed} misslyckades.` : ''}`,
             color: result.failed > 0 ? 'yellow' : 'green',
-            });
+          });
         },
         onError: (err) => {
-            notifications.show({
+          notifications.show({
             title: 'Något gick fel',
             message: getApiMessage(err),
             color: 'red',
-            });
+          });
         },
-        }
+      }
     );
-    };
+  };
 
   return (
     <Container py="xl">
@@ -93,10 +112,11 @@ export function AdminNewsletterPage() {
         <Group justify="flex-end" gap="sm">
           <Button
             variant="subtle"
-            onClick={() => setPreview(!preview)}
+            onClick={handlePreview}
+            loading={previewNewsletter.isPending}
             disabled={!subject.trim() && !body.trim()}
           >
-            {preview ? 'Dölj förhandsgranskning' : 'Förhandsgranska'}
+            {previewHtml ? 'Dölj förhandsgranskning' : 'Förhandsgranska'}
           </Button>
           <Button
             onClick={handleSend}
@@ -108,15 +128,19 @@ export function AdminNewsletterPage() {
         </Group>
       </Stack>
 
-      {preview && (subject.trim() || body.trim()) && (
+      {previewHtml && (
         <>
           <Title order={2} mb="md">Förhandsgranskning</Title>
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
-            <Title order={3} mb="md">{subject || '(Inget ämne)'}</Title>
-            <Text style={{ whiteSpace: 'pre-line' }}>
-              {body || '(Inget innehåll)'}
-            </Text>
-          </Card>
+          <iframe
+            srcDoc={previewHtml}
+            style={{
+              width: '100%',
+              height: 700,
+              border: '1px solid var(--mantine-color-default-border)',
+              borderRadius: 'var(--mantine-radius-md)',
+            }}
+            title="Förhandsgranskning av nyhetsbrev"
+          />
         </>
       )}
     </Container>
