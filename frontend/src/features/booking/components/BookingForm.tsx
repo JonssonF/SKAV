@@ -114,7 +114,12 @@ export function BookingForm({ onSubmit, loading, errors }: BookingFormProps) {
         />
 
         <Group justify="flex-end">
-          <Button type="submit" loading={loading}>
+          <Button 
+          type="submit" 
+          loading={loading}
+          variant="gradient"
+          gradient={{ from: 'red', to: 'gray' }}
+          >
             Skicka förfrågan
           </Button>
         </Group>

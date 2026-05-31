@@ -49,7 +49,13 @@ export function SubscribeSection() {
               style={{ flex: 1, maxWidth: 300 }}
               required
             />
-            <Button type="submit" loading={subscribe.isPending}>
+            <Button 
+            type="submit" 
+            loading={subscribe.isPending}
+             variant="gradient"
+             gradient={{ from: 'red', to: 'gray' }}
+             size="md"
+             >
               Prenumerera
             </Button>
           </Group>

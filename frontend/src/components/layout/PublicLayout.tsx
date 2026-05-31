@@ -71,49 +71,47 @@ const scrollTo = (href: string) => {
               SKAV
             </span>
 
-            {/* Desktop nav */}
-            <Group gap="xs" visibleFrom="sm">
-              {navItems.map((item) => (
-                <Button
-                  key={item.href}
-                  variant="subtle"
-                  size="sm"
-                  color="gray"
-                  onClick={() => scrollTo(item.href)}
-                >
-                  {item.label}
-                </Button>
-                
-              ))}
+          {/* Desktop nav */}
+          <Group gap={4} wrap="nowrap" visibleFrom="md">
+            {navItems.map((item) => (
               <Button
-                variant="light"
-                size="sm"
-                onClick={() => navigate('/shop')}
-              >
-                Shop
-              </Button>
-              <ActionIcon
+                key={item.href}
                 variant="subtle"
+                size="xs"
                 color="gray"
-                onClick={() => setColorScheme(colorScheme === 'dark' ? 'light' : 'dark')}
-
+                onClick={() => scrollTo(item.href)}
               >
-                {colorScheme === 'dark' ? '☀️' : '🌙'}
-              </ActionIcon>
-
-              {isAuthenticated && (isAdmin || isEditor) && (
-                <Button variant="light" size="sm" onClick={() => navigate('/admin')}>
-                  Admin
-                </Button>
-              )}
-            </Group>
+                {item.label}
+              </Button>
+            ))}
+            <Button
+              variant="gradient"
+              gradient={{ from: 'red', to: 'gray' }}
+              size="xs"
+              onClick={() => navigate('/shop')}
+            >
+              Shop
+            </Button>
+            <ActionIcon
+              variant="subtle"
+              color="gray"
+              onClick={() => setColorScheme(colorScheme === 'dark' ? 'light' : 'dark')}
+            >
+              {colorScheme === 'dark' ? '☀️' : '🌙'}
+            </ActionIcon>
+            {isAuthenticated && (isAdmin || isEditor) && (
+              <Button variant="gradient" gradient={{ from: 'red', to: 'gray' }} size="xs" onClick={() => navigate('/admin')}>
+                Admin
+              </Button>
+            )}
+          </Group>
 
             {/* Mobil hamburger */}
             <ActionIcon
               variant="subtle"
               color="gray"
               size="lg"
-              hiddenFrom="sm"
+              hiddenFrom="md"
               onClick={() => setDrawerOpen(true)}
             >
               <IconMenu2 size={24} />
@@ -144,7 +142,8 @@ const scrollTo = (href: string) => {
             </Button>
           ))}
           <Button
-            variant="light"
+            variant="gradient"
+            gradient={{ from: 'red', to: 'gray' }}
             fullWidth
             onClick={() => {
               navigate('/shop');
@@ -168,7 +167,8 @@ const scrollTo = (href: string) => {
 
           {isAuthenticated && (isAdmin || isEditor || isMember) && (
             <Button
-              variant="light"
+              variant="gradient"
+              gradient={{ from: 'red', to: 'gray' }}
               fullWidth
               onClick={() => {
                 navigate('/admin');
