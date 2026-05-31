@@ -61,5 +61,9 @@ namespace SKAV.Application.Services
                 Failed = failed,
             };
         }
+
+        public PreviewNewsletterResponseDto Preview(PreviewNewsletterRequestDto request)
+        => new(NewsletterTemplate.Build(request.Subject, request.Body, "#", "https://skav.se"));
+
     }
 }

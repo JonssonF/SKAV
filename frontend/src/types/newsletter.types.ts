@@ -8,3 +8,12 @@ export interface SendNewsletterResponse {
   sent: number;
   failed: number;
 }
+
+export interface PreviewNewsletterRequest {
+  subject: string;
+  body: string;
+}
+
+export interface PreviewNewsletterResponse {
+  html: string;
+}
