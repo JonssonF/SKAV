@@ -95,7 +95,7 @@ const scrollTo = (href: string) => {
               <ActionIcon
                 variant="subtle"
                 color="gray"
-                onClick={() => setColorScheme(colorScheme === 'dark' ? 'light' : 'light')}
+                onClick={() => setColorScheme(colorScheme === 'dark' ? 'light' : 'dark')}
 
               >
                 {colorScheme === 'dark' ? '☀️' : '🌙'}
@@ -159,7 +159,7 @@ const scrollTo = (href: string) => {
             fullWidth
             justify="flex-start"
             onClick={() => {
-              setColorScheme(colorScheme === 'dark' ? 'light' : 'light');
+              setColorScheme(colorScheme === 'dark' ? 'light' : 'dark');
               setDrawerOpen(false);
             }}
           >
