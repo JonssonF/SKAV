@@ -163,7 +163,7 @@ export function ProductCard({ product, onAddToCart, disabled }: ProductCardProps
             <Checkbox
               label={
                 product.signingPrice
-                  ? `Signerad (+${product.signingPrice} kr)`
+                  ? `Signerad (+${product.signingPrice} kr) Tusch är dyrt.`
                   : 'Signerad (gratis)'
               }
               checked={isSigned}

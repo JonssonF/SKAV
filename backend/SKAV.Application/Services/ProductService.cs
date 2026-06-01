@@ -104,11 +104,11 @@ namespace SKAV.Application.Services
         }
 
         private static ProductResponseDto MapToDto(
-            Product p,
-            IEnumerable<ProductVariant> variants,
-            IEnumerable<ProductAttributeDefinition> attributes,
-            IEnumerable<ProductImage> images) => new()
-            {
+        Product p,
+        IEnumerable<ProductVariant> variants,
+        IEnumerable<ProductAttributeDefinition> attributes,
+        IEnumerable<ProductImage> images) => new()
+        {
                 Id = p.Id,
                 Title = p.Title,
                 Description = p.Description,
@@ -138,6 +138,18 @@ namespace SKAV.Application.Services
                     PriceOverride = v.PriceOverride,
                     StockQuantity = v.StockQuantity,
                 }).ToList(),
-            };
+        };
+
+        public async Task<IEnumerable<string>> GetCategoriesAsync(CancellationToken ct)
+        {
+            var products = await repo.GetAllAsync(ct);
+
+            return products
+                .Where(p => !string.IsNullOrWhiteSpace(p.Category))
+                .Select(p => p.Category!)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(c => c)
+                .ToList();
+        }
     }
 }

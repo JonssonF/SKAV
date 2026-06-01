@@ -57,6 +57,12 @@ export function useDeleteProduct() {
   });
 }
 
+export const useProductCategories = () =>
+  useQuery({
+    queryKey: ['product-categories'],
+    queryFn: productsApi.getCategories,
+  });
+
 // Attribute definitions
 export function useCreateAttributeDefinition() {
   const queryClient = useQueryClient();

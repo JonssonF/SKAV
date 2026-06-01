@@ -39,5 +39,11 @@ namespace SKAV.Api.Controllers
         [SwaggerOperation("Ta bort en produkt")]
         public async Task<DeleteProductResponseDto> Delete(int id, CancellationToken ct)
             => await service.DeleteAsync(id, ct);
+
+        [HttpGet("categories")]
+        [Authorize(Roles = "Admin,Editor")]
+        [SwaggerOperation("Hämta alla unika kategorier")]
+        public async Task<IEnumerable<string>> GetCategories(CancellationToken ct)
+        => await service.GetCategoriesAsync(ct);
     }
 }

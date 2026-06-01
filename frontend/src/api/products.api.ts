@@ -19,6 +19,11 @@ export const productsApi = {
     return response.data;
   },
 
+  getCategories: async (): Promise<string[]> => {
+    const response = await apiClient.get<string[]>('/products/categories');
+    return response.data;
+  },
+
   getById: async (id: number): Promise<ProductResponse> => {
     const response = await apiClient.get<ProductResponse>(`/products/${id}`);
     return response.data;
