@@ -11,7 +11,7 @@ namespace SKAV.Api.Controllers
     public class SubscriberController(ISubscriberService subscriberService) : ControllerBase
     {
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Editor")]
         [SwaggerOperation("Hämta alla prenumeranter")]
         public async Task<IEnumerable<SubscriberResponseDto>> GetAll(CancellationToken ct)
             => await subscriberService.GetAllAsync(ct);

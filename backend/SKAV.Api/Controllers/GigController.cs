@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SKAV.Application.DTOs.Gigs;
 using SKAV.Application.Services.Interface;
 using Swashbuckle.AspNetCore.Annotations;
@@ -21,16 +22,19 @@ namespace SKAV.Api.Controllers
 
         [HttpPost]
         [SwaggerOperation("Skapar ett nytt gig")]
+        [Authorize(Roles = "Admin,Editor")]
         public async Task<CreateGigResponseDto> Create(CreateGigRequestDto request, CancellationToken ct)
             => await service.CreateAsync(request, ct);
 
         [HttpPut("{id}")]
         [SwaggerOperation("Uppdaterar ett befintligt gig")]
+        [Authorize(Roles = "Admin,Editor")]
         public async Task<UpdateGigResponseDto> Update(int id, UpdateGigRequestDto request, CancellationToken ct)
             => await service.UpdateAsync(id, request, ct);
 
         [HttpDelete("{id}")]
         [SwaggerOperation("Tar bort ett befintligt gig")]
+        [Authorize(Roles = "Admin,Editor")]
         public async Task<DeleteGigResponseDto> Delete(int id, CancellationToken ct)
             => await service.DeleteAsync(id, ct);
     }

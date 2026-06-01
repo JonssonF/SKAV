@@ -35,7 +35,7 @@ namespace SKAV.Api.Controllers
             => await service.UpdateAsync(id, request, ct);
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Editor")]
         [SwaggerOperation("Ta bort en produkt")]
         public async Task<DeleteProductResponseDto> Delete(int id, CancellationToken ct)
             => await service.DeleteAsync(id, ct);

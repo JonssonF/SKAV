@@ -27,6 +27,7 @@
             => await service.CreateAsync(request, ct);
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin,Editor")]
         [SwaggerOperation("Uppdatera en befintlig medlem")]
         public async Task<UpdateMemberResponseDto> Update(int id, UpdateMemberRequestDto request, CancellationToken ct)
             => await service.UpdateAsync(id, request, ct);

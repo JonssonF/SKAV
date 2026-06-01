@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SKAV.Application.DTOs.Lyrics;
 using SKAV.Application.Services.Interface;
 using Swashbuckle.AspNetCore.Annotations;
@@ -26,16 +27,19 @@ namespace SKAV.Api.Controllers
 
         [HttpPost]
         [SwaggerOperation("Skapar en ny låttext")]
+        [Authorize(Roles = "Admin,Editor")]
         public async Task<CreateLyricsResponseDto> Create(CreateLyricsRequestDto request, CancellationToken ct)
             => await service.CreateAsync(request, ct);
 
         [HttpPut("{id}")]
         [SwaggerOperation("Uppdaterar en befintlig låttext")]
+        [Authorize(Roles = "Admin,Editor")]
         public async Task<UpdateLyricsResponseDto> Update(int id, UpdateLyricsRequestDto request, CancellationToken ct)
             => await service.UpdateAsync(id, request, ct);
 
         [HttpDelete("{id}")]
         [SwaggerOperation("Tar bort en befintlig låttext")]
+        [Authorize(Roles = "Admin,Editor")]
         public async Task<DeleteLyricsResponseDto> Delete(int id, CancellationToken ct)
             => await service.DeleteAsync(id, ct);
     }

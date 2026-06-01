@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SKAV.Application.DTOs.Album;
 using SKAV.Application.Services.Interface;
@@ -22,16 +23,19 @@ namespace SKAV.Api.Controllers
 
         [HttpPost]
         [SwaggerOperation("Skapar ett nytt album")]
+        [Authorize(Roles = "Admin,Editor")]
         public async Task<CreateAlbumResponseDto> Create(CreateAlbumRequestDto request, CancellationToken ct)
             => await service.CreateAsync(request, ct);
 
         [HttpPut("{id}")]
         [SwaggerOperation("Uppdaterar ett befintligt album")]
+        [Authorize(Roles = "Admin,Editor")]
         public async Task<UpdateAlbumResponseDto> Update(int id, UpdateAlbumRequestDto request, CancellationToken ct)
             => await service.UpdateAsync(id, request, ct);
 
         [HttpDelete("{id}")]
         [SwaggerOperation("Tar bort ett befintligt album")]
+        [Authorize(Roles = "Admin,Editor")]
         public async Task<DeleteAlbumResponseDto> Delete(int id, CancellationToken ct)
             => await service.DeleteAsync(id, ct);
     }

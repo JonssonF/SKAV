@@ -26,7 +26,7 @@ namespace SKAV.Api.Controllers
             => await userService.CreateAsync(request, ct);
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Editor")]
         [SwaggerOperation("Ta bort en användare")]
         public async Task<DeleteUserResponseDto> Delete(
             int id, CancellationToken ct)

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SKAV.Application.DTOs.Song;
 using SKAV.Application.Services.Interface;
@@ -21,16 +22,19 @@ namespace SKAV.Api.Controllers
             => await service.GetByIdAsync(id, ct);
 
         [HttpPost]
+        [Authorize(Roles = "Admin,Editor")]
         [SwaggerOperation("Skapar en ny låt")]
         public async Task<CreateSongResponseDto> Create(CreateSongRequestDto request, CancellationToken ct)
             => await service.CreateAsync(request, ct);
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin,Editor")]
         [SwaggerOperation("Uppdaterar en befintlig låt")]
         public async Task<UpdateSongResponseDto> Update(int id, UpdateSongRequestDto request, CancellationToken ct)
             => await service.UpdateAsync(id, request, ct);
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin,Editor")]
         [SwaggerOperation("Tar bort en befintlig låt")]
         public async Task<DeleteSongResponseDto> Delete(int id, CancellationToken ct)
             => await service.DeleteAsync(id, ct);
