@@ -62,7 +62,7 @@ namespace SKAV.Application.Services
             var existing = await repo.GetByIdAsync(id, ct)
                 ?? throw new NotFoundException(BusinessRules.MemberNotFound);
 
-            if (existing.UserId != currentUser.UserId)
+            if (!currentUser.Roles.HasFlag(Roles.Admin) && existing.UserId != currentUser.UserId)
             {
                 throw new ForbiddenException(BusinessRules.Forbidden);
             }
