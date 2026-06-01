@@ -7,8 +7,10 @@ import {
   Stack,
   Group,
   Switch,
+  Autocomplete,
 } from '@mantine/core';
 import type { ProductResponse } from '../../../types/product.types';
+import { useProductCategories } from '../hooks/useProducts';
 
 interface ProductFormProps {
   initialData?: ProductResponse;
@@ -31,6 +33,7 @@ export function ProductForm({ initialData, onSubmit, loading, errors }: ProductF
   const [category, setCategory] = useState('');
   const [isSignable, setIsSignable] = useState(false);
   const [signingPrice, setSigningPrice] = useState<number | string>('');
+  const { data: categories = [] } = useProductCategories();
 
   useEffect(() => {
     if (initialData) {
@@ -87,11 +90,12 @@ export function ProductForm({ initialData, onSubmit, loading, errors }: ProductF
           required
         />
 
-        <TextInput
+        <Autocomplete
           label="Kategori"
           placeholder="T.ex. Kläder, Musik, Övrigt"
           value={category}
-          onChange={(e) => setCategory(e.currentTarget.value)}
+          onChange={setCategory}
+          data={categories}
           error={errors?.category}
         />
 

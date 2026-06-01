@@ -333,7 +333,7 @@ export function ProductManageModal({
           <div>
             <Title order={4} mb="sm">Varianter & Lager</Title>
             <Text size="sm" c="dimmed" mb="md">
-              Skapa varianter med lagersaldo. Varje kombination av attribut är en egen variant.
+              Skapa varianter med lagersaldo. Varje kombination av attribut är en egen variant.<br />Avvikande pris kan sättas per variant, annars används produktens ordinarie pris.
             </Text>
 
             {product.variants.length > 0 && (
@@ -342,7 +342,7 @@ export function ProductManageModal({
                   <Table.Tr>
                     <Table.Th>Variant</Table.Th>
                     <Table.Th>Lager</Table.Th>
-                    <Table.Th>Prisöverride</Table.Th>
+                    <Table.Th>Avvikande pris</Table.Th>
                     <Table.Th />
                   </Table.Tr>
                 </Table.Thead>
