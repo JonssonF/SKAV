@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using SKAV.Domain.Entities;
+using System.Text.Json;
 
 namespace SKAV.Tests.Smoke
 {
@@ -42,7 +43,8 @@ namespace SKAV.Tests.Smoke
                 "/api/product-orders",
                 "/api/users",
                 "/api/product-order-recipients",
-                "/api/booking-requests"
+                "/api/booking-requests",
+                "/api/products/categories"
             };
 
             if (needAuth.Contains(url))
