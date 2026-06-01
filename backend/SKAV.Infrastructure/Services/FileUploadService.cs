@@ -14,18 +14,25 @@ namespace SKAV.Infrastructure.Services
         public async Task<string> UploadImageAsync(
             Stream fileStream, string fileName, string folder, CancellationToken ct)
         {
-            // Skapa mapp om den inte finns
             var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", folder);
             Directory.CreateDirectory(uploadsPath);
 
-            // Generera unikt filnamn (behåll inte originalnamnet – undvik konflikter)
-            var uniqueName = $"{Guid.NewGuid()}.webp";
+            // Läs in filens innehåll för att kunna hasha det
+            using var memoryStream = new MemoryStream();
+            await fileStream.CopyToAsync(memoryStream, ct);
+            var fileBytes = memoryStream.ToArray();
+
+            // Generera filnamn baserat på innehållet — samma bild = samma namn
+            var hash = System.Security.Cryptography.SHA256.HashData(fileBytes);
+            var uniqueName = $"{Convert.ToHexString(hash).ToLower()}.webp";
             var filePath = Path.Combine(uploadsPath, uniqueName);
 
-            // Ladda bilden med ImageSharp (stöder JPEG, PNG, GIF, BMP, TIFF, WebP)
-            using var image = await Image.LoadAsync(fileStream, ct);
+            // Om filen redan finns — returnera bara URL:en, ingen dublett
+            if (File.Exists(filePath))
+                return $"/uploads/{folder}/{uniqueName}";
 
-            // Skala ner om bilden är för stor, behåll proportioner
+            // Annars komprimera och spara
+            using var image = await Image.LoadAsync(new MemoryStream(fileBytes), ct);
             image.Mutate(x => x.Resize(new ResizeOptions
             {
                 Size = new Size(MaxWidth, MaxHeight),
@@ -34,7 +41,6 @@ namespace SKAV.Infrastructure.Services
 
             await image.SaveAsWebpAsync(filePath, new WebpEncoder { Quality = Quality }, ct);
 
-            // Returnera relativ sökväg för databasen
             return $"/uploads/{folder}/{uniqueName}";
         }
     }
