@@ -1,4 +1,6 @@
-﻿namespace SKAV.Tests.Smoke
+﻿using System.Text.Json;
+
+namespace SKAV.Tests.Smoke
 {
     public class SmokeTests : IClassFixture<CustomWebApplicationFactory>
     {
@@ -9,41 +11,48 @@
             _client = factory.CreateClient();
         }
 
-        [Theory]
-        [InlineData("/api/albums")]
-        [InlineData("/api/gigs")]
-        [InlineData("/api/members")]
-        [InlineData("/api/songs")]
-        [InlineData("/api/products")]
-        //With Auth
-        [InlineData("/api/booking-recipients")]
-        [InlineData("/api/subscribers")]
-        [InlineData("/api/users")]
-        [InlineData("/api/product-orders")]
-
-
-
-
-        public async Task Endpoints_ShouldBeAlive(string url)
+        public static IEnumerable<object[]> GetEndpointsFromSwagger()
         {
-            // Collection to test controllers with authorization
+            var factory = new CustomWebApplicationFactory();
+            var client = factory.CreateClient();
+
+            var response = client.GetAsync("/swagger/v1/swagger.json").Result;
+            var json = response.Content.ReadAsStringAsync().Result;
+
+            var doc = JsonDocument.Parse(json);
+            var paths = doc.RootElement.GetProperty("paths");
+
+            foreach (var path in paths.EnumerateObject())
+            {
+                if (path.Name.Contains("{")) continue;
+                if (!path.Value.TryGetProperty("get", out _)) continue;
+
+                yield return new object[] { path.Name };
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(GetEndpointsFromSwagger))]
+        public async Task Get_Endpoints_ShouldRespond(string url)
+        {
             var needAuth = new List<string>
-            { "/api/subscribers",
-              "/api/booking-recipients",
-              "/api/product-orders",
-              "/api/users"
+            {
+                "/api/subscribers",
+                "/api/booking-recipients",
+                "/api/product-orders",
+                "/api/users",
+                "/api/product-order-recipients",
+                "/api/booking-requests"
             };
 
             if (needAuth.Contains(url))
             {
-
-                var auth = await _client.GetAsync(url);
-                Assert.Equal(System.Net.HttpStatusCode.Unauthorized, auth.StatusCode);
+                var unauth = await _client.GetAsync(url);
+                Assert.Equal(System.Net.HttpStatusCode.Unauthorized, unauth.StatusCode);
                 return;
             }
 
             var response = await _client.GetAsync(url);
-
             Assert.True(response.IsSuccessStatusCode);
         }
     }
