@@ -90,12 +90,14 @@ namespace SKAV.Tests.Api
 
             var response = await _client.PostAsJsonAsync("/api/auth/login", new
             {
-                email = "admin@skav.se",
-                password
+                Email = "admin@skav.se",
+                Password = password
             });
 
-            response.EnsureSuccessStatusCode();
-            var result = await response.Content.ReadFromJsonAsync<JsonElement>();
+            var body = await response.Content.ReadAsStringAsync();
+            Assert.True(response.IsSuccessStatusCode, $"Login failed: {response.StatusCode} - {body}");
+
+            var result = JsonSerializer.Deserialize<JsonElement>(body);
             var token = result.GetProperty("token").GetString();
 
             _client.DefaultRequestHeaders.Authorization =
