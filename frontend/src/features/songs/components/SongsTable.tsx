@@ -1,7 +1,10 @@
-import { Table, Group, Button, Text, Badge, Card, Stack, SimpleGrid } from '@mantine/core';
+import { Table, Group, Button, Text, Badge, Card, Stack, SimpleGrid, Avatar } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import type { SongResponse } from '../../../types/song.types';
 import type { AlbumResponse } from '../../../types/album.types';
+import { getImageUrl } from '../../../utils/imageUrl';
+
+const SONG_PLACEHOLDER = '/images/song-default.png';
 
 function formatDuration(seconds?: number): string {
   if (!seconds) return '-';
@@ -53,7 +56,14 @@ export function SongsTable({ songs, albums, onEdit, onDelete, onLyrics, deleteLo
         {sorted.map((song) => (
           <Card key={song.id} shadow="xs" padding="sm" radius="md" withBorder>
             <Group justify="space-between" mb={4}>
-              <Text size="sm" fw={600}>{song.title}</Text>
+              <Group gap="xs">
+                <Avatar
+                  src={getImageUrl(song.imageUrl ?? SONG_PLACEHOLDER)}
+                  size="sm"
+                  radius="sm"
+                />
+                <Text size="sm" fw={600}>{song.title}</Text>
+              </Group>
               {getAlbumTitle(song.albumId) ? (
                 <Badge variant="light" size="sm">{getAlbumTitle(song.albumId)}</Badge>
               ) : (
@@ -95,6 +105,7 @@ export function SongsTable({ songs, albums, onEdit, onDelete, onLyrics, deleteLo
     <Table striped highlightOnHover>
       <Table.Thead>
         <Table.Tr>
+          <Table.Th>Bild</Table.Th>
           <Table.Th>Titel</Table.Th>
           <Table.Th miw={120}>Album</Table.Th>
           <Table.Th>Musik av</Table.Th>
@@ -107,6 +118,13 @@ export function SongsTable({ songs, albums, onEdit, onDelete, onLyrics, deleteLo
       <Table.Tbody>
         {sorted.map((song) => (
           <Table.Tr key={song.id}>
+            <Table.Td>
+              <Avatar
+                src={getImageUrl(song.imageUrl ?? SONG_PLACEHOLDER)}
+                size="md"
+                radius="sm"
+              />
+            </Table.Td>
             <Table.Td>
               <Text size="sm" fw={500}>{song.title}</Text>
             </Table.Td>
