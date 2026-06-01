@@ -405,6 +405,30 @@ namespace SKAV.Infrastructure.Database
                 new { Email = "member@skav.se", Roles = 4 },   // Member
             };
 
+            var smokeTestPassword = configuration["Seed:SmokeTestPassword"];
+
+            if (smokeTestPassword != null)
+            {
+                var smokeExists = await connection.ExecuteScalarAsync<int>(
+                    "SELECT COUNT(1) FROM Users WHERE Email = @Email",
+                    new { Email = "smoketest@skav.se" });
+
+                if (smokeExists == 0)
+                {
+                    var smokeHash = BCrypt.Net.BCrypt.HashPassword(smokeTestPassword);
+                    await connection.ExecuteAsync(@"
+                        INSERT OR IGNORE INTO Users (Email, PasswordHash, Roles, CreatedAt)
+                        VALUES (@Email, @PasswordHash, @Roles, @CreatedAt)",
+                        new
+                        {
+                            Email = "smoketest@skav.se",
+                            PasswordHash = smokeHash,
+                            Roles = 2, // Editor – kan läsa men inte radera användare osv
+                            CreatedAt = DateTime.UtcNow.ToString("O")
+                        });
+                }
+            }
+
             foreach (var user in users)
             {
                 var exists = await connection.ExecuteScalarAsync<int>(
@@ -416,8 +440,8 @@ namespace SKAV.Infrastructure.Database
                 var hash = BCrypt.Net.BCrypt.HashPassword(adminPassword);
 
                 await connection.ExecuteAsync(@"
-            INSERT OR IGNORE INTO Users (Email, PasswordHash, Roles, CreatedAt)
-            VALUES (@Email, @PasswordHash, @Roles, @CreatedAt)",
+                    INSERT OR IGNORE INTO Users (Email, PasswordHash, Roles, CreatedAt)
+                    VALUES (@Email, @PasswordHash, @Roles, @CreatedAt)",
                     new
                     {
                         user.Email,

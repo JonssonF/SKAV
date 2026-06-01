@@ -31,26 +31,28 @@ namespace SKAV.Api
                 await seeder.SeedAsync();
             }
 
-            if (app.Environment.IsDevelopment())
+            if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Test"))
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-                app.UseRateLimiter();
-            }
+                {
+                    app.UseSwagger();
+                    app.UseSwaggerUI();
+                    app.UseRateLimiter();
+                }
 
-            app.UseMiddleware<ExceptionHandlingMiddleware>();
-            app.UseCors("AllowFrontend");
-            app.UseStaticFiles();
-            // Only use HTTPS redirection in production, as it can interfere with development and testing
-            if (!app.Environment.IsDevelopment())
-            {
-                app.UseHttpsRedirection();
+                app.UseMiddleware<ExceptionHandlingMiddleware>();
+                app.UseCors("AllowFrontend");
+                app.UseStaticFiles();
+                // Only use HTTPS redirection in production, as it can interfere with development and testing
+                if (!app.Environment.IsDevelopment())
+                {
+                    app.UseHttpsRedirection();
+                }
+                app.UseRateLimiter();
+                app.UseAuthentication();
+                app.UseAuthorization();
+                app.MapControllers();
+                app.Run();
             }
-            app.UseRateLimiter();
-            app.UseAuthentication();
-            app.UseAuthorization();
-            app.MapControllers();
-            app.Run();
         }
     }
 }
