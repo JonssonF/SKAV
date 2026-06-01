@@ -21,6 +21,15 @@ export function getApiErrors(err: unknown): Record<string, string> | null {
 export function getApiMessage(err: unknown): string {
   if (!(err instanceof AxiosError)) return 'Något gick fel.';
 
+  const status = err.response?.status;
+  if (status === 401) return 'Du är inte inloggad.';
+  if (status === 403) return 'Du har inte behörighet.';
+
   const data = err.response?.data as ApiError | undefined;
   return data?.message ?? 'Något gick fel.';
+}
+
+export function getApiStatus(err: unknown): number | null {
+  if (!(err instanceof AxiosError)) return null;
+  return err.response?.status ?? null;
 }

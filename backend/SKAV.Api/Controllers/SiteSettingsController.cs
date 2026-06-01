@@ -17,7 +17,7 @@ namespace SKAV.Api.Controllers
             => await service.GetAllAsync(ct);
 
         [HttpPut]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Editor")]
         [SwaggerOperation("Uppdatera en inställning")]
         public async Task<UpdateSiteSettingResponseDto> Update(UpdateSiteSettingDto request, CancellationToken ct)
             => await service.UpdateAsync(request, ct);

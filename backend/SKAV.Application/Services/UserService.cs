@@ -8,6 +8,7 @@ using SKAV.Application.Services.Interface;
 using SKAV.Application.Validators.User;
 using SKAV.Domain.Consts;
 using SKAV.Domain.Entities;
+using SKAV.Domain.Enumeration;
 using SKAV.Domain.Exceptions;
 
 namespace SKAV.Application.Services
@@ -48,6 +49,9 @@ namespace SKAV.Application.Services
         {
             var user = await repo.GetByIdAsync(id, ct)
                 ?? throw new NotFoundException(BusinessRules.UserNotFound);
+
+            if (user.Roles.HasFlag(Roles.Admin) && !currentUser.Roles.HasFlag(Roles.Admin))
+                throw new BusinessRuleException("Du kan inte ta bort en administratör.", BusinessRules.Forbidden);
 
             AuditHelper.SetDeleted(user, currentUser.UserId);
 

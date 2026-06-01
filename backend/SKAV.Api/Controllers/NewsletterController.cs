@@ -9,7 +9,7 @@ namespace SKAV.Api.Controllers
 {
     [Route("api/newsletter")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Editor")]
     public class NewsletterController(INewsletterService service) : ControllerBase
     {
         [HttpPost]
