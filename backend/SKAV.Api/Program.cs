@@ -33,12 +33,12 @@ namespace SKAV.Api
 
             if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Test"))
             {
-                {
+                
                     app.UseSwagger();
                     app.UseSwaggerUI();
                     app.UseRateLimiter();
-                }
-
+                
+            }
                 app.UseMiddleware<ExceptionHandlingMiddleware>();
                 app.UseCors("AllowFrontend");
                 app.UseStaticFiles();
@@ -55,4 +55,3 @@ namespace SKAV.Api
             }
         }
     }
-}
