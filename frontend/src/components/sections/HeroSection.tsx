@@ -11,7 +11,7 @@ export function HeroSection() {
   const isMobile = useMediaQuery('(max-width: 48em)');
 
   const heroImage = colorScheme === 'dark'
-    ? `${IMAGE_BASE_URL}/images/sections/hero-dark.png`
+    ? `${IMAGE_BASE_URL}/images/sections/hero-dark.webp`
     : `${IMAGE_BASE_URL}/images/sections/hero-light.webp`;
 
   const bgColor = colorScheme === 'dark'

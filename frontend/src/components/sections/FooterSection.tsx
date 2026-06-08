@@ -14,8 +14,8 @@ export function FooterSection() {
   const [unsubOpen, setUnsubOpen] = useState(false);
 
   const bottomImage = colorScheme === 'dark'
-    ? `${IMAGE_BASE_URL}/images/sections/bottom-dark.png`
-    : `${IMAGE_BASE_URL}/images/sections/bottom-light.jpg`;
+    ? `${IMAGE_BASE_URL}/images/sections/bottom-dark.webp`
+    : `${IMAGE_BASE_URL}/images/sections/bottom-light.webp`;
 
   const bgColor = colorScheme === 'dark'
     ? 'var(--mantine-color-dark-7)'
