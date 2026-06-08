@@ -12,7 +12,7 @@ export function HeroSection() {
 
   const heroImage = colorScheme === 'dark'
     ? `${IMAGE_BASE_URL}/images/sections/hero-dark.png`
-    : `${IMAGE_BASE_URL}/images/sections/hero-light.png`;
+    : `${IMAGE_BASE_URL}/images/sections/hero-light.webp`;
 
   const bgColor = colorScheme === 'dark'
     ? 'var(--mantine-color-dark-7)'
