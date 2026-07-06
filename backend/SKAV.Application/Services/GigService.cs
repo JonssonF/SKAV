@@ -22,7 +22,7 @@ public class GigService(
         var gigs = await repo.GetAllAsync(ct);
 
         return gigs
-            .OrderBy(g => g.Date)
+            .OrderByDescending(g => g.Date)
             .Select(MapToDto);
     }
 
