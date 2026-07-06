@@ -9,7 +9,6 @@ import {
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useSongProposals, useVoteSongProposal } from '../hooks/useSongProposals';
-import { getApiMessage } from '../../../utils/getApiErrors';
 import { VotingCard } from './VotingCard';
 import { SectionTitle } from '../../../components/ui/SectionTitle';
 
@@ -31,7 +30,7 @@ export function VotingSection() {
           color: 'green',
         });
       },
-      onError: (err) => {
+      onError: () => {
         notifications.show({
           title: 'Kunde inte rösta',
           message: 'Du har redan röstat. ',
