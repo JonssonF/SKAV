@@ -1,4 +1,5 @@
-import { Table, Group, Button, Text, Badge, Select } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
+import { Table, Group, Button, Text, Badge, Select, Card, Stack, Divider } from '@mantine/core';
 import type { UserResponse, UpdateUserRoleRequest } from '../../../types/user.types';
 import { getRoleLabel } from '../../../types/user.types';
 
@@ -66,12 +67,104 @@ export function UsersTable({
   deleteLoading,
   roleLoading,
 }: UsersTableProps) {
+  const isMobile = useMediaQuery('(max-width: 48em)');
   const isAdmin = currentUserRoles?.includes('Admin') ?? false;
 
   if (users.length === 0) {
     return <Text c="dimmed">Inga användare hittades.</Text>;
   }
 
+  // --- Mobilvy: ett kort per användare ---
+  if (isMobile) {
+    return (
+      <Stack gap="sm">
+        {users.map((user) => {
+          const isSelf = user.id === currentUserId;
+          const roleOptions = getRoleOptions(currentUserRoles ?? [], user.roles, isSelf);
+          const canChangeRole = roleOptions.length > 0;
+          const canDelete = !isSelf && isAdmin;
+
+          return (
+            <Card key={user.id} withBorder padding="sm">
+              <Group justify="space-between" mb="xs">
+                <Text size="sm" fw={500}>{user.email}</Text>
+                {isSelf && <Badge variant="light" size="xs">Du</Badge>}
+              </Group>
+
+              <Group justify="space-between" mb="xs">
+                <Text size="xs" c="dimmed">Roll</Text>
+                <Badge color={getRoleBadgeColor(user.roles)} variant="light">
+                  {getRoleLabel(user.roles)}
+                </Badge>
+              </Group>
+
+              <Group justify="space-between" mb="xs">
+                <Text size="xs" c="dimmed">Bandmedlem</Text>
+                {user.memberName ? (
+                  <Group gap="xs">
+                    <Text size="sm">{user.memberName}</Text>
+                    {isAdmin && (
+                      <Button variant="subtle" color="red" size="xs" onClick={() => onUnlinkMember(user)}>
+                        Bryt
+                      </Button>
+                    )}
+                  </Group>
+                ) : (
+                  isAdmin && (
+                    <Button variant="subtle" size="xs" onClick={() => onLinkMember(user)}>
+                      Koppla
+                    </Button>
+                  )
+                )}
+              </Group>
+
+              {canChangeRole && (
+                <Group justify="space-between" mb="xs">
+                  <Text size="xs" c="dimmed">Ändra roll</Text>
+                  <Select
+                    size="xs"
+                    data={roleOptions}
+                    value={String(user.roles)}
+                    onChange={(val) => {
+                      if (val) onUpdateRole(user, { roles: Number(val) });
+                    }}
+                    disabled={roleLoading}
+                    w={120}
+                  />
+                </Group>
+              )}
+
+              {(isSelf || canDelete) && (
+                <>
+                  <Divider my="xs" />
+                  <Group gap="xs">
+                    {isSelf && (
+                      <Button variant="light" size="xs" onClick={onChangePassword}>
+                        Byt lösenord
+                      </Button>
+                    )}
+                    {canDelete && (
+                      <Button
+                        variant="light"
+                        color="red"
+                        size="xs"
+                        onClick={() => onDelete(user)}
+                        loading={deleteLoading}
+                      >
+                        Ta bort
+                      </Button>
+                    )}
+                  </Group>
+                </>
+              )}
+            </Card>
+          );
+        })}
+      </Stack>
+    );
+  }
+
+  // --- Desktopvy: samma tabell som innan ---
   return (
     <Table striped highlightOnHover>
       <Table.Thead>
@@ -95,9 +188,7 @@ export function UsersTable({
               <Table.Td>
                 <Group gap="sm">
                   <Text size="sm">{user.email}</Text>
-                  {isSelf && (
-                    <Badge variant="light" size="xs">Du</Badge>
-                  )}
+                  {isSelf && <Badge variant="light" size="xs">Du</Badge>}
                 </Group>
               </Table.Td>
               <Table.Td>
@@ -110,23 +201,14 @@ export function UsersTable({
                   <Group gap="xs">
                     <Text size="sm">{user.memberName}</Text>
                     {isAdmin && (
-                      <Button
-                        variant="subtle"
-                        color="red"
-                        size="xs"
-                        onClick={() => onUnlinkMember(user)}
-                      >
+                      <Button variant="subtle" color="red" size="xs" onClick={() => onUnlinkMember(user)}>
                         Bryt
                       </Button>
                     )}
                   </Group>
                 ) : (
                   isAdmin && (
-                    <Button
-                      variant="subtle"
-                      size="xs"
-                      onClick={() => onLinkMember(user)}
-                    >
+                    <Button variant="subtle" size="xs" onClick={() => onLinkMember(user)}>
                       Koppla till medlem
                     </Button>
                   )
@@ -139,9 +221,7 @@ export function UsersTable({
                     data={roleOptions}
                     value={String(user.roles)}
                     onChange={(val) => {
-                      if (val) {
-                        onUpdateRole(user, { roles: Number(val) });
-                      }
+                      if (val) onUpdateRole(user, { roles: Number(val) });
                     }}
                     disabled={roleLoading}
                     w={120}
@@ -153,11 +233,7 @@ export function UsersTable({
               <Table.Td>
                 <Group gap="xs">
                   {isSelf && (
-                    <Button
-                      variant="light"
-                      size="xs"
-                      onClick={onChangePassword}
-                    >
+                    <Button variant="light" size="xs" onClick={onChangePassword}>
                       Byt lösenord
                     </Button>
                   )}

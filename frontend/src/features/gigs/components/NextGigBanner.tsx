@@ -39,8 +39,8 @@ function CountdownBox({ value, label }: { value: number; label: string }) {
         style={{
           background: isDark ? 'var(--mantine-color-dark-5)' : 'var(--mantine-color-gray-1)',
           border: '2px solid var(--mantine-color-red-3)',
-          width: 80,        // fast bredd istället för minWidth
-          height: 72,       // fast höjd
+          width: 'clamp(52px, 16vw, 80px)',
+          height: 'clamp(48px, 14vw, 72px)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -48,11 +48,11 @@ function CountdownBox({ value, label }: { value: number; label: string }) {
       >
         <Text
           fw={900}
-          size="2rem"
           lh={1}
           style={{
             fontFamily: '"Orbitron", monospace',
             color: 'var(--mantine-color-black-7)',
+            fontSize: 'clamp(1.1rem, 4.5vw, 2rem)',
           }}
         >
           {String(value).padStart(2, '0')}

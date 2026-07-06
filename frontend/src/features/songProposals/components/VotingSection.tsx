@@ -34,7 +34,7 @@ export function VotingSection() {
       onError: (err) => {
         notifications.show({
           title: 'Kunde inte rösta',
-          message: 'Du har redan röstat. ' + getApiMessage(err),
+          message: 'Du har redan röstat. ',
           color: 'red',
         });
       },
