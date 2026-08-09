@@ -63,7 +63,9 @@ namespace SKAV.Application.Services
         }
 
         public PreviewNewsletterResponseDto Preview(PreviewNewsletterRequestDto request)
-        => new(NewsletterTemplate.Build(request.Subject, request.Body, "#", "https://skav.se"));
-
+        {
+            var siteUrl = configuration["Site:BaseUrl"] ?? "https://skav.nu";
+            return new(NewsletterTemplate.Build(request.Subject, request.Body, "#", siteUrl));
+        }
     }
 }

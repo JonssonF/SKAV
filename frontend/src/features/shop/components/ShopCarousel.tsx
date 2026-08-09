@@ -18,11 +18,9 @@ export function ShopCarousel() {
   const { data: products } = useProducts();
   const navigate = useNavigate();
 
-  const inStockProducts = (products ?? []).filter((p) =>
-    p.variants.some((v) => v.stockQuantity > 0)
-  );
+  const allProducts = products ?? [];
 
-  if (inStockProducts.length === 0) return null;
+  if (allProducts.length === 0) return null;
 
   return (
     <Container size="lg" py="xl">
@@ -42,7 +40,7 @@ export function ShopCarousel() {
           slideGap="md"
           withIndicators
         >
-        {inStockProducts.map((product) => {
+        {allProducts.map((product) => {
           const totalStock = product.variants.reduce((sum, v) => sum + v.stockQuantity, 0);
           const primaryImage = product.images.find((i) => i.isPrimary) ?? product.images[0];
 
