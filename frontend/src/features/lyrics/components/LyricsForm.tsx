@@ -35,7 +35,6 @@ useEffect(() => {
           onChange={(e) => setBody(e.currentTarget.value)}
           minRows={12}
           autosize
-          required
         />
 
         <Group justify="flex-end">

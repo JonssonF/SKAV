@@ -6,5 +6,6 @@ namespace SKAV.Application.Interfaces.Repositories
     {
         Task<Lyrics?> GetBySongIdAsync(int songId, CancellationToken ct);
         Task<Lyrics?> GetBySlugAsync(string slug, CancellationToken ct);
+        Task HardDeleteAsync(int id, CancellationToken ct);
     }
 }

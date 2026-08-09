@@ -106,10 +106,8 @@ namespace SKAV.Application.Services
             var existing = await repo.GetByIdAsync(id, ct)
                 ?? throw new NotFoundException(BusinessRules.LyricsNotFound);
 
-            AuditHelper.SetDeleted(existing, currentUser.UserId);
-
             using var scope = uow.BeginTransactionScope();
-            await repo.DeleteAsync(id, existing, ct);
+            await repo.HardDeleteAsync(id, ct);
             await scope.CommitTransactionScopeAsync(ct);
 
             return new DeleteLyricsResponseDto();

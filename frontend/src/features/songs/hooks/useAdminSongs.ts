@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { notifications } from '@mantine/notifications';
 import { useSongs, useCreateSong, useUpdateSong, useDeleteSong } from './useSongs';
-import { useCreateLyrics, useUpdateLyrics } from '../../lyrics/hooks/useLyrics';
+import { useCreateLyrics, useUpdateLyrics, useDeleteLyrics } from '../../lyrics/hooks/useLyrics';
 import { lyricsApi } from '../../../api/lyrics.api';
 import { getApiErrors, getApiMessage } from '../../../utils/getApiErrors';
 import { useAlbums } from '../../albums/hooks/useAlbums';
@@ -16,6 +16,7 @@ export function useAdminSongs() {
   const deleteSong = useDeleteSong();
   const createLyrics = useCreateLyrics();
   const updateLyrics = useUpdateLyrics();
+  const deleteLyrics = useDeleteLyrics();
   const { data: albums } = useAlbums();
 
   // Create modal state
@@ -141,6 +142,33 @@ export function useAdminSongs() {
   const handleLyricsSubmit = (body: string) => {
     if (!lyricsSong) return;
 
+    const trimmedBody = body.trim();
+
+    // Tomt fält + ingen befintlig text att rensa → gör ingenting, stäng bara
+    if (!trimmedBody && !existingLyrics) {
+      closeLyrics();
+      return;
+    }
+
+    // Tomt fält + befintlig text finns → radera hela posten
+    if (!trimmedBody && existingLyrics) {
+      deleteLyrics.mutate(existingLyrics.id, {
+        onSuccess: () => {
+          closeLyrics();
+          notifications.show({
+            title: 'Låttext borttagen',
+            message: `Texten för "${lyricsSong.title}" har rensats.`,
+            color: 'green',
+          });
+        },
+        onError: (err) => {
+          notifications.show({ title: 'Något gick fel', message: getApiMessage(err), color: 'red' });
+        },
+      });
+      return;
+    }
+
+    // Text finns, uppdatera eller skapa som vanligt
     if (existingLyrics) {
       updateLyrics.mutate(
         { id: existingLyrics.id, data: { songId: lyricsSong.id, body } },
@@ -206,7 +234,7 @@ export function useAdminSongs() {
       lyricsLoading,
       onClose: closeLyrics,
       onSubmit: handleLyricsSubmit,
-      saving: createLyrics.isPending || updateLyrics.isPending,
+      saving: createLyrics.isPending || updateLyrics.isPending || deleteLyrics.isPending,
     },
 
     openCreate,
