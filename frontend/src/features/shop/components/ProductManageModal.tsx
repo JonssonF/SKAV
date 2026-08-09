@@ -19,6 +19,7 @@ import {
   SimpleGrid,
   Box,
 } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone';
 import { notifications } from '@mantine/notifications';
 import { IconTrash, IconUpload, IconPhoto, IconX, IconStar, IconStarFilled } from '@tabler/icons-react';
@@ -57,6 +58,7 @@ export function ProductManageModal({
   attrLoading,
   variantLoading,
 }: ProductManageModalProps) {
+  const isMobile = useMediaQuery('(max-width: 48em)');
   const { data: product, isLoading, refetch } = useProduct(initialProduct?.id ?? 0);
 
   const [attrName, setAttrName] = useState('');
@@ -178,7 +180,17 @@ export function ProductManageModal({
   const sortedImages = [...(product?.images ?? [])].sort((a, b) => a.displayOrder - b.displayOrder);
 
   return (
-    <Modal opened={initialProduct !== null} onClose={onClose} title={`Hantera – ${initialProduct.title}`} size="xl">
+    <Modal
+      opened={initialProduct !== null}
+      onClose={onClose}
+      title={
+        <Text fw={600} truncate style={{ maxWidth: isMobile ? '75vw' : 500 }}>
+          Hantera – {initialProduct.title}
+        </Text>
+      }
+      size="xl"
+      fullScreen={isMobile}
+    >
       {isLoading || !product ? (
         <Group justify="center" py="xl"><Loader /></Group>
       ) : (
