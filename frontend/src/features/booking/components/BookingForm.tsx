@@ -24,7 +24,6 @@ interface BookingFormProps {
 
 const eventTypes = [
   { value: 'Fest', label: 'Fest' },
-  { value: 'Bröllop', label: 'Bröllop' },
   { value: 'Festival', label: 'Festival' },
   { value: 'Företagsevent', label: 'Företagsevent' },
   { value: 'Annat', label: 'Annat' },
