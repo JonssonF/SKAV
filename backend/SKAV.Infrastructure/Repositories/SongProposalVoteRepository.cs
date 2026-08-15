@@ -10,24 +10,6 @@ namespace SKAV.Infrastructure.Repositories
         IDbConnectionFactory db,
         IUnitOfWorkConnection uow) : ISongProposalVoteRepository
     {
-        public async Task<bool> HasVotedOnActiveProposalAsync(
-            string voterIp, IEnumerable<int> activeProposalIds, CancellationToken ct)
-        {
-            using var conn = db.CreateConnection();
-            conn.Open();
-
-            const string sql = """
-                SELECT COUNT(1) FROM SongProposalVotes
-                WHERE VoterIp = @VoterIp
-                AND SongProposalId IN @Ids;
-                """;
-
-            return await conn.ExecuteScalarAsync<int>(new CommandDefinition(
-                commandText: sql,
-                parameters: new { VoterIp = voterIp, Ids = activeProposalIds },
-                cancellationToken: ct)) > 0;
-        }
-
         public async Task CreateAsync(SongProposalVote vote, CancellationToken ct)
         {
             const string sql = """

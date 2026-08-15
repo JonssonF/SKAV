@@ -72,6 +72,5 @@
         // Song Proposals
         public const string SongProposalNotFound = "SongProposalNotFound";
         public const string SongProposalNotActive = "SongProposalNotActive";
-        public const string SongProposalAlreadyVoted = "SongProposalAlreadyVoted";
     }
 }
