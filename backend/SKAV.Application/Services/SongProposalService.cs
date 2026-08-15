@@ -133,13 +133,6 @@ namespace SKAV.Application.Services
             if (!proposal.IsActive)
                 throw new BusinessRuleException(BusinessRules.SongProposalNotActive);
 
-            // Hämta alla aktiva förslags-ids för att kolla om IP:n redan röstat
-            var allProposals = await repo.GetAllAsync(ct);
-            var activeIds = allProposals.Where(p => p.IsActive).Select(p => p.Id).ToList();
-
-            if (await voteRepo.HasVotedOnActiveProposalAsync(voterIp, activeIds, ct))
-                throw new BusinessRuleException(BusinessRules.SongProposalAlreadyVoted);
-
             var vote = new SongProposalVote
             {
                 SongProposalId = id,

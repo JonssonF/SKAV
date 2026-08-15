@@ -374,11 +374,12 @@ namespace SKAV.Infrastructure.Database
                 """;
             await connection.ExecuteAsync(sqlSongProposalVotes);
 
-            const string indexSongProposalVoterIp = """
-                CREATE UNIQUE INDEX IF NOT EXISTS idx_song_proposal_voter_ip
-                ON SongProposalVotes (SongProposalId, VoterIp);
+            // Tidigare unikt index (SongProposalId, VoterIp) togs bort: bakom Cloudflare
+            // delar många besökare samma IP, så en-röst-per-IP blockerade legitima röster.
+            const string dropIndexSongProposalVoterIp = """
+                DROP INDEX IF EXISTS idx_song_proposal_voter_ip;
                 """;
-            await connection.ExecuteAsync(indexSongProposalVoterIp);
+            await connection.ExecuteAsync(dropIndexSongProposalVoterIp);
 
             const string sqlSongProposalVoteSnapshots = """
                 CREATE TABLE IF NOT EXISTS SongProposalVoteSnapshots (

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using SKAV.Application.DTOs.SongProposal;
 using SKAV.Application.Services.Interface;
 using Swashbuckle.AspNetCore.Annotations;
@@ -44,6 +45,7 @@ namespace SKAV.Api.Controllers
 
         [HttpPost("{id}/vote")]
         [AllowAnonymous]
+        [EnableRateLimiting("BookingLimit")]
         [SwaggerOperation("Rösta på ett låtförslag")]
         public async Task<VoteSongProposalResponseDto> Vote(int id, CancellationToken ct)
             => await service.VoteAsync(id, GetVoterIp(), ct);
