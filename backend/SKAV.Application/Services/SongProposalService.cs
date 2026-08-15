@@ -175,11 +175,12 @@ namespace SKAV.Application.Services
         public async Task<ResetVotesResponseDto> ResetVotesAsync(CancellationToken ct)
         {
             var allProposals = (await repo.GetAllAsync(ct)).ToList();
+            var allIds = allProposals.Select(p => p.Id).ToList();
             var activeIds = allProposals.Where(p => p.IsActive).Select(p => p.Id).ToList();
 
-            if (activeIds.Count == 0) return new ResetVotesResponseDto();
+            if (allIds.Count == 0) return new ResetVotesResponseDto();
 
-            // Hämta nuvarande röstantal för snapshots
+            // Hämta nuvarande röstantal för snapshots (endast aktiva förslag)
             var voteCounts = await voteRepo.GetVoteCountsAsync(activeIds, ct);
 
             using var scope = uow.BeginTransactionScope();
@@ -201,8 +202,8 @@ namespace SKAV.Application.Services
                 await snapshotRepo.DeleteOldestAsync(id, 3, ct);
             }
 
-            // Radera alla röster
-            await voteRepo.DeleteByProposalIdsAsync(activeIds, ct);
+            // Radera alla röster (även för inaktiva förslag, annars förblir deras IP-adresser blockerade)
+            await voteRepo.DeleteByProposalIdsAsync(allIds, ct);
 
             // Nollställ vinnare
             foreach (var proposal in allProposals.Where(p => p.IsWinner))
